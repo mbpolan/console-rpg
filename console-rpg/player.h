@@ -46,8 +46,8 @@ class player: public creature {
 		int getMP() const {return currentMP;}
 		void setMP(int mp) {currentMP=mp;}
 		
-		void setName(std::string initialName) {creature::name=initialName;}
-		std::string getName() const {return creature::name;}
+		void setName(std::string initialName) {name=initialName;}
+		std::string getName() const {return name;}
 		
 		void setLuck(int _luck) {luck=_luck;};
 		int getLuck() const {return luck;}
@@ -99,6 +99,14 @@ class player: public creature {
 		void displayInventory();
 		int displayStats();
 		
+		// visual accessors
+		void setHair(std::string hairColor) {hairOutfit=hairColor;}
+		void setTorso(std::string torsoColor) {torsoOutfit=torsoColor;}
+		void setLegs(std::string legsColor) {legsOutfit=legsColor;}
+		std::string getHair() const {return hairOutfit;}
+		std::string getTorso() const {return torsoOutfit;}
+		std::string getLegs() const {return legsOutfit;}
+		
 		// misc methods
 		void setPlayerID(int id) {playerID=id;}
 		int getPlayerID() const {return playerID;}
@@ -107,6 +115,9 @@ class player: public creature {
 		void setLook();
 		
 	private:
+		std::string name;
+		std::string hairOutfit, legsOutfit, torsoOutfit;
+		
 		static int playersOn; // count of all the players on the game
 		
 		// stats and id

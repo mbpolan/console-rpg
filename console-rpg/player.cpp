@@ -127,7 +127,7 @@ bool player::operator==(const player &r_player) {
 		    
 		    headEq==r_player.getHeadItem() && torsoEq==r_player.getTorsoItem() &&
 		    legEq==r_player.getLegsItem() && bootEq==r_player.getBootsItem() &&
-		    creature::name==r_player.getName() && playerVocation==r_player.getVoc())
+		    name==r_player.getName() && playerVocation==r_player.getVoc())
 			return true;
 	}
 	
@@ -182,13 +182,13 @@ void player::setLook() {
 	}
 	
 	std::cout << "\nWhat is your hair color? ";
-	std::cin >> creature::hairOutfit;
+	std::cin >> hairOutfit;
 	
 	std::cout << "\nWhat is your shirt color? ";
-	std::cin >> creature::torsoOutfit;
+	std::cin >> torsoOutfit;
 
 	std::cout << "\nWhat is your pants color? ";
-	std::cin >> creature::legsOutfit;
+	std::cin >> legsOutfit;
 };
 
 // display player's inventory
@@ -332,7 +332,7 @@ int player::savePlayerData(map *karte,int player,int game,bool ignoreTemp) {
 		return 0;
 	}
 	
-	fout << creature::name;
+	fout << name;
 	fout.close();
 	
 	saveToIndex(game);
@@ -403,7 +403,7 @@ int player::loadPlayerData(map *karte,int player,int game) {
 		return 0;
 	}
 	
-	fin >> creature::name;
+	fin >> name;
 	fin.close();
 
 };

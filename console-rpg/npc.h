@@ -52,6 +52,7 @@ class npc: public creature {
 		
 	private:
 		int posx, posy;
+		std::string name;
 };
 
 #endif

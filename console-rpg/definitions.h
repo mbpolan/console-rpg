@@ -163,13 +163,13 @@ int generic::configurePlayers(playerList<player*> &r_list,int playerCount) {
   grid->spawnMapItems(grid,karte); // spawn items on map NOW
 
   char cVar; // confirmation variable
-  
-  // we need to set name and look
-  // make a temporary player object
-  player *pPlayer=new player;
 
   // loop for as long as there are players
   for (int i=0;i<playerCount;i++) {
+    // we need to set name and look
+    // make a temporary player object
+    player *pPlayer=new player;
+  
     // now we configure each player's character
     std::cout << "\n==========================";
     std::cout << "\nPlayer " << i+1 << " Configuration\n";
@@ -187,9 +187,6 @@ int generic::configurePlayers(playerList<player*> &r_list,int playerCount) {
     std::cin.ignore();
     std::cout << "==========================\n";
   }
-  
-  // delete allocated memory for temporary player
-  delete pPlayer;
 
   std::cout << "\nStart a new game? (y,n) ";
   std::cin >> cVar;
@@ -219,6 +216,7 @@ void generic::preGame(movement *rhs,map *karte,playerList<player*> &r_list,int p
     // reset the counter
     if (j==playerCount)
       j=0;
+      std::cout << "j: " << j << std::endl;
 
     std::cout << "\n*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*";
     std::cout << "\nWelcome to Console RPG, " << r_list[j]->getName() << std::endl
