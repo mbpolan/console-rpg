@@ -29,8 +29,8 @@ map::~map() {};
 // add item to map on X
 void map::addItemX(item	*thisItem,int spawnX) {
 	if (spawnX<0) {
-		itemSquareNgX[spawnX-1]=spawnX;
-		itemLineNgX[spawnX-1]=thisItem;
+		itemSquareNgX[(spawnX-1)*(-1)]=spawnX;
+		itemLineNgX[(spawnX-1)*(-1)]=thisItem;
 	}
 	if (spawnX>0) {
 		itemSquareX[spawnX-1]=spawnX;
@@ -41,8 +41,8 @@ void map::addItemX(item	*thisItem,int spawnX) {
 // add item to map on Y
 void map::addItemY(item *thisItem,int spawnY) {
 	if (spawnY<0) {
-		itemSquareNgY[spawnY-1]=spawnY;
-		itemLineNgY[spawnY-1]=thisItem;
+		itemSquareNgY[(spawnY-1)*(-1)]=spawnY;
+		itemLineNgY[(spawnY-1)*(-1)]=thisItem;
 	}
 	if (spawnY>0) {
 		itemSquareY[spawnY-1]=spawnY;
@@ -53,8 +53,8 @@ void map::addItemY(item *thisItem,int spawnY) {
 // remove item from map on X
 void map::removeItemX(int spawnX) {
 	if (spawnX<0) {
-		itemSquareNgX[spawnX-1]=0;
-		itemLineNgX[spawnX-1]=0;
+		itemSquareNgX[(spawnX-1)*(-1)]=0;
+		itemLineNgX[(spawnX-1)*(-1)]=0;
 	}
 	if (spawnX>0) {
 		itemSquareX[spawnX-1]=0;
@@ -65,8 +65,8 @@ void map::removeItemX(int spawnX) {
 // remove item from map on Y
 void map::removeItemY(int spawnY) {
 	if (spawnY<0) {
-		itemSquareNgY[spawnY-1]=0;
-		itemLineNgY[spawnY-1]=0;
+		itemSquareNgY[(spawnY-1)*(-1)]=0;
+		itemLineNgY[(spawnY-1)*(-1)]=0;
 	}
 	if (spawnY>0) {
 		itemSquareY[spawnY-1]=0;
@@ -85,7 +85,7 @@ bool map::itemExists(map *karte,int currentX,int currentY) {
 		return false;
 	
 	if (currentX<0 && currentY<0) { // if both X & Y are <0
-		if (itemSquareNgX[currentX-1]==currentX && itemSquareNgY[currentY-1]==currentY)
+		if (itemSquareNgX[(currentX-1)*(-1)]==currentX && itemSquareNgY[(currentY-1)*(-1)]==currentY)
 			return true;
 		else
 			return false;
@@ -97,13 +97,13 @@ bool map::itemExists(map *karte,int currentX,int currentY) {
 		 	return false;
 	}
 	if (currentX<0 && currentY>0) { // if X<0 BUT Y>0
-	        if (itemSquareNgX[currentX-1]==currentX && itemSquareY[currentY-1]==currentY)
+	        if (itemSquareNgX[(currentX-1)*(-1)]==currentX && itemSquareY[currentY-1]==currentY)
 	                return true;
 	        else
 	                return false;
 	}
 	if (currentX>0 && currentY<0) { // if X>0 BUT Y<0
-                if (itemSquareX[currentX-1]==currentX && itemSquareNgY[currentY-1]==currentY)
+                if (itemSquareX[currentX-1]==currentX && itemSquareNgY[(currentY-1)*(-1)]==currentY)
 	                return true;
 	        else
 	                return false;
@@ -115,17 +115,23 @@ std::string map::identifyItem(map *karte) {
 	int currentX=karte->getCurrentSpaceX();
 	int currentY=karte->getCurrentSpaceY();
 	
-	if (currentX>currentY) {
-		if (currentX<0)
-			return itemLineNgX[currentX-1]->getName();
-		if (currentX>0)
+	if (currentX<0 && currentY>0) { // if X<0 BUT Y>0
+		if ((itemLineNgX[(currentX-1)*(-1)]->getName())==(itemLineY[currentY-1]->getName()))
+			return itemLineNgX[(currentX-1)*(-1)]->getName();
+	}
+	
+	if (currentX>0 && currentY<0) { // if X>0 BUT Y<0
+		if ((itemLineX[currentX-1]->getName())==(itemLineY[(currentY-1)*(-1)]->getName()))
 			return itemLineX[currentX-1]->getName();
 	}
 
-	if (currentX<currentY) {
-		if (currentY<0)
-			return itemLineNgY[currentY-1]->getName();
-		if (currentY>0)
+	if (currentX<0 && currentY<0) { // both <0
+		if ((itemLineNgX[(currentX-1)*(-1)]->getName())==(itemLineNgY[(currentY-1)*(-1)]->getName()))
+			return itemLineNgX[(currentX-1)*(-1)]->getName();
+	}
+	
+	if (currentX>0 && currentY>0) { // both >0
+		if ((itemLineX[currentX-1]->getName())==(itemLineY[currentY-1]->getName()))
 			return itemLineY[currentY-1]->getName();
 	}
 
@@ -136,40 +142,69 @@ std::string map::identifyItem(map *karte) {
 			yName=itemLineY[currentY-1]->getName();
 			if (xName==yName)
 				return xName;
-			if (xName!=yName)
-				return "nothing";
+			if (xName!=yName) {
+				int id=karte->getGroundID();
+				std::string ground=karte->parseGroundID(id);
+				return ground;
+			}
 		}
 		if (currentX<0 && currentY<0) {
-			xName=itemLineNgX[currentX-1]->getName();
-			yName=itemLineNgY[currentY-1]->getName();
+			xName=itemLineNgX[(currentX-1)*(-1)]->getName();
+			yName=itemLineNgY[(currentY-1)*(-1)]->getName();
 			if (xName==yName)
 				return xName;
-			if (xName!=yName)
-				return "nothing";
+			if (xName!=yName) {
+                                int id=karte->getGroundID();
+                                std::string ground=karte->parseGroundID(id);
+                                return ground;
+			}
 		}
-	}
+		
+	} // end of -if (currentX==currentY)- block
 			
-	else
-		return "nothing";
+	else {
+		int id=karte->getGroundID();
+		std::string ground=karte->parseGroundID(id);
+		return ground;
+	}
+};
+
+// parse the ground id and return a std::string
+std::string map::parseGroundID(int id) {
+	std::string groundType;
+	switch (id) {
+		case 1: groundType="grass"; break;
+		case 2: groundType="pavement"; break;
+		case 3: groundType="water"; break;
+		default: groundType="grass"; break;
+	}
+	
+	return groundType;
 };
 
 // check the type of item (head,torso,leg,boot,npe)
 TYPE map::checkItemType(map *karte) {
 	int currentX=karte->getCurrentSpaceX();
 	int currentY=karte->getCurrentSpaceY();
-
-	if (currentX>currentY) {
-		if (currentX<0)
-			return itemLineNgX[currentX-1]->checkType();
-		if (currentX>0)
+	
+	if (currentX<0 && currentY>0) { // if X<0 BUT Y>0
+		if ((itemLineNgX[(currentX-1)*(-1)]->checkType())==(itemLineY[currentY-1]->checkType()))
+			return itemLineNgX[(currentX-1)*(-1)]->checkType();
+	}
+	
+	if (currentX>0 && currentY<0) { // if X>0 BUT Y<0
+		if ((itemLineX[currentX-1]->checkType())==(itemLineY[(currentY-1)*(-1)]->checkType()))
 			return itemLineX[currentX-1]->checkType();
 	}
 
-	if (currentX<currentY) {
-		if (currentY<0)
-			return itemLineNgY[currentY-1]->checkType();
-		if (currentY>0)
-			return itemLineY[currentY-1]->checkType();
+	if (currentX<0 && currentY<0) { // both <0
+		if ((itemLineNgX[(currentX-1)*(-1)]->checkType())==(itemLineNgY[(currentY-1)*(-1)]->checkType()))
+			return itemLineNgX[(currentY-1)*(-1)]->checkType();
+	}
+	
+	if (currentX>0 && currentY>0) { // both >0
+		if ((itemLineX[currentX-1]->checkType())==(itemLineY[currentY-1]->checkType()))
+			return itemLineX[currentX-1]->checkType();
 	}
 
 	if (currentX==currentY) {
@@ -182,16 +217,17 @@ TYPE map::checkItemType(map *karte) {
 			if (xType!=yType)
 				return npe;
 		}
+		
 		if (currentX<0 && currentY<0) {
-			xType=itemLineNgX[currentX-1]->checkType();
-			yType=itemLineNgY[currentY-1]->checkType();
+			xType=itemLineNgX[(currentX-1)*(-1)]->checkType();
+			yType=itemLineNgY[(currentY-1)*(-1)]->checkType();
 			if (xType==yType)
 				return xType;
 			if (xType!=yType)
 				return npe;
 		}
 	}
-			
+	
 	else
 		return npe;
 };

@@ -123,14 +123,9 @@ void movement::moveSW(map *karte) {
 // look(): look command
 void movement::look(map *karte) {
 	std::string groundType; // this is the ground type
-	int gID=(karte->getGroundID());
 	
-	switch (gID) {
-		case 1: groundType="grass"; break;
-		case 2: groundType="pavement"; break;
-		case 3: groundType="water"; break;
-		default: groundType="grass"; break;
-	}
+	int gID=(karte->getGroundID());
+	groundType=karte->parseGroundID(gID); // parse the id
 	
 	if (karte->itemExists(karte,karte->getCurrentSpaceX(),karte->getCurrentSpaceY())) {
 		std::string theName=karte->identifyItem(karte);

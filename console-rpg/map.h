@@ -3,8 +3,8 @@
 
 #include "items.h"
 
-#ifndef __nMap
-#define __nMap
+#ifndef map_h
+#define map_h
 
 const int max=30; // remove this later
 
@@ -33,6 +33,7 @@ class map {
 		// misc methods for map
 		bool itemExists(map*,int,int);
 		std::string identifyItem(map*);
+		std::string parseGroundID(int);
 		TYPE checkItemType(map*);
 		int getGroundID() const {return groundID;}
 		
@@ -40,8 +41,12 @@ class map {
 	private:
 		int MapMaxSizeX,MapMaxSizeY,MapMaxSizeNgY,MapMaxSizeNgX;
 		int currentSquareX,currentSquareY, groundID;
+
+		// the item coordinate arrays
 		int itemSquareX[max],itemSquareY[max];
 		int itemSquareNgX[max],itemSquareNgY[max];
+
+		// the item object arrays
 		item *itemLineX[max];
 		item *itemLineY[max];
 		item *itemLineNgX[max];
