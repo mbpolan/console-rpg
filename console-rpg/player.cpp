@@ -33,10 +33,10 @@ player::player() {
 	luck=0,power=0,strength=0,defense=0;
 	playerVocation=warrior;
 
-	headEq=new item("nothing",head);
-	torsoEq=new item("Jacket",torso);
-	legEq=new item("Travel Pants",legs);
-	bootEq=new item("Boots",boots);
+	headEq=new item(0,head);
+	torsoEq=new item(100,torso);
+	legEq=new item(114,legs);
+	bootEq=new item(130,boots);
 
 	playerID=0;
 	x=0;
@@ -57,10 +57,10 @@ player::player(int fixedHP, int fixedMP, int id) {
 	hairOutfit="brown", legsOutfit="blue", torsoOutfit="brown";
 	playerVocation=warrior;
 	
-	headEq=new item("nothing",head);
-	torsoEq=new item("Jacket",torso);
-	legEq=new item("Travel Pants",legs);
-	bootEq=new item("Boots",boots);
+	headEq=new item(0,head);
+	torsoEq=new item(100,torso);
+	legEq=new item(114,legs);
+	bootEq=new item(130,boots);
 	
 	playerID=id;
 	x=0;
@@ -81,10 +81,10 @@ player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense,int id)
 	hairOutfit="brown", legsOutfit="blue", torsoOutfit="brown";
 	playerVocation=warrior;
 
-	headEq=new item("nothing",head);
-	torsoEq=new item("Jacket",torso);
-	legEq=new item("Travel Pants",legs);
-	bootEq=new item("Boots",boots);
+	headEq=new item(0,head);
+	torsoEq=new item(100,torso);
+	legEq=new item(114,legs);
+	bootEq=new item(130,boots);
 	
 	playerID=id;
 	x=0;
@@ -209,10 +209,10 @@ void player::displayInventory() {
 // remove item from inventory
 void player::removeInventoryItem(int theType) {
 	switch(theType) {
-		case 0: headEq=new item("nothing",head);;break;
-		case 1: torsoEq=new item("nothing",torso);break;
-		case 2: legEq=new item("nothing",legs);break;
-		case 3: bootEq=new item("nothing",boots);break;
+		case 0: headEq=new item(0,head);;break;
+		case 1: torsoEq=new item(0,torso);break;
+		case 2: legEq=new item(0,legs);break;
+		case 3: bootEq=new item(0,boots);break;
 		default: std::cout << "This item is not equiped!";
 	}
 };
@@ -362,7 +362,9 @@ int player::loadPlayerData(int player,int game) {
 	fin >> strength; fin.clear();
 	fin >> power; fin.clear();
 	fin >> defense; fin.clear();
-	 
+	
+	// todo: load eq
+	
 	fin.close();
 };
 
@@ -394,7 +396,7 @@ int player::saveToIndex(int game) {
 };
 
 // load data from the index file
-int player::loadFromIndex(int game) {
+int player::loadFromIndex(int game,int &playersOnGame) {
 
 	// this is the path to the index file
 	#ifdef __LINUX__
@@ -415,11 +417,8 @@ int player::loadFromIndex(int game) {
 		return 0;
 	}
 	
-	int playersOnGame;
 	fin >> playersOnGame; fin.clear();
 	fin.close();
-	
-	return playersOnGame;
 };
 	
 // delete the temporary directory (99)

@@ -14,6 +14,7 @@ EXT =
 OSUFFIX = .o
 #CPPFLAGS = -D__LINUX__ -DDEBUG #for debugging
 CPPFLAGS = -D__LINUX__
+LINKFLAGS = -lxml2
 DEL = rm -f
 
 #########################
@@ -26,6 +27,7 @@ DEL = rm -f
 #OSUFFIX = .obj
 #CPPFLAGS = -D__WINDOWS__ -DDEBUG #for debugging
 #CPPFLAGS = -D__WINDOWS__
+#LINKFLAGS = -lxml2
 #DEL = rm
 #
 ############################
@@ -42,7 +44,7 @@ all: \
 
 # object files
 crpg: crpg$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) npc$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX)
-	$(CPP) crpg$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) npc$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX) $(OFLAG) crpg$(EXT)
+	$(CPP) crpg$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) npc$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX) $(LINKFLAGS) $(OFLAG) crpg$(EXT)
 
 crpg$(OSUFFIX): crpg.cpp definitions.h
 	$(CPP) $(CPPFLAGS) $(CFLAG) crpg.cpp $(OFLAG) crpg$(OSUFFIX)

@@ -23,6 +23,9 @@
  
 // items.h: holds item class and declarations
 #include <iostream>
+#include <sstream>
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
 
 // enumerate the types of items
 enum TYPE {head,torso,legs,boots,npe};
@@ -31,8 +34,11 @@ class item {
 	public:
 		item();
 		item(item*); // copy constructor
-		item(std::string,TYPE); // lesser constructor
-		item(std::string,int,int,TYPE); // our constructor
+		item(int id); // lesser constructor
+		item(int id,TYPE); // type inclusive constructor
+		item(int id,int x,int y); // our constructor
+		item(int,const char*,const char*,const char*);
+		
 		virtual ~item();
 
 		void setItemID(int id) {itemID=id;};
@@ -50,6 +56,9 @@ class item {
 
 		TYPE checkType();
 		void invalidateItem(item*);
+		
+		xmlNodePtr compressToXML();
+		void parseItem(int);
 
 		int x,y;
 		static int itemCount;

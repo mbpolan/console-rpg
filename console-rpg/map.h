@@ -31,6 +31,7 @@
 // our maximum map size (+/-)
 #define max 30
 
+class item;
 class player;
 class npc;
 

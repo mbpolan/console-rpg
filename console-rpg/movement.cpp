@@ -176,8 +176,6 @@ void movement::look(player *Player,map *karte) {
 // place item on the map
 void movement::placeItem(item *thisItem,map *karte) {
 	item::itemCount+=1;
-	thisItem->setItemID(item::itemCount);
-
 	karte->addItem(thisItem);
 
 	// shows what this function is doing when called
@@ -226,12 +224,12 @@ void movement::spawnMapItems(map *karte) {
 
 	// syntax for new item is name,x,y,type.
 	// then call placeItem to put these on the map.
-	placeItem(new item("fern",1,2,npe),karte);
-	placeItem(new item("rock",-1,-1,npe),karte);
-	placeItem(new item("herb",-2,3,npe),karte);
-	placeItem(new item("bush",-10,5,npe),karte);
-	placeItem(new item("sunflowers",20,5,npe),karte);
-	placeItem(new item("Leather Armor",4,6,torso),karte);
+	placeItem(new item(4,1,2),karte);
+	placeItem(new item(2,-1,-1),karte);
+	placeItem(new item(5,-2,3),karte);
+	placeItem(new item(1,-10,5),karte);
+	placeItem(new item(3,20,5),karte);
+	//placeItem(new item("Leather Armor",4,6,torso),karte);
 
 	// syntax for new npcs is x,y,name
 	karte->npcs.push_back(new npc(2,3,"Mike"));

@@ -78,8 +78,9 @@ class player: public creature {
 		// for saving the data to a savefile
 		int savePlayerData(int,int,bool);
 		int loadPlayerData(int,int);
+		
 		int saveToIndex(int);
-		static int loadFromIndex(int);
+		static int loadFromIndex(int,int&);
 		int removeTemp();
 		
 		// item actions

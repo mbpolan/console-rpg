@@ -194,7 +194,7 @@ void generic::preGame(movement *rhs,map *karte,playerList<player*> &r_list,int p
     std::cout << "current player: " << j << std::endl;
     #endif
 
-    CRPG_CLEAR_SCREEN;
+ //   CRPG_CLEAR_SCREEN;
     std::cout << "\n*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*";
     std::cout << "\nWelcome to Console RPG, " << r_list[j]->getName() << std::endl
     << "Type 'help' to display a help menu.";
@@ -496,16 +496,18 @@ int generic::loadGame() {
 
    // now we attempt to open the index file
    int players;
-   players=player::loadFromIndex(slot);
+   player::loadFromIndex(slot,players);
 
    // allocate memory for the core compenents of the game.
    playerList<player*> list; // list of players
    movement *grid=new movement; // movement grid
    map *karte=new map(PMAX,PMAX,NMAX,NMAX); // world map
    
-   grid->spawnMapItems(karte);
+//   grid->spawnMapItems(karte);
 
-//   karte->loadMapData(slot);
+   int success=karte->loadMapData(slot);
+   if (success==0)
+   	return 0;
 
    // start the loop to fill up array with saved player data
    for (int i=0;i<players;i++) {
@@ -532,11 +534,12 @@ int generic::loadGame() {
         }
 
        list[i]->loadPlayerData(i+1,slot);
+       karte->players.push_back(list[i]);
 
        fin.close();
-       load=true;
    }
-
+   
+   load=true;
    generic::preGame(grid,karte,list,players);
    
    // free up the memory allocated for these objects

@@ -22,6 +22,11 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+
+// nessesary includes
 #include "map.h"
 
 // map class constructor
@@ -119,196 +124,93 @@ TYPE map::checkItemType(int currentX,int currentY) {
 // save the current map data to file
 // todo: merge the map.dat file into savefile.dat
 int map::saveMapData(int game) {
-/*	std::ofstream fout;
-
-	std::stringstream path,obj;
-
+	std::stringstream path;
+	
 	#ifdef __LINUX__
-	path << "data/game" << game << "/map.crpgmap";
-	obj << "data/game" << game << "/obj.crpgmap";
+	path << "data/game" << game << "/map.xml";
 	#endif
 
 	#ifdef __WINDOWS__
-	path << "data\\game" << game << "\\map.crpgmap";
-	obj << "data\\game" << game << "\\obj.crpgmap";
+	path << "data\\game" << game << "\\map.xml";
 	#endif
+
+	xmlDocPtr doc;
+	xmlNodePtr p,root;
 	
-	fout.open(path.str().c_str()); // open a new map file
+	doc = xmlNewDoc((const xmlChar*)"1.0");
+	doc->children = xmlNewDocNode(doc, NULL, (const xmlChar*)"map", NULL);
+	root=doc->children;
 	
-	if (!fout) {
-		std::cout << "\nFailed to save map data!\n";
-		return 0;
+	std::list<item*>::iterator iit;
+	for (iit=items.begin();iit!=items.end();++iit) {
+		if ((*iit)) {
+			p=xmlNewChild(doc->children, NULL, (const xmlChar*)"object", NULL);
+			xmlAddChild(p,(*iit)->compressToXML());
+		}
 	}
+
+	xmlKeepBlanksDefault(1);
 	
-	// now we save the item squares to file
-	for (int i=0;i<max;i++)
-		fout << itemSquareX[i] << std::endl;
-
-	for (int i=0;i<max;i++)
-		fout << itemSquareNgX[i] << std::endl;
-
-	for (int i=0;i<max;i++)
-		fout << itemSquareY[i] << std::endl;
-
-	for (int i=0;i<max;i++)
-		fout << itemSquareNgY[i] << std::endl;
-
-	fout.close();
-
-	fout.open(obj.str().c_str());
-	if (!fout) {
-		std::cout << "\nFailed to save map data!\n";
-		return 0;
-	}
-
-	// now we save the item object arrays to the same file
-	for (int i=0;i<max;i++) {
-		fout.write((char*) &(*itemLineX[i]),sizeof(itemLineX[i]));
-		fout << std::endl;
-	}
-
-	for (int i=0;i<max;i++) {
-		fout.write((char*) &(*itemLineNgX[i]),sizeof(itemLineNgX[i]));
-		fout << std::endl;
-	}
-	
-	for (int i=0;i<max;i++) {
-		fout.write((char*) &(*itemLineY[i]),sizeof(itemLineY[i]));
-		fout << std::endl;
-	}
-	
-	for (int i=0;i<max;i++) {
-		fout.write((char*) &(*itemLineNgY[i]),sizeof(itemLineNgY[i]));
-		fout << std::endl;
-	}
-	fout.close();
-
-	// save the player/npc lists
-	std::list<player*>::iterator pit;
-	std::list<npc*>::iterator nit;
-
-	for (pit=players.begin();pit!=players.end();++pit) {
-		fout.write((char*) &(*pit),sizeof(player));
-		fout << " ";
-	}
-	fout << std::endl << std::endl;
-
-	for (nit=npcs.begin();nit!=npcs.end();++nit) {
-		fout.write((char*) &(*nit),sizeof(npc));
-		fout << " ";
-	}*/
+	// save our new map...
+	xmlSaveFile(path.str().c_str(), doc);
+	xmlFreeDoc(doc);
 };
 
 // load saved map data from file
 int map::loadMapData(int game) {
-/*	std::ifstream fin;
+	std::ifstream fin;
+	
 	char path[256];
-	char obj[256];
 	
 	#ifdef __LINUX__
-	sprintf(path,"data/game%d/map.crpgmap",game);
-	sprintf(obj,"data/game%d/obj.crpgmap",game);
+	sprintf(path,"data/game%d/map.xml",game);
 	#endif
 	
 	#ifdef __WINDOWS__
-	sprintf(path,"data\\game%d\\map.crpgmap",game);
-	sprintf(obj,"data\\game%d\\obj.crpgmap",game);
+	sprintf(path,"data\\game%d\\map.xml",game);
 	#endif
 	
-	fin.open(path); // try to load a map file
-
-	if (!fin) {
-		std::cout << "\nFailed to load map data!\n";
-		return 0;
-	}
+	xmlDocPtr doc=xmlParseFile(path);
+	std::list<item*> itemsId;
 	
-	for (int i=0;i<max;i++) {
-		itemSquareX[i]=0;
-		itemSquareNgX[i]=0;
-		itemSquareY[i]=0;
-		itemSquareNgY[i]=0;
+	if (doc) {
+		xmlNodePtr root,ptr,temp;
+		root=xmlDocGetRootElement(doc);
 		
-		itemLineX[i]=NULL;
-		itemLineNgX[i]=NULL;
-		itemLineY[i]=NULL;
-		itemLineNgY[i]=NULL;
+		if (xmlStrcmp(root->name,(const xmlChar*) "map")) {
+			xmlFreeDoc(doc);
+			std::cout << "\nInvalid map.xml!\n";
+			return 0;
+		}
+		
+		ptr=root->children;
+		
+		while(ptr) {
+			const char* tile=(const char*) xmlGetProp(ptr,(xmlChar*) "object");
+			temp=ptr->children;
+			
+			while (temp) {
+				int t=atoi((const char*)xmlGetProp(temp,(xmlChar*) "id"));
+				if (t>0) {
+					const char* x=(const char*) xmlGetProp(temp,(xmlChar*) "x");
+					const char* y=(const char*) xmlGetProp(temp,(xmlChar*) "y");
+					const char* valid=(const char*) xmlGetProp(temp,(xmlChar*) "valid");
+					
+					items.push_back(new item(t,x,y,valid));
+					temp=temp->next;
+				}
+			}
+				
+			ptr=ptr->next;
+		} // while(ptr)
+		
+		xmlFreeDoc(doc);
+		
+		return 1;
 	}
 	
-	// load the first 4 lines of the file into itemSquare
-	for (int i=0;i<max;i++) {
-		fin >> itemSquareX[i];
-		fin.clear();
-	}
-
-	for (int i=0;i<max;i++) {
-		fin >> itemSquareNgX[i];
-		fin.clear();
-	}
-
-	for (int i=0;i<max;i++) {
-		fin >> itemSquareY[i];
-		fin.clear();
-	}
-
-	for (int i=0;i<max;i++) {
-		fin >> itemSquareNgY[i];
-		fin.clear();
-	}
-	fin.close();
-
-	fin.open(obj);
-	if (!fin) {
-		std::cout << "\nFailed to load map data!\n";
-		return 0;
-	}
-
-	// load the last 4 lines of the file into itemLine
-	for (int i=0;i<max;i++) {
-		fin.read((char*) &itemLineX[i],sizeof(itemLineX[i]));
-		fin.clear();
-	}
-
-	for (int i=0;i<max;i++) {
-		fin.read((char*) &itemLineNgX[i],sizeof(itemLineNgX[i]));
-		fin.clear();
-	}
-
-	for (int i=0;i<max;i++) {
-		fin.read((char*) &itemLineY[i],sizeof(itemLineY[i]));
-		fin.clear();
-	}
-
-	for (int i=0;i<max;i++) {
-		fin.read((char*) &itemLineNgY[i],sizeof(itemLineNgY[i]));
-		fin.clear();
-	}
-
-	// load the player/npc lists
-	std::list<player*>::iterator pit;
-	std::list<npc*>::iterator nit;
-
-//	player *pPlayer;
-//	npc *pNpc;
-
-	for (int i=0;i<player::getPlayersOn();i++) {
-		fin.read((char*) &pPlayer,sizeof(player));
-		players.push_back(pPlayer);
-
-		fin.ignore(256,' ');
-	}
-	fin.clear(); fin.clear();
-
-	for (int i=0;i<npc::getNpcsOn();i++) {
-		fin.read((char*) &pNpc,sizeof(npc));
-		npcs.push_back(pNpc);
-
-		fin.ignore(256,' ');
-	}
-
-//	delete pPlayer;
-//	delete pNpc;
-
-	fin.close();*/
+	std::cout << "\nUnable to load map.xml in savefile " << game << "!\n";
+	return 0;
 };
 
 // map method for removing players from the list

@@ -41,18 +41,40 @@ item::item(item *rhs) {
 };
 
 // lesser item constructor
-item::item(std::string fixedItemName,TYPE thisType) {
-	itemName=fixedItemName;
-	itemTYPE=thisType;
+item::item(int id) {
+	parseItem(id);
+	itemID=id;
+};
+
+// type inclusive constructor
+item::item(int id,TYPE type) {
+	parseItem(id);
+	itemID=id;
+	itemTYPE=type;
 };
 
 // our item class constructor
-item::item(std::string fixedItemName,int spawnX,int spawnY,TYPE thisType) {
+item::item(int id,int spawnX,int spawnY) {
+	parseItem(id);
 	x=spawnX;
 	y=spawnY;
-	itemName=fixedItemName;
-	itemTYPE=thisType;
+	
+	itemID=id;
 };
+
+item::item(int id,const char* cx,const char* cy,const char* valid) {
+	parseItem(id);
+	
+	x=atoi(cx);
+	y=atoi(cy);
+	
+	if (strcmp(valid,"1"))
+		isValid=true;
+	else
+		isValid=false;
+		
+	itemID=id;
+};	
 
 // item class destructor
 item::~item() {
@@ -102,4 +124,81 @@ bool item::isBootsItem(item *thisItem) {
 // method for making items unusable
 void item::invalidateItem(item *thisItem) {
 	isValid=false;
+};
+
+xmlNodePtr item::compressToXML() {
+	std::stringstream ss;
+	xmlNodePtr ptr;
+	
+	ptr=xmlNewNode(NULL,(const xmlChar*) "item");
+	
+	ss << itemID;
+	xmlSetProp(ptr,(const xmlChar*) "id",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << x;
+	xmlSetProp(ptr,(const xmlChar*) "x",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << y;
+	xmlSetProp(ptr,(const xmlChar*) "y",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	if (isValid)
+		ss << 1;
+	else
+		ss << 0;
+	
+	xmlSetProp(ptr,(const xmlChar*) "valid",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	return ptr;
+};
+
+void item::parseItem(int id) {
+	switch(id) {
+		// generic
+		case 0: itemName="nothing"; itemTYPE=npe; break;
+		// inanimate objects
+		case 1: itemName="a bush"; itemTYPE=npe; break;
+		case 2: itemName="a rock"; itemTYPE=npe; break;
+		case 3: itemName="sunflowers"; itemTYPE=npe; break;
+		case 4: itemName="a fern"; itemTYPE=npe; break;
+		case 5: itemName="an herb"; itemTYPE=npe; break;
+		case 6: itemName=""; itemTYPE=npe; break;
+		
+		// equipment
+		// armors
+		case 100: itemName="Jacket"; itemTYPE=torso; break;
+		case 101: itemName="Leather Armor"; itemTYPE=torso; break;
+		case 102: itemName="Chain Mail"; itemTYPE=torso; break;
+		case 103: itemName="Full Chain Armor"; itemTYPE=torso; break;
+		case 104: itemName="Steel Mail"; itemTYPE=torso; break;
+		case 105: itemName="Full Steel Armor"; itemTYPE=torso; break;
+		
+		// legs
+		case 114: itemName="Leather Legs"; itemTYPE=legs; break;
+		case 115: itemName="Chain Legs"; itemTYPE=legs; break;
+		case 116: itemName="Light Steel Legs"; itemTYPE=legs; break;
+		case 117: itemName="Heavy Steel Legs"; itemTYPE=legs; break;
+		case 118: itemName="Fighter Legs"; itemTYPE=legs; break;
+		case 119: itemName="Noble Legs"; itemTYPE=legs; break;
+		case 120: itemName="Warrior Legs"; itemTYPE=legs; break;
+		
+		// boots
+		case 130: itemName="Boots"; itemTYPE=boots; break;
+		case 131: itemName="War Boots"; itemTYPE=boots; break;
+		case 132: itemName="Ares Boots"; itemTYPE=boots; break;
+		
+		// helmets
+		case 140: itemName="Leather Cap"; itemTYPE=head; break;
+		case 141: itemName="Chain Helmet"; itemTYPE=head; break;
+		case 142: itemName="Light Steel Helmet"; itemTYPE=head; break;
+		case 143: itemName="Heavy Steel Helmet"; itemTYPE=head; break;
+		case 144: itemName="Fighter Helmet"; itemTYPE=head; break;
+		case 145: itemName="Noble Helmet"; itemTYPE=head; break;
+		case 146: itemName="Warrior Helmet"; itemTYPE=head; break;
+		
+		default: itemName=""; itemTYPE=npe; break;
+	}
 };
