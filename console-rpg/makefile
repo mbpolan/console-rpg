@@ -43,11 +43,14 @@ all: \
 	crpg
 
 # object files
-crpg: crpg$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) npc$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX) utilities$(OSUFFIX)
-	$(CPP) crpg$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) npc$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX) utilities$(OSUFFIX) $(LINKFLAGS) $(OFLAG) crpg$(EXT)
+crpg: crpg$(OSUFFIX) enemy$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) npc$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX) utilities$(OSUFFIX)
+	$(CPP) crpg$(OSUFFIX) enemy$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) npc$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX) utilities$(OSUFFIX) $(LINKFLAGS) $(OFLAG) crpg$(EXT)
 
 crpg$(OSUFFIX): crpg.cpp definitions.h
 	$(CPP) $(CPPFLAGS) $(CFLAG) crpg.cpp $(OFLAG) crpg$(OSUFFIX)
+
+enemy$(OSUFFIX): enemy.cpp enemy.h creature.h
+	$(CPP) $(CPPFLAGS) $(CFLAG) enemy.cpp $(OFLAG) enemy$(OSUFFIX)
 
 items$(OSUFFIX): items.cpp items.h
 	$(CPP) $(CPPFLAGS) $(CFLAG) items.cpp $(OFLAG) items$(OSUFFIX)
