@@ -29,6 +29,7 @@ item::item() {
 	y=0;
 	itemName="NULL";
 	itemTYPE=npe;
+	layer=0;
 };
 
 // copy constructor
@@ -40,41 +41,45 @@ item::item(item *rhs) {
 	itemTYPE=rhs->checkType();
 	
 	itemID=rhs->getItemID();
-	pos=rhs->getPos();
+	layer=rhs->getLayer();
 };
 
 // lesser item constructor
-item::item(int id) {
+item::item(int id, int _layer) {
 	x=0;
 	y=0;
+	layer=_layer;
 
 	parseItem(id);
 	itemID=id;
 };
 
 // type inclusive constructor
-item::item(int id,TYPE type) {
+item::item(int id,TYPE type, int _layer) {
 	parseItem(id);
 	itemID=id;
 	itemTYPE=type;
+	layer=_layer;
 };
 
 // our item class constructor
-item::item(int id,int spawnX,int spawnY) {
+item::item(int id,int spawnX,int spawnY, int _layer) {
 	parseItem(id);
 	x=spawnX;
 	y=spawnY;
+	layer=_layer;
 	
 	itemID=id;
 };
 
-item::item(int id,const char* cx,const char* cy,const char* valid) {
+item::item(int id,const char* cx,const char* cy,const char* valid, const char *lyr) {
 	parseItem(id);
 	
 	x=atoi(cx);
 	y=atoi(cy);
+	layer=atoi(lyr);
 	
-	if (strcmp(valid,"1")==0)
+	if (strcmp(valid, "1")==0)
 		isValid=true;
 	else
 		isValid=false;
@@ -144,6 +149,10 @@ xmlNodePtr item::compressToXML() {
 	
 	ss << y;
 	xmlSetProp(ptr,(const xmlChar*) "y",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << layer;
+	xmlSetProp(ptr,(const xmlChar*) "layer",(const xmlChar*) ss.str().c_str());
 	ss.str("");
 	
 	if (isValid)
@@ -285,19 +294,6 @@ void bag::displayContents() {
 		if ((*it)) {
 			i++;
 			std::cout << i << ": " << (*it)->getName() << std::endl;
-		}
-	}
-};
-
-// resync the content list if it was modified
-void bag::resync() {
-	std::list<item*>::iterator it;
-	
-	int i=0;
-	for (it=contents.begin();it!=contents.end();++it) {
-		if ((*it)) {
-			i++;
-			(*it)->setPos(i);
 		}
 	}
 };

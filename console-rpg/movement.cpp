@@ -43,8 +43,13 @@ void movement::moveN(player *Player,map *karte) {
 	std::cout << "\nMoved north.\n";
 
 	int block=isOccupied(Player,karte);
+	int sTile=isSpecialTile(Player, karte);
 
 	parseCreature(karte,Player,block);
+	parseSpecialTile(sTile);
+	
+	if (sTile>=1024)
+		layerAction(Player, sTile);
 };
 
 // move south
@@ -58,8 +63,13 @@ void movement::moveS(player *Player,map *karte) {
 	std::cout << "\nMoved south.\n";
 
 	int block=isOccupied(Player,karte);
+	int sTile=isSpecialTile(Player, karte);
 
 	parseCreature(karte,Player,block);
+	parseSpecialTile(sTile);
+	
+	if (sTile>=1024)
+		layerAction(Player, sTile);
 };
 
 // move west
@@ -73,8 +83,13 @@ void movement::moveW(player *Player,map *karte) {
 	std::cout << "\nMoved west.\n";
 
 	int block=isOccupied(Player,karte);
+	int sTile=isSpecialTile(Player, karte);
 
 	parseCreature(karte,Player,block);
+	parseSpecialTile(sTile);
+	
+	if (sTile>=1024)
+		layerAction(Player, sTile);
 };
 
 // move east
@@ -88,8 +103,13 @@ void movement::moveE(player *Player,map *karte) {
 	std::cout << "\nMoved east.\n";
 
 	int block=isOccupied(Player,karte);
+	int sTile=isSpecialTile(Player, karte);
 
 	parseCreature(karte,Player,block);
+	parseSpecialTile(sTile);
+	
+	if (sTile>=1024)
+		layerAction(Player, sTile);
 };
 
 // move northeast
@@ -168,15 +188,15 @@ void movement::look(player *Player,map *karte) {
 	std::list<npc*>::iterator nit;
 	for (nit=karte->npcs.begin();nit!=karte->npcs.end();++nit) {
 		if ((*nit)) {
-			if ((*nit)->posx==Player->x && (*nit)->posy==Player->y) {
+			if ((*nit)->posx==Player->x && (*nit)->posy==Player->y && (*nit)->getLayer()==Player->getLayer()) {
 				std::cout << std::endl << (*nit)->name << " is standing here.";
 				Npc=true;
 			}
 		}
 	} // for (...)
 
-	if (karte->itemExists(Player->x,Player->y)) {
-		item* theName=karte->getItem(Player->x,Player->y);
+	if (karte->itemExists(Player->x,Player->y, Player->getLayer())) {
+		item* theName=karte->getItem(Player->x,Player->y, Player->getLayer());
 
 		if (theName)
 			std::cout << "\nYou see " << theName->getName() << ".\n";
@@ -198,30 +218,30 @@ void movement::placeItem(item *thisItem,map *karte) {
 
 	// shows what this function is doing when called
 	#ifdef DEBUG
-		if (karte->itemExists(thisItem->x,thisItem->y)) {
-			std::cout << "\nItem added at " << thisItem->x << "," << thisItem->y << std::endl;
+		if (karte->itemExists(thisItem->x, thisItem->y, thisItem->getLayer())) {
+			std::cout << "\nItem added at " << thisItem->x << "," << thisItem->y << "," << thisItem->getLayer() << std::endl;
 		}
 		
-		else if (!karte->itemExists(thisItem->x,thisItem->y)) {
-			std::cout << "\nFailed to add item at " << thisItem->x << "," << thisItem->y << std::endl;
+		else if (!karte->itemExists(thisItem->x, thisItem->y, thisItem->getLayer())) {
+			std::cout << "\nFailed to add item at " << thisItem->x << "," << thisItem->y << "," << thisItem->getLayer() << std::endl;
 		}
 	#endif
 };
 
 // remove the item from the map
-void movement::removeItem(map *karte,int x,int y) {
-	karte->removeItem(x,y);
+void movement::removeItem(map *karte,int x,int y, int layer) {
+	karte->removeItem(x, y, layer);
 	item::itemCount-=1;
 
 	// shows what this function is doing when called
 	#ifdef DEBUG
 //		item *thisItem=karte->getItem(x,y);
-		if (karte->itemExists(x,y)) {
-			std::cout << "\nFailed to remove item at " << x << "," << y << std::endl;
+		if (karte->itemExists(x ,y, layer)) {
+			std::cout << "\nFailed to remove item at " << x << "," << y << "," << layer << std::endl;
 		}
 		
-		else if (!karte->itemExists(x,y)) {
-			std::cout << "\nItem removed at " << x << "," << y << std::endl;
+		else if (!karte->itemExists(x, y, layer)) {
+			std::cout << "\nItem removed at " << x << "," << y << "," << layer << std::endl;
 		}
 
 //		delete thisItem;
@@ -241,20 +261,27 @@ void movement::spawnMapItems(map *karte) {
 
 	srand(static_cast<unsigned> (time(0)));
 	
-	for (int i=0;i<((karte->getMapMaxSizeX()*2)*4)*2;i++) {
+	for (int i=0;i<3000;i++) {
 		int x=(rand()%100);
 		int y=(rand()%100);
 		int id=(rand()%5)+1;
+		int layer=(rand()%1)-5;
 		
 		// syntax for new item is id,x,y
-		placeItem(new item(id,x,y),karte);
+		placeItem(new item(id, x, y, layer), karte);
 	}
 	
-	placeItem(new item(100, 26, 26), karte);
-	placeItem(new item(101, 26, 27), karte);
+	karte->spItems.push_back(new item(1024, 27, 27, 0));
+	
+	for (int i=1;i<6;i++) {
+		int x=(rand()%100);
+		int y=(rand()%100);
+	
+		karte->spItems.push_back(new item(1025, x, y, (i*-1)));
+	}
 
 	// syntax for new npcs is x,y,name
-	placeNPC(new npc(26,26,"Mike"),karte);
+	placeNPC(new npc(0, 26,26,"Mike"),karte);
 };
 
 // toggle between night and day, or increase step count if none
@@ -313,31 +340,46 @@ int movement::isOccupied(player *Player,map *karte) {
 	return CLEAR;
 };
 
+// check if a special tile is here (id >= 1024)
+int movement::isSpecialTile(player *Player, map *karte) {
+	std::list<item*>::iterator it;
+	for (it=karte->spItems.begin();it!=karte->spItems.end();++it) {
+		if ((*it)) {
+			if ((*it)->x==Player->x && (*it)->y==Player->y && (*it)->getLayer()==Player->getLayer()) {
+				if ((*it)->getItemID()>=1024)
+					return (*it)->getItemID();
+			}
+		}
+	}
+}
+
 // get an NPC based on coordinates
-npc* movement::getNPC(map *karte,int x,int y) {
+npc* movement::getNPC(map *karte, int x, int y, int _layer) {
 	std::list<npc*>::iterator it;
 
 	for (it=karte->npcs.begin();it!=karte->npcs.end();++it) {
 		if ((*it)) {
 			int nx=(*it)->posx;
 			int ny=(*it)->posy;
+			int ly=(*it)->getLayer();
 
-			if (x==nx && y==ny)
+			if (x==nx && y==ny && ly==_layer)
 				return (*it);
 		}
 	}
 };
 
 // get a player based on coordinates
-player* movement::getPlayer(map *karte,int x,int y) {
+player* movement::getPlayer(map *karte, int x, int y, int _layer) {
 	std::list<player*>::iterator it;
 
 	for (it=karte->players.begin();it!=karte->players.end();++it) {
 		if ((*it)) {
 			int nx=(*it)->x;
 			int ny=(*it)->y;
+			int ly=(*it)->getLayer();
 
-			if (x==nx && y==ny)
+			if (x==nx && y==ny && ly==_layer)
 				return (*it);
 		}
 	}
@@ -347,15 +389,42 @@ player* movement::getPlayer(map *karte,int x,int y) {
 void movement::parseCreature(map *karte,player *Player,int block) {
 	if (block!=CLEAR) {
 		if (block==BLOCK_NPC) {
-			npc *myNpc=getNPC(karte,Player->x,Player->y);
+			npc *myNpc=getNPC(karte, Player->x, Player->y, Player->getLayer());
 			if (myNpc)
 				std::cout << "(!) ~ You encounter " << myNpc->name << " (NPC) ~ (!)\n";
 		}
 
 		else if (block==BLOCK_PLAYER) {
-			player *myPlayer=getPlayer(karte,Player->x,Player->y);
+			player *myPlayer=getPlayer(karte, Player->x, Player->y, Player->getLayer());
 			if (myPlayer)
 				std::cout << "(!) ~ You encounter " << myPlayer->getName() << " (Player) ~ (!)\n";
 		}
 	}
 };
+
+// parse a special tile id (ladders, doors, etc.)
+void movement::parseSpecialTile(int id) {
+	switch(id) {
+		case 0x400: std::cout << "There is a hole here. Proceed down? "; break;
+		case 0x401: std::cout << "There is a ladder here. Climb up? "; break;
+	}
+}
+
+// preform an action if this tile allows access to other layers
+void movement::layerAction(player *Player, int sTile) {
+	std::string ch;
+	std::cin >> ch;
+
+	// the users wants to change layers
+	if (ch[0]=='y' || ch[0]=='Y') {
+		if (sTile==1024) { // hole, go down
+			Player->setLayer(Player->getLayer()-1);
+			std::cout << "\nYou went down the hole.\n";
+		}
+		
+		if (sTile==1025)  { // ladder, go up
+			Player->setLayer(Player->getLayer()+1);
+			std::cout << "\nYou climbed up the ladder.\n";
+		}
+	}
+}

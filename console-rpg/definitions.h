@@ -87,6 +87,12 @@ int generic::menu() {
 
   for(;;) {
     std::cout << "\nConsole-RPG Main Menu\n"
+    
+    // just for the hell of it ;)
+    #ifdef DEBUG
+    << " - Debug enabled -\n"
+    #endif
+    
     << "---------------------" << std::endl;
     std::cout << "(1) Start a new game\n"
     << "(2) Continue playing\n"
@@ -267,10 +273,11 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
     // for quick movement when debugging ;)
     #ifdef DEBUG
     if (moverVar=="t") {
-      int x,y;
-      std::cin >> x >> y;
+      int x, y, lyr;
+      std::cin >> x >> y >> lyr;
       list[playerNow]->x=x;
       list[playerNow]->y=y;
+      list[playerNow]->setLayer(lyr);
     }
     #endif
 
@@ -365,8 +372,8 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
     // add an item to player's backpack
     if (moverVar=="add") {
       std::cout << "\n----------";
-      if (karte->itemExists(list[playerNow]->x, list[playerNow]->y)) {
-      	item *Item=karte->getItem(list[playerNow]->x, list[playerNow]->y);
+      if (karte->itemExists(list[playerNow]->x, list[playerNow]->y, list[playerNow]->getLayer())) {
+      	item *Item=karte->getItem(list[playerNow]->x, list[playerNow]->y, list[playerNow]->getLayer());
 	
 	std::string s;
 	if (Item) {
@@ -374,9 +381,9 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
 		std::cin >> s;
 		
 		if (s[0]=='y' || s[0]=='Y') {
-			if (list[playerNow]->bp->addItem(new item(Item->getItemID()))) {
+			if (list[playerNow]->bp->addItem(new item(Item->getItemID(), list[playerNow]->getLayer()))) {
 				std::cout << "\nItem added.";
-				rhs->removeItem(karte, list[playerNow]->x, list[playerNow]->y);
+				rhs->removeItem(karte, list[playerNow]->x, list[playerNow]->y, list[playerNow]->getLayer());
 			}
 			
 			else
@@ -517,12 +524,13 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
     if (moverVar=="equip") {
       int x=list[playerNow]->x;
       int y=list[playerNow]->y;
+      int ly=list[playerNow]->getLayer();
       std::cout << "\n----------";      
 
-      if (karte->itemExists(x,y)) {
-        TYPE type=karte->checkItemType(x,y);
+      if (karte->itemExists(x, y, ly)) {
+        TYPE type=karte->checkItemType(x, y, ly);
         char confirm;
-        item *targetItem=karte->getItem(x,y);
+        item *targetItem=karte->getItem(x, y, ly);
 
 	// if the target item is NULL, then disable equipping since
 	// it will mostly likely cause a segfault
@@ -535,7 +543,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
             list[playerNow]->addInventoryItem(type,targetItem);
             std::cout << std::endl << targetItem->getName() << " was equipped.\n";
 
-	    karte->removeItem(x,y);
+	    karte->removeItem(x, y, ly);
           }
 	  
           if (confirm=='N')

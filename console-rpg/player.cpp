@@ -45,6 +45,7 @@ player::player() {
 	playerID=0;
 	x=25;
 	y=25;
+	layer=0;
 
 };
 
@@ -70,6 +71,7 @@ player::player(int fixedHP, int fixedMP, int id) {
 	playerID=id;
 	x=25;
 	y=25;
+	layer=0;
 
 };
 
@@ -92,6 +94,7 @@ player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense,int id)
 	
 	x=25;
 	y=25;
+	layer=0;
 
 };
 
@@ -327,6 +330,10 @@ int player::savePlayerData(int player,int game,bool ignoreTemp) {
 	xmlSetProp(info,(const xmlChar*) "y",(const xmlChar*) ss.str().c_str());
 	ss.str("");
 	
+	ss << layer;
+	xmlSetProp(info, (const xmlChar*) "layer", (const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
 	ss << utilities::vtoi(playerVocation);
 	xmlSetProp(info,(const xmlChar*) "vocation",(const xmlChar*) ss.str().c_str());
 	ss.str("");
@@ -479,6 +486,7 @@ int player::loadPlayerData(int player,int game) {
 		this->name=atos((const char*) xmlGetProp(ptr,(xmlChar*) "name"));
 		this->x=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "x"));
 		this->y=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "y"));
+		this->layer=atoi((const char*) xmlGetProp(ptr, (xmlChar*) "layer"));
 		this->playerVocation=itov((int) xmlGetProp(ptr,(xmlChar*) "vocation"));
 		
 		ptr=ptr->next;
@@ -502,10 +510,10 @@ int player::loadPlayerData(int player,int game) {
 		
 		// load the player's equipment
 		//int hid=atoi((const char*)xmlGetProp(ptr,(xmlChar*) "head"));
-		headEq=new item(atoi((const char*) xmlGetProp(ptr,(xmlChar*) "head")));
-		torsoEq=new item(atoi((const char*) xmlGetProp(ptr,(xmlChar*) "torso")));
-		legEq=new item(atoi((const char*) xmlGetProp(ptr,(xmlChar*) "legs")));
-		bootEq=new item(atoi((const char*) xmlGetProp(ptr,(xmlChar*) "boots")));
+		headEq=new item(atoi((const char*) xmlGetProp(ptr,(xmlChar*) "head")), 0x64);
+		torsoEq=new item(atoi((const char*) xmlGetProp(ptr,(xmlChar*) "torso")), 0x64);
+		legEq=new item(atoi((const char*) xmlGetProp(ptr,(xmlChar*) "legs")), 0x64);
+		bootEq=new item(atoi((const char*) xmlGetProp(ptr,(xmlChar*) "boots")), 0x64);
 		
 		temp=ptr->children;
 		
@@ -516,7 +524,7 @@ int player::loadPlayerData(int player,int game) {
 		while(bpItemNode) {
 			int bpItemId=atoi((const char*) xmlGetProp(bpItemNode, (xmlChar*) "item"));
 			
-			bp->addItem(new item(bpItemId));
+			bp->addItem(new item(bpItemId, 0x64));
 			
 			bpItemNode=bpItemNode->next;
 		}
@@ -587,7 +595,7 @@ void player::sendNpcMsg(map *karte,movement *rhs) {
 	std::cout << "Enter message: ";
 	std::cin >> msg;
 	
-	npc *myNpc=rhs->getNPC(karte,x,y);
+	npc *myNpc=rhs->getNPC(karte, x, y, layer);
 	if (myNpc) {
 		msg=myNpc->replyToMsg(msg);
 		

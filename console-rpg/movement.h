@@ -56,17 +56,22 @@ class movement {
 		// other methods
 		void look(player*,map*);
 		void placeItem(item*,map*);
-		void removeItem(map*,int,int);
+		void removeItem(map*, int, int, int);
 		
 		void placeNPC(npc*,map*);
 		
 		void spawnMapItems(map*);
 		int isOccupied(player*,map*);
+		int isSpecialTile(player*, map*);
 
 		// get creatures methods
-		npc *getNPC(map*,int,int);
-		player *getPlayer(map*,int,int);
+		npc *getNPC(map*, int, int, int);
+		player *getPlayer(map*, int, int, int);
 		void parseCreature(map*,player*,int);
+		void parseSpecialTile(int);
+		
+		// various actions
+		void layerAction(player*, int);
 
 		// time related methods
 		void checkTime();

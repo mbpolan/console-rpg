@@ -35,10 +35,10 @@ class item {
 	public:
 		item();
 		item(item*); // copy constructor
-		item(int id); // lesser constructor
-		item(int id,TYPE); // type inclusive constructor
-		item(int id,int x,int y); // our constructor
-		item(int,const char*,const char*,const char*);
+		item(int id, int _layer); // lesser constructor
+		item(int id, TYPE, int _layer); // type inclusive constructor
+		item(int id, int x, int y, int _layer); // our constructor
+		item(int, const char*, const char*, const char*, const char*);
 		
 		virtual ~item();
 
@@ -50,8 +50,8 @@ class item {
 
 		int getItemID() const {return itemID;}
 		
-		void setPos(int p) {pos=p;}
-		int getPos() const {return pos;}
+		void setLayer(int p) {layer=p;}
+		int getLayer() const {return layer;}
 
 		bool isHeadItem();
 		bool isTorsoItem();
@@ -69,7 +69,7 @@ class item {
 
 	private:
 		int itemID;
-		int pos; // used only in bag-type items
+		int layer; // used in map layer
 		bool isValid;
 
 		std::string itemName;
@@ -93,9 +93,7 @@ class bag: public item {
 		// list of this bag's items
 		std::list<item*> contents;
 		
-	private:
-		void resync(); // for resyncing the list
-	
+	private:	
 		int contentCount; // amount of items now
 		int maxSize; // max items
 };

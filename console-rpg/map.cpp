@@ -38,6 +38,7 @@ map::map(int X,int Y,int x,int y) {
 	players.clear();
 	npcs.clear();
 	items.clear();
+	spItems.clear();
 };
 
 // map class destructor
@@ -49,13 +50,13 @@ void map::addItem(item *thisItem) {
 };
 
 // remove item from map
-void map::removeItem(int x,int y) {
-	item *thisItem=getItem(x,y);
+void map::removeItem(int x, int y, int _layer) {
+	item *thisItem=getItem(x, y, _layer);
 	std::list<item*>::iterator it=items.begin();
 
 	while (it!=items.end()) {
 		if ((*it)) {
-			if ((*it)->x==x && (*it)->y==y) {
+			if ((*it)->x==x && (*it)->y==y && (*it)->getLayer()==_layer) {
 				it = items.erase(it);
 				delete (*it);
 			}
@@ -68,12 +69,12 @@ void map::removeItem(int x,int y) {
 };
 
 // check to see if the item exists on this space
-bool map::itemExists(int currentX,int currentY) {
+bool map::itemExists(int currentX, int currentY, int _layer) {
 	std::list<item*>::iterator it;
 
 	for (it=items.begin();it!=items.end();++it) {
 		if ((*it)) {
-			if ((*it)->x==currentX && (*it)->y==currentY)
+			if ((*it)->x==currentX && (*it)->y==currentY && (*it)->getLayer()==_layer)
 				return true;
 		}
 	}
@@ -82,12 +83,12 @@ bool map::itemExists(int currentX,int currentY) {
 };
 
 // get the item based on coordinates
-item* map::getItem(int currentX,int currentY) {
+item* map::getItem(int currentX, int currentY, int _layer) {
 	std::list<item*>::iterator it;
 
 	for (it=items.begin();it!=items.end();++it) {
 		if ((*it)) {
-			if ((*it)->x==currentX && (*it)->y==currentY)
+			if ((*it)->x==currentX && (*it)->y==currentY && (*it)->getLayer()==_layer)
 				return (*it);
 		}
 	}
@@ -108,12 +109,12 @@ std::string map::parseGroundID(int id) {
 };
 
 // check the type of item (head,torso,leg,boot,npe)
-TYPE map::checkItemType(int currentX,int currentY) {
+TYPE map::checkItemType(int currentX,int currentY, int _layer) {
 	std::list<item*>::iterator it;
 
 	for (it=items.begin();it!=items.end();++it) {
 		if ((*it)) {
-			if ((*it)->x==currentX && (*it)->y==currentY)
+			if ((*it)->x==currentX && (*it)->y==currentY && (*it)->getLayer()==_layer)
 				return (*it)->checkType();
 		}
 	}
@@ -151,6 +152,18 @@ int map::saveMapData(int game) {
 	for (iit=items.begin();iit!=items.end();++iit) {
 		if ((*iit))
 			xmlAddChild(ptr,(*iit)->compressToXML());
+	}
+	
+	// save our special tiles
+	ptr=xmlNewChild(doc->children, NULL, (const xmlChar*) "spItems", NULL);
+	
+	ss << spItems.size();
+	xmlSetProp(ptr, (const xmlChar*) "count", (const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	for (iit=spItems.begin();iit!=spItems.end();++iit) {
+		if ((*iit))
+			xmlAddChild(ptr, (*iit)->compressToXML());
 	}
 	
 	// save the npcs
@@ -210,16 +223,35 @@ int map::loadMapData(int game) {
 				if (t>0) {
 					const char* x=(const char*) xmlGetProp((xmlNodePtr) items,(xmlChar*) "x");
 					const char* y=(const char*) xmlGetProp((xmlNodePtr) items,(xmlChar*) "y");
+					const char* _layer=(const char*) xmlGetProp((xmlNodePtr) items, (xmlChar*) "layer");
 					const char* valid=(const char*) xmlGetProp((xmlNodePtr) items,(xmlChar*) "valid");
 				
-					this->items.push_back(new item(t,x,y,valid));
+					this->items.push_back(new item(t , x, y, valid, _layer));
 				}
 					
 				items=items->next;
 			}
 			
 			ptr=ptr->next;
-		
+			
+			// second, load in all special tiles, etc.
+			int spItemCount=atoi((const char*) xmlGetProp(ptr, (xmlChar*) "count"));
+			xmlNodePtr spItems=ptr->children;
+			
+			for (int i=0;i<spItemCount;i++) {
+				int t=atoi((const char*) xmlGetProp((xmlNodePtr) spItems, (xmlChar*) "id"));
+				const char* x=(const char*) xmlGetProp((xmlNodePtr) spItems,(xmlChar*) "x");
+				const char* y=(const char*) xmlGetProp((xmlNodePtr) spItems,(xmlChar*) "y");
+				const char* _layer=(const char*) xmlGetProp((xmlNodePtr) spItems, (xmlChar*) "layer");
+				const char* valid=(const char*) xmlGetProp((xmlNodePtr) spItems,(xmlChar*) "valid");
+				
+				this->spItems.push_back(new item(t , x, y, valid, _layer));
+				
+				spItems=spItems->next;
+			}
+			
+			ptr=ptr->next;
+			
 			// now load in the npcs
 			int npcCount=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "count"));
 			xmlNodePtr npcs=ptr->children;
@@ -230,8 +262,9 @@ int map::loadMapData(int game) {
 				int Y=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "y"));
 				int HP=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "hp"));
 				int MP=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "mp"));
+				int _layer=atoi((const char*) xmlGetProp((xmlNodePtr) npcs, (xmlChar*) "layer"));
 			
-				this->npcs.push_back(new npc(npcName,X,Y,HP,MP));
+				this->npcs.push_back(new npc(_layer, npcName,X,Y,HP,MP));
 				
 				npcs=npcs->next;
 			}

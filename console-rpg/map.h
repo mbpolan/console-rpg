@@ -47,14 +47,14 @@ class map {
 		
 		// map methods
 		void addItem(item*);
-		void removeItem(int,int);
+		void removeItem(int, int, int);
 
 		// misc methods for map
-		bool itemExists(int,int);
+		bool itemExists(int, int, int);
 
-		item* getItem(int,int);
+		item* getItem(int, int, int);
 		std::string parseGroundID(int);
-		TYPE checkItemType(int,int);
+		TYPE checkItemType(int, int, int);
 
 		int getGroundID() const {return groundID;}
 		int saveMapData(int);
@@ -73,6 +73,9 @@ class map {
 
 		// list of all items on the map
 		std::list<item*> items;
+		
+		// list of all special items/tiles on map
+		std::list<item*> spItems;
 		
 	private:
 		int MapMaxSizeX,MapMaxSizeY;

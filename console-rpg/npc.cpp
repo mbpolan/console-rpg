@@ -27,16 +27,18 @@ npc::npc() {
 };
 
 // npc class constructor
-npc::npc(int x,int y,std::string _name) {
+npc::npc(int _layer, int x,int y,std::string _name) {
 	name=_name;
 	posx=x;
 	posy=y;
+	layer=_layer;
 };
 
-npc::npc(std::string _name,int x,int y,int _hp,int _mp) {
+npc::npc(int _layer, std::string _name,int x,int y,int _hp,int _mp) {
 	name=_name;
 	posx=x;
 	posy=y;
+	layer=_layer;
 	
 	hp=_hp;
 	mp=_mp;
@@ -172,6 +174,10 @@ xmlNodePtr npc::compressToXML() {
 	
 	ss << mp;
 	xmlSetProp(ptr,(const xmlChar*) "mp",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << layer;
+	xmlSetProp(ptr, (const xmlChar*) "layer", (const xmlChar*) ss.str().c_str());
 	ss.str("");
 	
 	return ptr;

@@ -38,8 +38,8 @@ class map;
 class npc {
 	public:
 		npc();
-		npc(int,int,std::string _name); // our constructor
-		npc(std::string,int,int,int,int); // xml parsed constructor
+		npc(int _layer, int,int,std::string _name); // our constructor
+		npc(int _layer, std::string,int,int,int,int); // xml parsed constructor
 		~npc();
 
 		// methods for AI and actions
@@ -52,6 +52,9 @@ class npc {
 
 		static void setNpcsOn(int npcs) {npcsOn=npcs;}
 		static int getNpcsOn() {return npcsOn;}
+		
+		void setLayer(int l) {layer=l;}
+		int getLayer() const {return layer;}
 		
 		xmlNodePtr compressToXML();
 		
@@ -68,6 +71,7 @@ class npc {
 	private:
 		int id;
 		static int npcsOn;
+		int layer; // map layer
 };
 
 #endif

@@ -116,9 +116,13 @@ class player: public creature {
 		// misc methods
 		void setPlayerID(int id) {playerID=id;}
 		int getPlayerID() const {return playerID;}
+		
 		static void setPlayersOn(int players) {playersOn=players;}
 		static int getPlayersOn() {return playersOn;}
+		
 		void setLook();
+		void setLayer(int _layer) {layer=_layer;}
+		int getLayer() const {return layer;}
 		
 		// communication methods
 		void sendNpcMsg(map*,movement*);
@@ -137,6 +141,7 @@ class player: public creature {
 		// stats and id
 		int playerID;
 		int currentHP,currentMP,luck,strength,power,defense,level,exp;
+		int layer; // map layer
 		
 		// equipment
 		item *headEq;
