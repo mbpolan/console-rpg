@@ -1,6 +1,6 @@
-Console-RPG 0.1.5
+Console-RPG 0.1.8
 -----------------
-(released: 9/20/04)
+(released: 10/18/04)
 
 
 Background
@@ -12,7 +12,7 @@ monsters, items, equipment, etc.
 Package Info
 ------------
 Initial release 0.1. Don't expect much in this version. The only thing
-you can really do is move around.
+you can really do is move around, etc.
 
 Install
 -------
@@ -25,13 +25,35 @@ Console-RPG should now start.
 
 What's New?
 -----------
-Some pre-alpha items have been added. You now have an inventory, which you
-can look at by typing 'inventory' in-game. Also, you can now save your
-current stats to a file (can't be loaded yet) by typing 'save' in-game.
+Much has been done since the last release. The inventory bug
+was fixed, so viewing your inventory is now possible again. A
+few more map bugs have been taken care of, so the map system is
+near fully functional, with the exception of a few more annoying
+bugs that need work. Finally, file loading is working, so you can
+continue from where you left off. :)
 
-Player customization is in. You will be prompted whether you want to
-customize your player before starting a new game. The map is now
-30x30 tiles as well.
+NOTE about file saving/loading: the savefile is saved to a data/
+directory where the CRPG binary is. If that directory doesn't exist,
+then please make it! Example:
+
+(Current directory: /home/mike/crpg/)
+$ mkdir data
+
+That outta be it. ;)
+
+List of Commands In-game
+------------------------
+n,w,e,s = move in the compass directions
+nw,ne,sw,se = move diagonally
+stats = display your melee stats
+pos = show your current position on the map
+look = check the tile you are standing on, also display the time
+save = save your game (saves to data/ directory)
+load = load your saved file (from data/ directory)
+inv = display your inventory (eq only for now)
+equip = equip an item that's on your current tile
+unequip = unequip an item you already have on
+quit = end the game
 
 Credits
 -------
