@@ -34,6 +34,8 @@ namespace utilities {
 	VOCATION itov(int);
 	int vtoi(VOCATION);
 	
+	int random_range(int,int);
+	
 	// method to remove a temp directory
 	int removeTemp();
 };

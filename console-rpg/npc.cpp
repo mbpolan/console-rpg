@@ -75,58 +75,42 @@ ACTIONS npc::preformThink(map *karte) {
 	int action;
 
 	srand(time(NULL));
-
-	// first we check if there are any players nearby and
-	// execute actions accordingly. our npc's goal is to
-	// avoid walking into players (if possible)
-	std::list<player*>::iterator it;
-	for (it=karte->players.begin();it!=karte->players.end();++it) {
+	
+	std::list<npc*> nearbyNpcs;
+	std::list<npc*>::iterator it=karte->npcs.begin();
+	int px=this->posx;
+	int py=this->posy;
+	
+	// check for nearby npcs
+	while(it!=karte->npcs.end()) {
 		if ((*it)) {
-			int x=(*it)->x;
-			int y=(*it)->y;
-
-			// player to north
-			if ((posx++)==x) {
-				action=(rand()%3)-1;
+			if ((px++)==(*it)->posx)
+				nearbyNpcs.push_back((*it));
+			if ((px--)==(*it)->posx)
+				nearbyNpcs.push_back((*it));
+			if ((py++)==(*it)->posy)
+				nearbyNpcs.push_back((*it));
+			if ((py--)==(*it)->posy)
+				nearbyNpcs.push_back((*it));
+		}
+		
+		++it;
+	}
+	
+	// if there are nearby npcs, then move it off the map for now
+	// TODO: check if a space is already occupied before moving a blocking npc
+	if (!nearbyNpcs.empty()) {
+		for (it=nearbyNpcs.begin();it!=nearbyNpcs.end();++it) {
+			if ((*it)) {
+				(*it)->posx+=karte->getMapMaxSizeX()+1;
+				this->posx++;
 			}
-
-			// player to south
-			else if ((posx--)==x) {
-				do {
-					action=(rand()%3);
-				}
-				while(action!=MOVE_SOUTH);
-			}
-
-			// player to east
-			else if ((posy++)==y) {
-				do {
-					action=(rand()%3);
-				}
-				while(action!=MOVE_EAST);
-			}
-
-			// player to west
-			else if ((posy--)==y) {
-				do {
-					action=(rand()%3);
-				}
-				while(action!=MOVE_WEST);
-			}
-
-			// so there are no nearby players
-			else {
-				// do a random move for now
-				action=(rand()%7);
-
-				// todo: do an action other than move, such as talk
-				// to the player(s), etc.
-			}
-
-		} // if ((*it))...
-	} // for(...)
-
-	// todo: we should also check if there are any npcs nearby =\
+		}
+	}
+	
+	// no nearby npcs, so do a random move
+	else
+		action=rand()%4;
 
 	// parse the move and return it
 	switch(action) {
@@ -134,10 +118,10 @@ ACTIONS npc::preformThink(map *karte) {
 		case MOVE_SOUTH: return MOVE_SOUTH;break;
 		case MOVE_WEST: return MOVE_WEST;break;
 		case MOVE_EAST: return MOVE_EAST;break;
-		case MOVE_NW: return MOVE_NW;break;
+/*		case MOVE_NW: return MOVE_NW;break;
 		case MOVE_NE: return MOVE_NE;break;
 		case MOVE_SW: return MOVE_SW;break;
-		case MOVE_SE: return MOVE_SE;break;
+		case MOVE_SE: return MOVE_SE;break;*/
 		default: return DO_NOTHING;break;
 	}
 };
@@ -163,6 +147,7 @@ void npc::preformAction(int action,ACTIONS ACTION) {
 	}
 };
 
+// put the data into an xmlNodePtr and return it
 xmlNodePtr npc::compressToXML() {
 	xmlNodePtr ptr;
 	std::stringstream ss;

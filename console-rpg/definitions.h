@@ -45,8 +45,8 @@ typedef unsigned long long __int64;
 #endif
 
 // maximum map sizes
-#define PMAX 30
-#define NMAX -30
+#define PMAX 50
+#define NMAX -50
 
 // are we loading a savefile?
 bool load=false;
@@ -196,7 +196,7 @@ void generic::preGame(movement *rhs,map *karte,playerList<player*> &r_list,int p
     #ifdef DEBUG
     std::cout << "Current player: " << j << std::endl;
     #endif
-
+    
     CRPG_CLEAR_SCREEN;
     std::cout << "\n*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*";
     std::cout << "\nWelcome to Console RPG, " << r_list[j]->getName() << std::endl
@@ -316,7 +316,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
     }
 
     if (moverVar=="pos") {
-      rhs->getCurrentPosition(list[playerNow]);
+      std::cout << "Position: X:" << list[playerNow]->x << " / Y: " << list[playerNow]->y << std::endl;
     }
 
     if (moverVar=="look") {

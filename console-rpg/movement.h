@@ -19,7 +19,7 @@
  ***************************************************************************/
  
 #ifndef movement_h
-#define movement_t
+#define movement_h
 
 // movement.h: holds movement system and map stuff
 #include "creature.h"
@@ -61,9 +61,6 @@ class movement {
 		npc *getNPC(map*,int,int);
 		player *getPlayer(map*,int,int);
 		void parseCreature(map*,player*,int);
-
-		// public accessors
-		signed int getCurrentPosition(player*) const;
 
 		// time related methods
 		void checkTime();

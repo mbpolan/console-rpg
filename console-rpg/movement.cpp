@@ -22,6 +22,8 @@
 #include <iostream>
 
 #include "movement.h"
+#include "utilities.h"
+using namespace utilities;
 
 // movement class default constructor
 movement::movement() {
@@ -222,21 +224,19 @@ void movement::placeNPC(npc *thisNPC,map *karte) {
 	npc::setNpcsOn(npcs+=1);
 };
 
-// fetch the player's current position on X/Y
-int movement::getCurrentPosition(player *Player) const {
-	std::cout << "X: " << Player->x << " Y: " << Player->y << std::endl;
-};
-
 // spawn some initial map items/creatures
 void movement::spawnMapItems(map *karte) {
 
-	// syntax for new item is id,x,y
-	placeItem(new item(4,1,2),karte);
-	placeItem(new item(2,-1,-1),karte);
-	placeItem(new item(5,-2,3),karte);
-	placeItem(new item(1,-10,5),karte);
-	placeItem(new item(3,20,5),karte);
-	//placeItem(new item("Leather Armor",4,6,torso),karte);
+	srand(static_cast<unsigned> (time(0)));
+	
+	for (int i=0;i<((karte->getMapMaxSizeX()*2)*4)*2;i++) {
+		int x=(rand()%60)-30;
+		int y=(rand()%60)-30;
+		int id=(rand()%5)+1;
+		
+		// syntax for new item is id,x,y
+		placeItem(new item(id,x,y),karte);
+	}
 
 	// syntax for new npcs is x,y,name
 	placeNPC(new npc(2,3,"Mike"),karte);

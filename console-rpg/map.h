@@ -29,7 +29,7 @@
 #include "player.h"
 
 // our maximum map size (+/-)
-#define max 30
+#define max 50
 
 class item;
 class player;

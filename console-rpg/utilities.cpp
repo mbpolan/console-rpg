@@ -20,6 +20,9 @@
 
 #include "utilities.h"
 
+#include <algorithm>
+#include <time.h>
+
 // convert a char array to an std::string
 std::string utilities::atos(const char* cstring) {
 	std::stringstream ss;
@@ -73,7 +76,7 @@ int utilities::removeTemp() {
 	
 	#ifdef __WINDOWS__
 	sprintf(path,"data\\game99\\savefile1.dat");
-	sprintf(delCommand,"rm -rf data\\game99");
+	sprintf(delCommand,"rm -rf data\est_number\game99");
 	#endif
 
 	std::ifstream fin;
@@ -87,4 +90,16 @@ int utilities::removeTemp() {
 		fin.close();
 		system(delCommand);
 	}
+};
+
+// produce a random number based on a given range (low to high)
+int utilities::random_range(int low, int high) {
+    srand(time(NULL));
+    
+    if(low>high) {
+        std::swap(low,high);
+    }
+    
+    int range=high-low+1;
+    return low+int(range*rand()/(RAND_MAX+1.0));
 };
