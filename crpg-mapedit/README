@@ -1,0 +1,47 @@
+===========================
+Console RPG Map Editor v0.1
+Updated 1/20/05
+===========================
+
+-------------
+What is this?
+-------------
+
+This is a graphical map editor that you can use to make and edit maps for
+Console RPG. It can load and save maps directly to and from XML. With this,
+you can easily make a custom make and play on it.
+
+-----------------
+How does it work?
+-----------------
+
+Easily. ;) Pick tiles or objects from the toolbox on the left. Once you
+pick a tile, simply click on the map where you want it to be. You can also
+change pens to sizes of 2x2, 3x3, and 5x5 to make your work easier. NPC
+support is also in, which means you can make an NPC by going to NPC->New NPC.
+Enter his name, health, and mana. Click a tile on the map for this NPC to occupy.
+Editing NPCs is also simple. Just right click a tile that has the words "NPC" on
+it and select "Edit NPC." A dialog will come up where you can change his attributes.
+
+------------------
+Requirements/Usage
+------------------
+
+This map editor works on Linux/Unix systems that have X installed. I'm not
+sure about Windows, but I guess that it may work if anyone can compile it on
+Windows. Other than that, it's straightforward.
+
+-----------------------
+License and Source Code
+-----------------------
+
+The map editor is licensed under the GNU GPL v2. Source code is available at
+http://cvs.sf.net/viewcvs.py/console-rpg/crpg-mapedit.
+
+The Qt 3 library is used to do the rendering of graphics and windows.
+
+-------
+Credits
+-------
+
+KanadaKid - main developer/maintainer

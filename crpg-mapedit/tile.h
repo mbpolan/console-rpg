@@ -47,7 +47,7 @@ class tile: public QTableItem {
 	   virtual int rtti() const {return 1001;}
 	   
 	   // npc
-	   regNPC Npc;	   
+	   regNPC Npc;
 	   
        private:
 	   bool isNpc; // is an npc here?

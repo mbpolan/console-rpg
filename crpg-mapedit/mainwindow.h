@@ -76,6 +76,8 @@ class mainWindow: public QMainWindow {
 	  
 	  void makeNpc();
 	  
+	  tileIndicator *position;
+	  
       private:
 	  // our mapedit body
 	  mapTable *map;
@@ -90,7 +92,6 @@ class mainWindow: public QMainWindow {
 	  
 	  // extras
 	  toolBox *itemBox;
-	  tileIndicator *position;
 	  
 	  QPopupMenu *file;
 	  QPopupMenu *edit;

@@ -27,11 +27,13 @@
 #include <qeventloop.h>
 #include <qcombobox.h>
 #include <qlineedit.h>
+#include <qcursor.h>
 #include <sstream>
 
 #include "tiles.dat"
 
 #include "dialogs.h"
+#include "mainwindow.h"
 #include "maptable.h"
 #include "tile.h"
 
@@ -74,8 +76,8 @@ mapTable::mapTable(int row,int col,QWidget *parent,const char *name): QTable(row
     this->setLeftMargin(0);
     
     // if a tile was clicked on the map, update it
-    connect(this,SIGNAL(clicked(int,int,int,const QPoint&)),SLOT(updateTile(int,int)));
-    connect(this,SIGNAL(contextMenuRequested(int,int,const QPoint&)),SLOT(openContextMenu(int,int,const QPoint&)));
+    connect(this, SIGNAL(clicked(int,int,int,const QPoint&)), SLOT(updateTile(int,int)));
+    connect(this, SIGNAL(contextMenuRequested(int,int,const QPoint&)), SLOT(openContextMenu(int,int,const QPoint&)));
 };
 
 // resync the rows and columns
@@ -174,7 +176,9 @@ void mapTable::setPenTo1() {
     pen2=false;
     pen3=false;
     pen5=false;
-    penNpc=false;    
+    penNpc=false;
+    
+    setCursor(QCursor(Qt::ArrowCursor));
 };
 
 // method for setting the pen to 2x2
@@ -183,7 +187,9 @@ void mapTable::setPenTo2() {
     pen1=false;
     pen3=false;
     pen5=false;
-    penNpc=false;    
+    penNpc=false;
+    
+    setCursor(QCursor(Qt::ArrowCursor));
 };
 
 // method for setting the pen to 3x3
@@ -192,7 +198,9 @@ void mapTable::setPenTo3() {
     pen1=false;
     pen2=false;
     pen5=false;
-    penNpc=false;    
+    penNpc=false;
+    
+    setCursor(QCursor(Qt::ArrowCursor));
 };
 
 // method to set the pen to 5x5
@@ -202,14 +210,19 @@ void mapTable::setPenTo5() {
     pen2=false;
     pen3=false;
     penNpc=false;    
+    
+    setCursor(QCursor(Qt::ArrowCursor));
 };
 
 void mapTable::setNpcPen() {
-    penNpc=true;    
+    penNpc=true;
     pen1=false;
     pen2=false;
     pen3=false;
     pen5=false;
+    
+    // modify our cursor to be crosshair-like
+    setCursor(QCursor(Qt::CrossCursor));
 };
 
 // method to spawn the right-click context menu

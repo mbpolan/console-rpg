@@ -31,6 +31,9 @@ tile::tile(int _id,QTable *table,EditType ed): QTableItem(table,ed) {
     isNpc=false;
     id=_id;
     setPixmap(parseID(id));
+    
+    // locate the mouse
+//    setMouseTracking(true);
 };
 
 // npc constructor
@@ -38,6 +41,9 @@ tile::tile(int _id, bool NPC, QString _name, int _health, int _mp, QTable *table
     isItem=false;
     isNpc=NPC;
     id=_id;
+    
+    // locate the mouse
+ //   setMouseTracking(true);
     
     if (NPC) {
 	setPixmap(parseID(-100));
