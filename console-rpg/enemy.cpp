@@ -35,6 +35,14 @@ enemy::enemy() {
 	power=10;
 	strength=10;
 	defense=10;
+	mlevel=10;
+	
+	isPoisonous=false;
+	isElectric=false;
+	isBurning=false;
+	isStrong=false;
+	
+	attack_type=ATTACK_MELEE;
 };
 
 enemy::enemy(std::string _name, int _spawnX, int _spawnY, int _layer) {
@@ -50,4 +58,45 @@ enemy::enemy(std::string _name, int _spawnX, int _spawnY, int _layer) {
 	power=10;
 	strength=10;
 	defense=10;
+	
+	isPoisonous=false;
+	isElectric=false;
+	isBurning=false;
+	isStrong=false;
+	
+	attack_type=ATTACK_MELEE;
+};
+
+// method for changing attack damage based on skills
+int enemy::enhanceAttack(int orig_damage) {
+	switch(attack_type) {
+		case ATTACK_MELEE: return ((orig_damage+strength)+(orig_damage+power)); break;
+		case ATTACK_MAGIC: return ((orig_damage*mlevel)-10); break;
+		case ATTACK_STRONG: return ((orig_damage+strength)+(orig_damage+power)+((orig_damage*mlevel)-50));
+		default: return 0; break;
+	}
+};
+
+// method for changing the damage about to be taken based on defense skill
+int enemy::blockAttack(int orig_damage) {
+	switch(attack_type) {
+		case ATTACK_MELEE: return (orig_damage-defense*2); break;
+		case ATTACK_MAGIC: return (orig_damage-defense+20); break;
+		default: return 0; break;
+	}
+};
+
+// method for adding some more damage if this enemy has special attributes
+int enemy::addExtraDamageEffect(int orig_damage) {
+	if (isPoisonous)
+		orig_damage+=25;
+	
+	if (isElectric)
+		orig_damage+=50;
+		
+	if (isBurning)
+		orig_damage+=100;
+	
+	if (isStrong)
+		orig_damage+=500;
 };

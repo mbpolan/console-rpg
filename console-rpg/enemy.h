@@ -20,11 +20,19 @@
  
  #include "creature.h"
  
+ // ways to attack
+ enum ATTACKS { ATTACK_MELEE=0x00, ATTACK_MAGIC=0x01, ATTACK_STRONG=0x02 };
+ 
+ // attack type
+ typedef ATTACKS attack_t;
+ 
+ // a class for monsters and creatures that are attackable
  class enemy: public creature {
  	public:
 		enemy();
 		enemy(std::string, int, int, int);
 		
+		// some simple functions (from creature.h)
 		virtual int getHP() const {return hp;}
 		virtual void setHP(int _hp) {hp=_hp;}
 
@@ -46,15 +54,39 @@
 		virtual void setDefense(int _d) {defense=_d;}
 		virtual int getDefense() const {return defense;}
 		
+		// accessor methods
+		void setPoisonous(bool x) {isPoisonous=x;}
+		bool poisonous() const {return isPoisonous;}
+		
+		void setElectric(bool x) {isElectric=x;}
+		bool electric() const {return isElectric;}
+		
+		void setBurning(bool x) {isBurning=x;}
+		bool burning() const {return isBurning;}
+		
+		void setStrong(bool x) {isStrong=x;}
+		bool strong() const {return isStrong;}
+		
 		void setLayer(int _layer) {layer=_layer;}
 		int getLayer() const {return layer;}
 		
+		// battle methods
+		int enhanceAttack(int);
+		int blockAttack(int);
+		int addExtraDamageEffect(int);
+		
+		// map coordinates
 		int x, y;
 		
 	private:
-		int hp, mp;
-		std::string name;
+		int hp, mp, mlevel; // hitpoints, mana, and magic level
+		std::string name; // name
 		
-		int luck, power, strength, defense;
-		int layer;
+		int luck, power, strength, defense; // melee attributes
+		int layer; // what layer this enemy is on
+		
+		// enemy's special attributes
+		bool isPoisonous, isElectric, isBurning, isStrong;
+		
+		attack_t attack_type; // the prefered way to attack
 };
