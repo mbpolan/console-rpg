@@ -51,12 +51,12 @@ class mainWindow: public QMainWindow {
 	  // our mapedit body
 	  mapTable *map;
 	  
+	  // other components
+	  QDockWindow *toolbox;
+	  
 	  // needed dialogs
 	  goToDialog *goToCell_Dialog;
 	  newDialog *new_Dialog;
-	  
-	  // other components
-	  QDockWindow *toolbox;
 	  
 	  // extras
 	  toolBox *itemBox;
@@ -66,19 +66,27 @@ class mainWindow: public QMainWindow {
 	  QPopupMenu *edit;
 	  QPopupMenu *options;
 	  QPopupMenu *help;
+	  QPopupMenu *penOps;
 	  
 	  QToolBar *fileToolbar;
-	  QToolBar *editToolBar;
+	  QToolBar *editToolbar;
+	  QToolBar *drawToolbar;
 	  
 	  QAction *newAct;
 	  QAction *openAct;
 	  QAction *saveAct;
 	  QAction *saveAsAct;
 	  QAction *closeAct;
+	  
 	  QAction *aboutAct;
 	  QAction *helpAct;
 	  QAction *showGridAct;
 	  QAction *goToCellAct;
+	  
+	  QAction *setPen1Act;
+	  QAction *setPen2Act;
+	  QAction *setPen3Act;
+	  QAction *setPen5Act;
 	  
 	  // path to our open map file
 	  QString mapFilePath;

@@ -14,9 +14,11 @@ class toolBox: public QWidget {
 	   
        signals:
 	   void tileChanged(int,int);
+	   void objChanged(int,int);
 	   
        public slots:
 	   void broadcastNewTile(int,int);
+	   void broadcastNewObj(int,int);
 	   void highliteCell(int,int);	   
 	   
 	   
@@ -24,7 +26,7 @@ class toolBox: public QWidget {
 	   QTabWidget *mainFrame;
 	   
 	   QTable *items;
-	   QTable *status;
+	   QTable *objects;
 	   
 	   int irows;
 	   int icols;

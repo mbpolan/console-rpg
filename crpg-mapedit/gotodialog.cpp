@@ -39,8 +39,8 @@ goToDialog::goToDialog(QWidget *parent,const char *name): QDialog(parent,name) {
 };
 
 void goToDialog::broadcastTiles() {
-    int row=atoi(lineRow->text().ascii());
-    int col=atoi(lineCol->text().ascii());
+    int col=atoi(lineRow->text().ascii());
+    int row=atoi(lineCol->text().ascii());
     
     if (row==NULL || col==NULL) {
 	QMessageBox::warning(this,"Error",

@@ -17,8 +17,10 @@
 #include "icons/filesave.xpm"
 #include "icons/filesaveas.xpm"
 #include "icons/quit.xpm"
+#include "icons/pen1.xpm"
+#include "icons/pen2.xpm"
+#include "icons/pen3.xpm"
 
-#include "tiles.dat"
 #include "mainwindow.h"
 #include "tile.h"
 
@@ -40,6 +42,10 @@ mainWindow::mainWindow(QWidget *parent,const char *name): QMainWindow(parent,nam
     
     // make some connections
     connect(map,SIGNAL(tileClicked(int,int)),position,SLOT(update(int,int)));
+    
+    // create our dialogs
+    new_Dialog=new newDialog(this);
+    goToCell_Dialog=new goToDialog(this);    
 };
 
 // make the actions used by menus, toolbars, etc.
@@ -92,6 +98,29 @@ void mainWindow::makeActions() {
     goToCellAct=new QAction(tr("Go to Tile"),tr("Alt+G"),this);
     goToCellAct->setStatusTip("Go to a tile on the map");
     connect(goToCellAct,SIGNAL(activated()),this,SLOT(goToCellDialog()));
+    
+    QPixmap icon_pen1=QPixmap(pen1);
+    QPixmap icon_pen2=QPixmap(pen2);
+    QPixmap icon_pen3=QPixmap(pen3);    
+    
+    setPen1Act=new QAction(tr("Pen 1x1"),tr(""),this);
+    setPen1Act->setStatusTip("Set the pen to 1x1 tile");
+    setPen1Act->setIconSet(icon_pen1);
+    connect(setPen1Act,SIGNAL(activated()),map,SLOT(setPenTo1()));
+    
+    setPen2Act=new QAction(tr("Pen 2x2"),tr(""),this);
+    setPen2Act->setStatusTip("Set the pen to 2x2 tile");
+    setPen2Act->setIconSet(icon_pen2);
+    connect(setPen2Act,SIGNAL(activated()),map,SLOT(setPenTo2()));    
+    
+    setPen3Act=new QAction(tr("Pen 3x3"),tr(""),this);
+    setPen3Act->setStatusTip("Set the pen to 3x3 tile");
+    setPen3Act->setIconSet(icon_pen3);
+    connect(setPen3Act,SIGNAL(activated()),map,SLOT(setPenTo3()));    
+    
+    setPen5Act=new QAction(tr("Pen 5x5"),tr(""),this);
+    setPen5Act->setStatusTip("Set the pen to 5x5 tile");
+    connect(setPen5Act,SIGNAL(activated()),map,SLOT(setPenTo5()));
 };
 
 // create our menus
@@ -108,6 +137,15 @@ void mainWindow::makeMenus() {
     goToCellAct->addTo(edit);
     
     options=new QPopupMenu(this);
+    penOps=new QPopupMenu(options);
+
+    options->insertItem(tr("&Pen"),penOps);
+    setPen1Act->addTo(penOps);
+    setPen2Act->addTo(penOps);    
+    setPen3Act->addTo(penOps); 
+    setPen5Act->addTo(penOps);
+    
+    options->insertSeparator();
     showGridAct->addTo(options);
     
     help=new QPopupMenu(this);
@@ -133,18 +171,21 @@ void mainWindow::makeToolbars() {
     newAct->addTo(fileToolbar);
     openAct->addTo(fileToolbar);
     saveAct->addTo(fileToolbar);
+    
+    drawToolbar=new QToolBar(tr("Draw"),this);
+    setPen1Act->addTo(drawToolbar);
+    setPen2Act->addTo(drawToolbar);
+    setPen3Act->addTo(drawToolbar);
 };
 
 // slot to make a new map
-void mainWindow::makeNew() {
-    if (!new_Dialog==NULL)
-	new_Dialog=new newDialog;
-    
+void mainWindow::makeNew() {    
     new_Dialog->show();
     new_Dialog->raise();
     new_Dialog->setActiveWindow();
 	
-    connect(new_Dialog,SIGNAL(sizesChanged(int,int)),this,SLOT(handleSizes(int,int)));
+    connect(new_Dialog,SIGNAL(sizesChanged(int,int)),this,SLOT(handleSizes(int,int)));   
+    
 };
 
 // create our tile toolbox
@@ -160,6 +201,7 @@ void mainWindow::makeToolbox() {
     toolbox->setWidget(itemBox);
     
     connect(itemBox,SIGNAL(tileChanged(int,int)),map,SLOT(registerTile(int,int)));
+    connect(itemBox,SIGNAL(objChanged(int,int)),map,SLOT(registerObj(int,int)));
 };
 
 // slot to open a map file
@@ -198,14 +240,10 @@ void mainWindow::makeSaveAs() {
 };
 
 // display dialog for gotocell
-void mainWindow::goToCellDialog() {
-    if (!goToCell_Dialog==NULL)
-	goToCell_Dialog=new goToDialog;
-    
+void mainWindow::goToCellDialog() {     
     goToCell_Dialog->show();
     goToCell_Dialog->raise();
     goToCell_Dialog->setActiveWindow();
-    
     connect(goToCell_Dialog,SIGNAL(valueChanged(int,int)),this,SLOT(goToCell(int,int)));
 };
 
@@ -236,11 +274,11 @@ void mainWindow::handleSizes(int x,int y) {
     rows=x;
     cols=y;
     
-    map->clear();    
-    
+    map->clear();
+        
     map->setNumRows(x);
     map->setNumCols(y);
-    
+        
     map->resync(x,y);
     map->redraw();
 };
