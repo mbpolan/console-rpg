@@ -191,10 +191,10 @@ void generic::preGame(movement *rhs,map *karte,playerList<player*> &r_list,int p
       j=0;
       
     #ifdef DEBUG
-    std::cout << "current player: " << j << std::endl;
+    std::cout << "Current player: " << j << std::endl;
     #endif
 
- //   CRPG_CLEAR_SCREEN;
+    CRPG_CLEAR_SCREEN;
     std::cout << "\n*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*";
     std::cout << "\nWelcome to Console RPG, " << r_list[j]->getName() << std::endl
     << "Type 'help' to display a help menu.";

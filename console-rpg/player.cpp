@@ -442,7 +442,6 @@ int player::loadPlayerData(int player,int game) {
 		}
 		
 		ptr=root->children;
-		char _name[256];
 		
 		// load the basic info
 		this->name=item::atos((const char*) xmlGetProp(ptr,(xmlChar*) "name"));

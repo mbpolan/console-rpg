@@ -214,6 +214,14 @@ void movement::removeItem(map *karte,int x,int y) {
 	#endif
 };
 
+// method to add npc creatures to the map
+void movement::placeNPC(npc *thisNPC,map *karte) {
+	karte->npcs.push_back(thisNPC);
+	int npcs=npc::getNpcsOn();
+	
+	npc::setNpcsOn(npcs+=1);
+};
+
 // fetch the player's current position on X/Y
 int movement::getCurrentPosition(player *Player) const {
 	std::cout << "X: " << Player->x << " Y: " << Player->y << std::endl;
@@ -222,8 +230,7 @@ int movement::getCurrentPosition(player *Player) const {
 // spawn some initial map items/creatures
 void movement::spawnMapItems(map *karte) {
 
-	// syntax for new item is name,x,y,type.
-	// then call placeItem to put these on the map.
+	// syntax for new item is id,x,y
 	placeItem(new item(4,1,2),karte);
 	placeItem(new item(2,-1,-1),karte);
 	placeItem(new item(5,-2,3),karte);
@@ -232,8 +239,7 @@ void movement::spawnMapItems(map *karte) {
 	//placeItem(new item("Leather Armor",4,6,torso),karte);
 
 	// syntax for new npcs is x,y,name
-	karte->npcs.push_back(new npc(2,3,"Mike"));
-	npc::setNpcsOn(1);
+	placeNPC(new npc(2,3,"Mike"),karte);
 };
 
 // toggle between night and day, or increase step count if none
@@ -328,7 +334,7 @@ void movement::parseCreature(map *karte,player *Player,int block) {
 		if (block==BLOCK_NPC) {
 			npc *myNpc=getNPC(karte,Player->x,Player->y);
 			if (myNpc)
-				std::cout << "(!) ~ You encounter " << myNpc->getName() << " (NPC) ~ (!)\n";
+				std::cout << "(!) ~ You encounter " << myNpc->name << " (NPC) ~ (!)\n";
 		}
 
 		else if (block==BLOCK_PLAYER) {

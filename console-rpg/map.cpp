@@ -122,31 +122,49 @@ TYPE map::checkItemType(int currentX,int currentY) {
 };
 
 // save the current map data to file
-// todo: merge the map.dat file into savefile.dat
 int map::saveMapData(int game) {
-	std::stringstream path;
+	std::stringstream path,ss;
 	
 	#ifdef __LINUX__
-	path << "data/game" << game << "/map.xml";
+	path << "data/game" << game << "/crpgmap.xml";
 	#endif
 
 	#ifdef __WINDOWS__
-	path << "data\\game" << game << "\\map.xml";
+	path << "data\\game" << game << "\\crpgmap.xml";
 	#endif
 
-	xmlDocPtr doc;
-	xmlNodePtr p,root;
+	xmlDocPtr doc; // our document
+	xmlNodePtr root,ptr;
 	
 	doc=xmlNewDoc((const xmlChar*) "1.0");
-	doc->children=xmlNewDocNode(doc,NULL,(const xmlChar*) "map",NULL);
+	
+	doc->children=xmlNewDocNode(doc,NULL,(const xmlChar*) "crpg-map",NULL);
+	
 	root=doc->children;
+	
+	// save the items
+	ptr=xmlNewChild(doc->children,NULL,(const xmlChar*) "items",NULL);
+	
+	ss << items.size();
+	xmlSetProp(ptr,(const xmlChar*) "count",(const xmlChar*) ss.str().c_str());
+	ss.str("");
 	
 	std::list<item*>::iterator iit;
 	for (iit=items.begin();iit!=items.end();++iit) {
-		if ((*iit)) {
-			p=xmlNewChild(doc->children,NULL,(const xmlChar*) "object",NULL);
-			xmlAddChild(p,(*iit)->compressToXML());
-		}
+		if ((*iit))
+			xmlAddChild(ptr,(*iit)->compressToXML());
+	}
+	
+	// save the npcs
+	ptr=xmlNewChild(doc->children,NULL,(const xmlChar*) "npcs",NULL);
+	
+	ss << npcs.size();
+	xmlSetProp(ptr,(const xmlChar*) "count",(const xmlChar*) ss.str().c_str());
+	
+	std::list<npc*>::iterator nit;
+	for (nit=npcs.begin();nit!=npcs.end();++nit) {
+		if ((*nit))
+			xmlAddChild(ptr,(*nit)->compressToXML());
 	}
 
 	xmlKeepBlanksDefault(1);
@@ -163,46 +181,64 @@ int map::loadMapData(int game) {
 	char path[256];
 	
 	#ifdef __LINUX__
-	sprintf(path,"data/game%d/map.xml",game);
+	sprintf(path,"data/game%d/crpgmap.xml",game);
 	#endif
 	
 	#ifdef __WINDOWS__
-	sprintf(path,"data\\game%d\\map.xml",game);
+	sprintf(path,"data\\game%d\\crpgmap.xml",game);
 	#endif
 	
 	xmlDocPtr doc=xmlParseFile(path);
 	std::list<item*> itemsId;
 	
 	if (doc) {
-		xmlNodePtr root,ptr,temp;
+		xmlNodePtr root,ptr,Items,Npcs;
 		root=xmlDocGetRootElement(doc);
 		
-		if (xmlStrcmp(root->name,(const xmlChar*) "map")) {
+		if (xmlStrcmp(root->name,(const xmlChar*) "crpg-map")) {
 			xmlFreeDoc(doc);
-			std::cout << "\nInvalid map.xml!\n";
 			return 0;
 		}
 		
 		ptr=root->children;
 		
-		while(ptr) {
-			const char* tile=(const char*) xmlGetProp(ptr,(xmlChar*) "object");
-			temp=ptr->children;
+		if (ptr) {
+			// first load in the items
+			int itemCount=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "count"));
+			xmlNodePtr items=ptr->children;
 			
-			while (temp) {
-				int t=atoi((const char*) xmlGetProp(temp,(xmlChar*) "id"));
+			for (int i=0;i<itemCount;i++) {
+				int t=atoi((const char*) xmlGetProp(items,(xmlChar*) "id"));
 				if (t>0) {
-					const char* x=(const char*) xmlGetProp(temp,(xmlChar*) "x");
-					const char* y=(const char*) xmlGetProp(temp,(xmlChar*) "y");
-					const char* valid=(const char*) xmlGetProp(temp,(xmlChar*) "valid");
-					
-					items.push_back(new item(t,x,y,valid));
-					temp=temp->next;
-				}
-			}
+					const char* x=(const char*) xmlGetProp((xmlNodePtr) items,(xmlChar*) "x");
+					const char* y=(const char*) xmlGetProp((xmlNodePtr) items,(xmlChar*) "y");
+					const char* valid=(const char*) xmlGetProp((xmlNodePtr) items,(xmlChar*) "valid");
 				
+					this->items.push_back(new item(t,x,y,valid));
+				}
+					
+				items=items->next;
+			}
+			
 			ptr=ptr->next;
-		} // while(ptr)
+		
+			// now load in the npcs
+			int npcCount=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "count"));
+			xmlNodePtr npcs=ptr->children;
+			
+			for (int i=0;i<npcCount;i++) {
+				std::string npcName=item::atos((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "name"));
+				int X=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "x"));
+				int Y=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "y"));
+				int HP=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "hp"));
+				int MP=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "mp"));
+			
+				this->npcs.push_back(new npc(npcName,X,Y,HP,MP));
+				
+				npcs=npcs->next;
+			}
+
+		}
 		
 		xmlFreeDoc(doc);
 		

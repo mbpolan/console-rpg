@@ -26,6 +26,7 @@
 // needed libraries
 #include <iostream>
 #include <time.h>
+#include <libxml/parser.h>
 
 // needed headers
 #include "creature.h"
@@ -34,33 +35,12 @@
 
 class map;
 
-class npc: public creature {
+class npc {
 	public:
 		npc();
 		npc(int,int,std::string _name); // our constructor
+		npc(std::string,int,int,int,int); // xml parsed constructor
 		~npc();
-
-		// methods for npc entity
-		int getHP() const {return hp;}
-		void setHP(int _hp) {hp=_hp;}
-
-		int getMP() const {return mp;}
-		void setMP(int _mp) {mp=_mp;}
-
-		void setName(std::string initialName) {name=initialName;}
-		std::string getName() const {return name;}
-
-		void setLuck(int _luck) {luck=_luck;};
-		int getLuck() const {return luck;}
-
-		void setPower(int _power) {power=_power;}
-		int getPower() const {return power;}
-
-		void setStrength(int _strength) {strength=_strength;}
-		int getStrength() const {return strength;}
-
-		void setDefense(int _defense) {defense=_defense;}
-		int getDefense() const {return defense;}
 
 		// methods for AI and actions
 		ACTIONS preformThink(map*);
@@ -72,17 +52,19 @@ class npc: public creature {
 
 		static void setNpcsOn(int npcs) {npcsOn=npcs;}
 		static int getNpcsOn() {return npcsOn;}
+		
+		xmlNodePtr compressToXML();
 
 		// coordinates
 		int posx;
 		int posy;
+		
+		std::string name;
+		int hp,mp;
 
 	private:
 		int id;
 		static int npcsOn;
-
-		std::string name;
-		int hp,mp,luck,strength,power,defense;
 };
 
 #endif

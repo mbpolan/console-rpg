@@ -23,7 +23,7 @@
 // npc class default constructor
 npc::npc() {
 	name="Arbba";
-	posx=0;	posy=0;
+	posx=0; posy=0;
 };
 
 // npc class constructor
@@ -31,6 +31,15 @@ npc::npc(int x,int y,std::string _name) {
 	name=_name;
 	posx=x;
 	posy=y;
+};
+
+npc::npc(std::string _name,int x,int y,int _hp,int _mp) {
+	name=_name;
+	posx=x;
+	posy=y;
+	
+	hp=_hp;
+	mp=_mp;
 };
 
 // npc class destructor
@@ -152,4 +161,33 @@ void npc::preformAction(int action,ACTIONS ACTION) {
 		}
 		return;
 	}
+};
+
+xmlNodePtr npc::compressToXML() {
+	xmlNodePtr ptr;
+	std::stringstream ss;
+	
+	ptr=xmlNewNode(NULL,(const xmlChar*) "npc");
+	
+	ss << name;
+	xmlSetProp(ptr,(const xmlChar*) "name",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << posx;
+	xmlSetProp(ptr,(const xmlChar*) "x",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << posy;
+	xmlSetProp(ptr,(const xmlChar*) "y",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << hp;
+	xmlSetProp(ptr,(const xmlChar*) "hp",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << mp;
+	xmlSetProp(ptr,(const xmlChar*) "mp",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	return ptr;
 };
