@@ -24,10 +24,13 @@
 // map.h: map class and related stuff
 #include "items.h"
 #include "npc.h"
+#include "player.h"
 #include "playerlist.h"
 
 // our maximum map size (+/-)
 #define max 30
+
+class player;
 
 class map {
 	public:
@@ -60,6 +63,15 @@ class map {
 		int saveMapData(int);
 		int loadMapData(int);
 		
+		void addToList(player*);
+		void removeFromList(player*);
+		
+		// list of players on the map
+		playerList<player*> players;
+		
+		// list of npcs on the map
+		playerList<npc*> npcs;
+		
 	private:
 		int MapMaxSizeX,MapMaxSizeY,MapMaxSizeNgY,MapMaxSizeNgX;
 		int currentSquareX,currentSquareY,groundID;
@@ -73,9 +85,6 @@ class map {
 		item *itemLineY[max];
 		item *itemLineNgX[max];
 		item *itemLineNgY[max];
-		
-		// list of npcs on the map
-		playerList<npc*> npcs;
 };
 
 #endif

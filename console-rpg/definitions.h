@@ -31,172 +31,110 @@
 #include "player.h"
 #include "playerlist.h"
 #include "movement.h"
-
+   
 #ifdef __LINUX__
 typedef unsigned long long __int64;
+#define CRPG_CLEAR_SCREEN system("clear") // clear screen macro
 #endif
+
+#ifdef __WINDOWS__
+#define CRPG_CLEAR_SCREEN system("cls") // clear screen macro
+#endif
+
 bool load=false;
 
 // set the static number of players to 0
 int player::playersOn=0;
+
+// movement strings
+std::string N="n",S="s",W="w",E="e",NW="nw",NE="ne",SW="sw",SE="se";
 
 // first we place all the function prototypes
 // into a generic namespace. this hopefully makes
 // it more organized ;)
 namespace generic {
   int menu();
-  int configurePlayers(playerList<player*>&,int);
+  int optionMenu();
+  int configurePlayers();
+  int loadGame();
   void preGame(movement*,map*,playerList<player*>&,int);
   void startGame(movement*,map*,playerList<player*>&,int,int,int&);
-  void optionMenu();
 }
+
+// namespace for all methods relating to gameplay customization
+namespace options {        
+  int redefCtrl();
+}
+
 // menu function: display menu and options
 int generic::menu() {
-  // takes a reference to player
   char a_menuChoice[5];
   int menuChoice;
 
   for(;;) {
-    std::cout << "\nMain Menu\n"
-    << "---------" << std::endl;
-    std::cout << "(1) Start a new game.\n"
+    std::cout << "\nConsole-RPG Main Menu\n"
+    << "---------------------" << std::endl;
+    std::cout << "(1) Start a new game\n"
     << "(2) Continue playing\n"
     << "(3) Options\n"
     << "(4) Quit\n"
-    << "---------\n> ";
+    << "---------------------\n> ";
     std::cin >> a_menuChoice;
     menuChoice=atoi(a_menuChoice);
     std::cin.ignore(); // remove the newline
-
-    // the user wants to start a new game
-    if (menuChoice==1) {
-
-      char ch[5];
-      int players; // the amount of players
-      std::cout << "\nEnter amount of players (max 10): ";
-      std::cin >> ch;
-      std::cin.ignore(); // remove the newline
-      
-      players=atoi(ch);
-      
-      if (!(players<=10 && players>0)) {
-        std::cout << "\nInvalid player amount!\n";
-        return 0;
-      }
-
-      // make an array of current players
-      //player *list[players];
-      playerList<player*> list;
-      player::setPlayersOn(players);
-
-      // fill up this array
-      for (int i=0;i<players;i++) {
-        list[i]=new player(5,0,i); // player HP/MP/id
-      }
-
-      generic::configurePlayers(list,players); // pass in the character list
-
-      return 0;
+    
+    switch(menuChoice) {
+       case 1: generic::configurePlayers();break;
+       case 2: generic::loadGame();break;
+       case 3: generic::optionMenu();break;
+       default: CRPG_CLEAR_SCREEN; return 0;
     }
-
-    if (menuChoice==2) {
-
-      // ask the user which slot to load from
-      int slot;
-      std::cout << "\nLoad from which slot (1-9)? ";
-      std::cin >> slot; std::cin.ignore();
-
-      // our stream object
-      std::ifstream fin;
-
-      // now we declare some paths based on the client's
-      // operating system.
-      #ifdef __LINUX__
-      std::stringstream index;
-      char path[256];
-      index << "data/game" << slot << "/index.dat"; // path to index file
-      #endif
-
-      #ifdef __WINDOWS__
-      char path[256];
-      std::stringstream index;
-      index << "data\\game" << slot << "\\index.dat"; // path to index file
-      #endif
-
-      // now we attempt to open the index file
-      player *pPlayer=new player;
-      int players;
-      players=(pPlayer->loadFromIndex(slot));
-      delete pPlayer;
-
-      // allocate memory for the core compenents of the game.
-      playerList<player*> list; // list of players
-      movement *grid=new movement; // movement grid
-      map *karte=new map(30,30,-30,-30); // world map
-
-      // start the loop to fill up array with saved player data
-      for (int i=0;i<players;i++) {
-        list[i]=new player;
-        player *pPlayer=new player;
-
-	#ifdef __LINUX__
-	sprintf(path,"data/game%d/savefile%d.dat",slot,i+1);
-	#endif
-
-	#ifdef __WINDOWS__
-	sprintf(path,"data\\game%d\\savefile%d.dat",slot,i+1);	
-	#endif
-
-        fin.open(path);
-
-    #ifdef DEBUG
-	std::cout << "\nLoading from " << path << "...\n";
-	#endif
-
-        if (!fin) {           
-          std::cout << "\nGame: " << slot;
-          std::cout << "\nSavefile " << i << " is either corrupt or not present. Aborting...\n";
-          return 0;
-        }
-
-        pPlayer->loadPlayerData(karte,i+1,slot);
-        pPlayer->loadFromIndex(slot);
-        list[i]=pPlayer;
-
-        fin.close();
-	load=true;
-      }
-
-      generic::preGame(grid,karte,list,players);
-    }
-
-
-    if( menuChoice==3)
-      generic::optionMenu(); // display options (todo)
-
-    else
-      return 0;
-  }
+  } // for(...)
 }
 
 // configurePlayers: (formerly mainMenu) configure all players
-int generic::configurePlayers(playerList<player*> &r_list,int playerCount) {
-  // takes an array of players and count
+int generic::configurePlayers() {
+    
+    CRPG_CLEAR_SCREEN;
+    
+    char ch[5];
+    int players; // the amount of players
+    std::cout << "\nEnter amount of players (max 10): ";
+    std::cin >> ch;
+    std::cin.ignore(); // remove the newline
+      
+    players=atoi(ch);
+      
+    if (!(players<=10 && players>0)) {
+       std::cout << "\nInvalid player amount!\n";
+       return 0;
+    }
 
-  movement *grid=new movement; // make a new movement grid
-  map *karte=new map(30,30,-30,-30); // make a new map
+    // make an array of current players
+    //player *list[players];
+    playerList<player*> list;
+    player::setPlayersOn(players);
 
-  grid->spawnMapItems(grid,karte); // spawn items on map NOW
+    // fill up this array
+    for (int i=0;i<players;i++) {
+        list[i]=new player(5,0,i); // player HP/MP/id
+    }
 
-  char cVar; // confirmation variable
+    movement *grid=new movement; // make a new movement grid
+    map *karte=new map(30,30,-30,-30); // make a new map
 
-  // loop for as long as there are players
-  for (int i=0;i<playerCount;i++) {
+    grid->spawnMapItems(grid,karte); // spawn items on map NOW
+
+    char cVar; // confirmation variable
+
+    // loop for as long as there are players
+    for (int i=0;i<players;i++) {
     // we need to set name and look
     // make a temporary player object
     player *pPlayer=new player;
   
     // now we configure each player's character
+    CRPG_CLEAR_SCREEN;
     std::cout << "\n==========================";
     std::cout << "\nPlayer " << i+1 << " Configuration\n";
     std::cout << "\nEnter player name: ";
@@ -208,7 +146,8 @@ int generic::configurePlayers(playerList<player*> &r_list,int playerCount) {
     pPlayer->setLook();
 
     // put this temporary object into the array for good
-    r_list[i]=pPlayer;
+    list[i]=pPlayer;
+    karte->addToList(pPlayer);
 
     std::cin.ignore();
     std::cout << "==========================\n";
@@ -219,13 +158,17 @@ int generic::configurePlayers(playerList<player*> &r_list,int playerCount) {
   cVar=toupper(cVar);
 
   if (cVar=='Y') {
-    generic::preGame(grid,karte,r_list,playerCount);
+    generic::preGame(grid,karte,list,players);
   }
   else {
-    std::cout << "\nQuitting...\n";
+    std::cout << std::endl;   
+    CRPG_CLEAR_SCREEN;
     return 0;
   }
 
+  karte->players.clear();
+  karte->npcs.clear();
+  
   delete grid; // we are done with the grid map; delete it
   delete karte; // we are done with the world map; delete it
   grid=0;
@@ -247,6 +190,7 @@ void generic::preGame(movement *rhs,map *karte,playerList<player*> &r_list,int p
     std::cout << "j: " << j << std::endl;
     #endif
 
+    CRPG_CLEAR_SCREEN;
     std::cout << "\n*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*";
     std::cout << "\nWelcome to Console RPG, " << r_list[j]->getName() << std::endl
     << "Type 'help' to display a help menu.";
@@ -259,8 +203,24 @@ void generic::preGame(movement *rhs,map *karte,playerList<player*> &r_list,int p
 }
 
 // optionMenu: function for displaying option menu (finish this later)
-void generic::optionMenu() {
-  std::cout << "\nNo options avaliable at this time.\n";
+int generic::optionMenu() {
+  CRPG_CLEAR_SCREEN;
+  std::cout << "\nOptions\n";
+  std::cout << "-------\n\n";
+  std::cout << "(1) Redefine controls\n"
+            << "(2) Return to main\n"
+            << "-------\n\n> ";
+            
+  std::string ch;
+  int command;
+  std::cin >> ch;
+  
+  command=atoi(ch.c_str());
+  switch (command) {
+         case 1: options::redefCtrl(); break;
+         default: break;  
+  }
+  CRPG_CLEAR_SCREEN;
 }
 
 // startGame function: this will start the actual game
@@ -319,49 +279,49 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       moverVar="end";
     }
 
-    if (moverVar=="n") {
+    if (moverVar==N) {
       rhs->moveN(karte);
       rhs->controlTime(count);
       moves--;
     }
 
-    if (moverVar=="s") {
+    if (moverVar==S) {
       rhs->moveS(karte);
       rhs->controlTime(count);
       moves--;
     }
 
-    if (moverVar=="w") {
+    if (moverVar==W) {
       rhs->moveW(karte);
       rhs->controlTime(count);
       moves--;
     }
 
-    if (moverVar=="e") {
+    if (moverVar==E) {
       rhs->moveE(karte);
       rhs->controlTime(count);
       moves--;
     }
 
-    if (moverVar=="nw") {
+    if (moverVar==NW) {
       rhs->moveNW(karte);
       rhs->controlTime(count);
       moves--;
     }
 
-    if (moverVar=="ne") {
+    if (moverVar==NE) {
       rhs->moveNE(karte);
       rhs->controlTime(count);
       moves--;
     }
 
-    if (moverVar=="sw") {
+    if (moverVar==SW) {
       rhs->moveSW(karte);
       rhs->controlTime(count);
       moves--;
     }
 
-    if (moverVar=="se") {
+    if (moverVar==SE) {
       rhs->moveSE(karte);
       rhs->controlTime(count);
       moves--;
@@ -384,7 +344,8 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       std::cout << "\nYou may move around the map using the following directions:\n"
       << "n, w, e, s, nw, ne, sw, se."
       << "\nType 'quit' to exit the game. Further instructions are provided\n"
-      << "in the documentation that came with this game.\n";
+      << "in the documentation that came with this game.\n"
+      << "\nConsole-RPG is licensed under the GNU GPL. Coded by KanadaKid.";
     }
 
     if (moverVar=="save") {
@@ -409,16 +370,16 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       
       if (fin) {
         std::cout << "\nSlot " << slot << " is already full. Please select another.\n";
-        exists=true;
         break;
       }
       
       // only if the slot is not occupied
       if (!fin) {
-        // since the slot doesn't yet exist, we pass in 'false' as the
-        // parameter to make the slot directory. loop until every players'
-        // stats are saved in the slot.
         for (int i=0;i<playerCount;i++) {
+          // to avoid the "directory already exists" error  
+          if (i>0)
+             exists=true;
+             
           list[i]->savePlayerData(karte,list[i]->getPlayerID(),slot,exists);
         }
         karte->saveMapData(slot);
@@ -517,7 +478,145 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
 
   } // for (int i=0;i<MAXTURNS;i++)
 
-} // void startGame(movement *rhs,map *karte,player* r_player,int playerCount)
+} // void startGame(...)
 
+// method to load a previously saved game
+int generic::loadGame() {
+   // ask the user which slot to load from
+   int slot;
+   std::cout << "\nLoad from which slot (1-9)? ";
+   std::cin >> slot; std::cin.ignore();
+
+   // our stream object
+   std::ifstream fin;
+
+   // now we declare some paths based on the client's
+   // operating system.
+   #ifdef __LINUX__
+   std::stringstream index;
+   char path[256];
+   index << "data/game" << slot << "/index.dat"; // path to index file
+   #endif
+
+   #ifdef __WINDOWS__
+   char path[256];
+   std::stringstream index;
+   index << "data\\game" << slot << "\\index.dat"; // path to index file
+   #endif
+
+   // now we attempt to open the index file
+   player *pPlayer=new player;
+   int players;
+   players=(pPlayer->loadFromIndex(slot));
+   delete pPlayer;
+
+   // allocate memory for the core compenents of the game.
+   playerList<player*> list; // list of players
+   movement *grid=new movement; // movement grid
+   map *karte=new map(30,30,-30,-30); // world map
+
+   // start the loop to fill up array with saved player data
+   for (int i=0;i<players;i++) {
+       list[i]=new player;
+       player *pPlayer=new player;
+
+	   #ifdef __LINUX__
+	   sprintf(path,"data/game%d/savefile%d.dat",slot,i+1);
+	   #endif
+
+	   #ifdef __WINDOWS__
+	   sprintf(path,"data\\game%d\\savefile%d.dat",slot,i+1);	
+	   #endif
+
+       fin.open(path);
+
+       #ifdef DEBUG
+	   std::cout << "\nLoading from " << path << "...\n";
+	   #endif
+
+       if (!fin) {           
+          std::cout << "\nGame: " << slot;
+          std::cout << "\nSavefile " << i << " is either corrupt or not present. Aborting...\n";
+          return 0;
+        }
+
+       pPlayer->loadPlayerData(karte,i+1,slot);
+       pPlayer->loadFromIndex(slot);
+       list[i]=pPlayer;
+
+       fin.close();
+       load=true;
+   }
+
+   generic::preGame(grid,karte,list,players);
+}
+
+/***************************************
+ * Start options namespace definitions *
+ **************************************/
+ 
+int options::redefCtrl() {
+    CRPG_CLEAR_SCREEN;
+    std::cout << "\nRedefine Controls\n";
+    std::cout << "-----------------\n\n";
+    std::string ch;
+    
+    std::cout << "Move north: ";
+    std::cin >> ch; N=ch; 
+       
+    std::cout << "\nMove south: ";
+    std::cin >> ch; 
+    if (ch!=N)
+       S=ch;
+    else
+       S="s";
+    
+    std::cout << "\nMove east: ";
+    std::cin >> ch; 
+    if (ch!=N && ch!=S)
+       E=ch;
+    else
+       E="e";  
+    
+    std::cout << "\nMove west: ";
+    std::cin >> ch; 
+    if (ch!=N && ch!=S && ch!=E)
+       W=ch;
+    else
+       W="w";
+    
+    std::cout << "\nMove northwest: ";
+    std::cin >> ch; 
+    if (ch!=N && ch!=S && ch!=W && ch!=E)
+       NW=ch;
+    else
+       NW="nw";
+    
+    std::cout << "\nMove northest: ";
+    std::cin >> ch; 
+    if (ch!=N && ch!=S && ch!=W && ch!=E && ch!=NW)
+       NE=ch;
+    else
+       NE="ne";
+    
+    std::cout << "\nMove southwest: ";
+    std::cin >> ch; 
+    if (ch!=N && ch!=S && ch!=W && ch!=E && ch!=NW && ch!=NE)
+       SW=ch;
+    else
+       SW="sw";   
+    
+    std::cout << "\nMove southest: ";
+    std::cin >> ch;
+    if (ch!=N && ch!=S && ch!=W && ch!=E && ch!=NW && ch!=NE && ch!=SW)
+       SE=ch;
+    else
+       SE="se"; 
+    
+    std::cout << "\n\nControls redefined! Press enter to return.\n";
+    std::cin.get();
+    std::cin.ignore();
+    return 0;
+}
 
 #endif

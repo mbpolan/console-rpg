@@ -403,3 +403,31 @@ int map::loadMapData(int game) {
 
 	fin.close();
 };
+
+// map method for adding players to the list
+void map::addToList(player *rhs) {
+     int j=0;
+     
+     while(1) {
+        j++;      
+     	if (players[j]!=NULL) {
+           players[j]=rhs;
+     	   break;
+        }
+     }
+};
+
+// map method for removing players from the list
+void map::removeFromList(player *rhs) {
+     int j=0;
+     
+     while(1) {
+        j++;
+        if (players[j]) {
+           if (players[j]->getName()==rhs->getName()) {
+              players[j]=0;
+              return;
+           }                         
+        }
+     } // while(1)
+};
