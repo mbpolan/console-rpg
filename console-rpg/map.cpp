@@ -68,6 +68,63 @@ void map::removeItem(int x, int y, int _layer) {
 	delete thisItem;
 };
 
+// remove an enemy
+void map::removeEnemy(enemy *e) {
+	std::list<enemy*>::iterator it=enemies.begin();
+	
+	while(it!=enemies.end()) {
+		if ((*it)) {
+			if ((*it)->x==e->x && (*it)->y==e->y && (*it)->getLayer()==e->getLayer() && (*it)->getName()==e->getName()) {
+				it=enemies.erase(it);
+				delete (*it);
+			}
+		}
+		
+		else
+			++it;
+	}
+	
+	delete e;
+};
+
+// remove an npc
+void map::removeNpc(npc *n) {
+	std::list<npc*>::iterator it=npcs.begin();
+	
+	while(it!=npcs.end()) {
+		if ((*it)) {
+			if ((*it)->posx==n->posx && (*it)->posy==n->posy && (*it)->getLayer()==n->getLayer() && (*it)->name==n->name) {
+				it=npcs.erase(it);
+				delete (*it);
+			}
+		}
+		
+		else
+			++it;
+	}
+	
+	delete n;
+};
+
+// remove a player
+void map::removePlayer(player *p) {
+	std::list<player*>::iterator it=players.begin();
+	
+	while(it!=players.end()) {
+		if ((*it)) {
+			if ((*it)->x==p->x && (*it)->y==p->y && (*it)->getLayer()==p->getLayer() && (*it)->getName()==p->getName()) {
+				it=players.erase(it);
+				delete (*it);
+			}
+		}
+		
+		else
+			++it;
+	}
+	
+	delete p;
+}
+
 // check to see if the item exists on this space
 bool map::itemExists(int currentX, int currentY, int _layer) {
 	std::list<item*>::iterator it;
@@ -278,34 +335,6 @@ int map::loadMapData(int game) {
 	
 	std::cout << "\nUnable to load map.xml in savefile " << game << "!\n";
 	return 0;
-};
-
-// map method for removing players from the list
-void map::removeFromList(player *rhs) {
-	std::list<player*>::iterator it;
-
-	for (it=players.begin();it!=players.end();++it) {
-		if ((*it)) {
-			std::string name=(*it)->getName();
-
-			if (name==rhs->getName())
-				players.pop_front();
-		}
-	} // for(...)
-};
-
-// map method for removing npcs from the list
-void map::removeFromList(npc *rhs) {
-	std::list<npc*>::iterator it;
-
-	for (it=npcs.begin();it!=npcs.end();++it) {
-		if ((*it)) {
-			int id=(*it)->getID();
-
-			if (id==rhs->getID())
-				npcs.pop_front();
-		}
-	} // for(...)
 };
 
 // map method for making creatures do certain actions

@@ -24,6 +24,7 @@
 // map.h: map class and related stuff
 #include <list>
 
+#include "enemy.h"
 #include "items.h"
 #include "npc.h"
 #include "player.h"
@@ -31,6 +32,7 @@
 // our maximum map size
 #define max 50
 
+class enemy;
 class item;
 class player;
 class npc;
@@ -48,6 +50,10 @@ class map {
 		// map methods
 		void addItem(item*);
 		void removeItem(int, int, int);
+		
+		void removeEnemy(enemy*);
+		void removePlayer(player*);
+		void removeNpc(npc*);
 
 		// misc methods for map
 		bool itemExists(int, int, int);
@@ -55,27 +61,27 @@ class map {
 		item* getItem(int, int, int);
 		std::string parseGroundID(int);
 		TYPE checkItemType(int, int, int);
-
+	
 		int getGroundID() const {return groundID;}
 		int saveMapData(int);
 		int loadMapData(int);
-
-		void removeFromList(player*);
-		void removeFromList(npc*);
-
+	
 		void creaturesDoAction();
-
+	
 		// list of players on the map
 		std::list<player*> players;
-
+	
 		// list of npcs on the map
 		std::list<npc*> npcs;
-
+	
 		// list of all items on the map
 		std::list<item*> items;
 		
 		// list of all special items/tiles on map
 		std::list<item*> spItems;
+		
+		// list of all enemies on map
+		std::list<enemy*> enemies;
 		
 	private:
 		int MapMaxSizeX,MapMaxSizeY;

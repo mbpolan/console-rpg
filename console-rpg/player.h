@@ -22,7 +22,9 @@
 #define player_h
 
 // player.h: holds player class and member data
+#include "battlesystem.h"
 #include "creature.h"
+#include "enemy.h"
 #include "items.h"
 #include "map.h"
 #include "movement.h"
@@ -30,6 +32,7 @@
 
 enum VOCATION {WARRIOR,MAGE,ARCHER};
 
+class battleAction;
 class map;
 class movement;
 
@@ -126,6 +129,11 @@ class player: public creature {
 		
 		// communication methods
 		void sendNpcMsg(map*,movement*);
+		
+		// battle methods
+		void receiveAttack(battleAction*);
+		bool attemptRunFromBattle(enemy*);
+		bool inBattle, inDefense;
 
 		int x,y;
 		

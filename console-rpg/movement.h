@@ -22,6 +22,7 @@
 #define movement_h
 
 // movement.h: holds movement system and map stuff
+#include "battlesystem.h"
 #include "creature.h"
 #include "map.h"
 #include "npc.h"
@@ -34,6 +35,8 @@ enum BLOCK {
 	CLEAR
 };
 
+class battleClass;
+class enemy;
 class map;
 class npc;
 class player;
@@ -77,11 +80,19 @@ class movement {
 		void checkTime();
 		int controlTime(int);
 		int getStepCount() const {return stepCount;}
+		
+		// battle related methods
+		bool startBattle(player*, enemy*, map*, int x, int y, int layer);
+		bool endBattle(player*);
 
 	private:
+		void initBattle(); // begin the actual battle
+	
 		std::string itemWarning;
 		bool fDay;
 		int stepCount;
+		
+		battleClass *currentBattle;
 };
 
 #endif

@@ -18,8 +18,15 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
  
+ #ifndef enemy_h
+ #define enemy_h
+ 
+ // enemy.h: holds classes that represent enemies on the map
  #include "creature.h"
  #include "battlesystem.h"
+ 
+ class battleAction;
+ class attackAction;
  
  // ways to attack
  enum ATTACKS { ATTACK_MELEE=0x00, ATTACK_MAGIC=0x01, ATTACK_STRONG=0x02 };
@@ -71,11 +78,15 @@
 		void setLayer(int _layer) {layer=_layer;}
 		int getLayer() const {return layer;}
 		
+		void setExp(int xp) {exp=xp;}
+		int getExp() const {return exp;}
+		
 		// battle methods
 		int enhanceAttack(int);
 		int blockAttack(int);
 		int addExtraDamageEffect(int);
 		void receiveAttack(battleAction*);
+		void prepareAttack(attackAction*);
 		
 		// map coordinates
 		int x, y;
@@ -84,7 +95,7 @@
 		int hp, mp, mlevel; // hitpoints, mana, and magic level
 		std::string name; // name
 		
-		int luck, power, strength, defense; // melee attributes
+		int luck, power, strength, defense, exp; // melee attributes
 		int layer; // what layer this enemy is on
 		
 		// enemy's special attributes
@@ -92,3 +103,5 @@
 		
 		attack_t attack_type; // the prefered way to attack
 };
+
+#endif

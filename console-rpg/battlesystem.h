@@ -18,11 +18,42 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
  
+ #ifndef battlesystem_h
+ #define battlesystem_h
+ 
+ // battlesystem.h: contains classes that are related to the battle system
  #include <iostream>
  #include <vector>
  
+ #include "enemy.h"
+ #include "player.h"
+ #include "map.h"
+ 
+ class player;
+ class enemy;
+ 
  // an enumeration of different effects
  enum statusEffect { EFFECT_NONE=0x00, EFFECT_POISON=0x01, EFFECT_ELECTRIC=0x02, EFFECT_BURN=0x03 };
+ 
+// struct holding info about a battle
+class battleClass {
+	public:
+		battleClass() {
+			x=0;
+			y=0;
+			layer=0;
+			
+			Player=NULL;
+			Enemy=NULL;
+			Map=NULL;
+		}
+		
+		int x, y;
+		int layer;
+		player *Player;
+		enemy *Enemy;
+		map *Map;
+};
  
  // adt class
  class battleAction {
@@ -135,3 +166,5 @@ class magicAttackAction: public spAttackAction {
 	protected:
 		std::string name; // attack name
 };
+
+#endif

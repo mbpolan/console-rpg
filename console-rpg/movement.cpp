@@ -408,7 +408,7 @@ void movement::parseSpecialTile(int id) {
 		case 0x400: std::cout << "There is a hole here. Proceed down? "; break;
 		case 0x401: std::cout << "There is a ladder here. Climb up? "; break;
 	}
-}
+};
 
 // preform an action if this tile allows access to other layers
 void movement::layerAction(player *Player, int sTile) {
@@ -427,4 +427,138 @@ void movement::layerAction(player *Player, int sTile) {
 			std::cout << "\nYou climbed up the ladder.\n";
 		}
 	}
-}
+};
+
+// start a battle between player and enemy
+bool movement::startBattle(player *Player, enemy *Enemy, map *Map, int _x, int _y, int _layer) {
+	if (Player->getHP()>0 && Enemy->getHP()>0) {
+		currentBattle->x=_x;
+		currentBattle->y=_y;
+		currentBattle->layer=_layer;
+		currentBattle->Player=Player;
+		currentBattle->Enemy=Enemy;
+		currentBattle->Map=Map;
+		
+		initBattle();
+		
+		return true;
+	}
+	
+	else
+		return false;
+};
+
+// force end a battle
+bool movement::endBattle(player *Player) {
+	if (currentBattle->Player && currentBattle->Enemy) {
+		currentBattle->Player->inBattle=false;
+		//currentBattle->enemy->inBattle=false;
+		
+		currentBattle->x=0;
+		currentBattle->y=0;
+		currentBattle->layer=0;
+		
+		currentBattle->Player=NULL;
+		currentBattle->Enemy=NULL;
+		currentBattle->Map=NULL;
+		
+		return true;
+	}
+	
+	else
+		return false;
+};
+
+// begin a battle
+void movement::initBattle() {
+	std::stringstream ss;
+	std::string s;
+	player *p=currentBattle->Player;
+	enemy *e=currentBattle->Enemy;
+	
+	// make sure these two exist
+	if (p && e) {
+		int i=0;
+		
+		// keep looping until the battle ends
+		while(1) {
+			// should be either 0 or 1
+			if (i>1)
+				i=0;
+		
+			// player's turn
+			if (i!=0) {
+				// display some information first
+				std::cout << "Current Turn: " << p->getName() << std::endl;
+				std::cout << "\nHP: " << p->getHP() << "\nMP: " << p->getMP() << std::endl;
+				
+				// battle selection screen
+				std::cout << "\n-----------------------\n"
+					     "Battle: \n"
+					     " 1) Bash\t 2) Defend\n 3) Item\t 4) Run\n> "
+					     "\n-----------------------\n";
+				
+				std::cin >> s;
+				ss << s;
+				
+				// parse the user's battle move
+				switch(atoi(ss.str().c_str())) {
+					case 1: /*prepareBattleAttack(p);*/ break; // TODO: attacking
+					case 2: p->inDefense=true; break;
+					case 3: break; // TODO: using items
+					case 4: p->attemptRunFromBattle(e); break;
+					default: continue;
+				}
+				
+				i++;
+			}
+			
+			// enemy's turn
+			else {
+				std::cout << "Current Turn: " << e->getName() << std::endl;
+				
+				// make an empty action
+				attackAction *act=new attackAction(0, 0);
+				
+				e->prepareAttack(act); // enemy creates action
+				
+				std::cout << "-----------------------\n";
+				std::cout << e->getName() << " attacks! ...\n";
+				std::cin.get();
+				
+				// now we do the actual attack
+				p->receiveAttack(act);
+				
+				// results
+				std::cout << "You suffer " << act->getDamage() << " hitpoints damage!\n";
+				
+				if (act->getManaReduction() > 0)
+					std::cout << "You lose " << act->getManaReduction() << " mana points!\n";
+				
+				std::cout << e->getName() << " has finished attacking.\n";
+				std::cout << "-----------------------\n";
+				
+				i++;
+			}
+			
+			if (p->getHP() <=0 || e->getHP() <=0)
+				break;
+		}
+	}
+	
+	if (p->getHP() <= 0) {
+		std::cout << "You were defeated by " << e->getName() << "!";
+		p->x=25;
+		p->y=25;
+		p->setLayer(0);	
+	}
+	
+	else if (e->getHP() <= 0) {
+		std::cout << "You defeated " << e->getName() << "!\n";
+		std::cout << "You gained " << e->getExp() << " exp points!\n";
+		
+		currentBattle->Map->removeEnemy(e);
+	}
+	
+	endBattle(p);
+};

@@ -36,6 +36,7 @@ enemy::enemy() {
 	strength=10;
 	defense=10;
 	mlevel=10;
+	exp=100;
 	
 	isPoisonous=false;
 	isElectric=false;
@@ -58,6 +59,7 @@ enemy::enemy(std::string _name, int _spawnX, int _spawnY, int _layer) {
 	power=10;
 	strength=10;
 	defense=10;
+	exp=100;
 	
 	isPoisonous=false;
 	isElectric=false;
@@ -124,4 +126,30 @@ void enemy::receiveAttack(battleAction *battle_act) {
 	
 	this->hp-=damage;
 	this->mp-=act->getManaReduction();
+};
+
+// method to prepare an attack
+void enemy::prepareAttack(attackAction *act) {
+	int damage=0;
+	// rework the damage
+	// TODO: also don't forget about the enemy's skills
+	damage=enhanceAttack(damage);
+	damage=addExtraDamageEffect(damage);
+	
+	act->setDamage(damage);
+	
+	// mana reduction
+	if (this->isPoisonous || this->isBurning)
+		act->setManaReduction(10);
+	
+	// set the effects
+	act->setBurning(isBurning);
+	act->setElectrifying(isElectric);
+	act->setPoisonous(isPoisonous);
+	act->setStrong(isStrong);
+	
+	// build action
+	act->build();
+	
+	return;
 };

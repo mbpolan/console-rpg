@@ -50,6 +50,8 @@ player::player() {
 	isPoisoned=false;
 	isBurned=false;
 	isElectrified=false;
+	inBattle=false;
+	inDefense=false;
 
 };
 
@@ -80,6 +82,8 @@ player::player(int fixedHP, int fixedMP, int id) {
 	isPoisoned=false;
 	isBurned=false;
 	isElectrified=false;
+	inBattle=false;
+	inDefense=false;
 
 };
 
@@ -107,6 +111,8 @@ player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense,int id)
 	isPoisoned=false;
 	isBurned=false;
 	isElectrified=false;
+	inBattle=false;
+	inDefense=false;
 
 };
 
@@ -601,6 +607,7 @@ int player::loadFromIndex(int game,int &playersOnGame) {
 	fin.close();
 };
 
+// send a message to an npc on the map
 void player::sendNpcMsg(map *karte,movement *rhs) {
 	std::string msg;
 	
@@ -621,4 +628,24 @@ void player::sendNpcMsg(map *karte,movement *rhs) {
 	}
 	
 	std::cout << "\nThere is no one here to talk to.";
+};
+
+// TODO: method to receive an attack
+void player::receiveAttack(battleAction *act) {
+	return;
+};
+
+// method to attempt to run from a battle
+bool player::attemptRunFromBattle(enemy *e) {
+	if (e->strong())
+		return false;
+	
+	else {
+		int rand=utilities::random_range(0, e->getStrength());
+		if (rand < e->getStrength()/2)
+			return true;
+		
+		else
+			return false;
+	}
 };
