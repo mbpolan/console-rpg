@@ -1,9 +1,9 @@
+// movement.h: holds movement system stuff
 #include <iostream>
 using namespace std;
 
 class movement {
 	public:
-		// movement() {};
 		movement(int defaultX, int defaultY); // our constructor
 		~movement() {};
 
@@ -25,14 +25,12 @@ class movement {
 	private:
 		signed int MapMaxSizeX, MapMaxSizeY, MapMaxSizeNgX, MapMaxSizeNgY;
 		signed int currentSquareX, currentSquareY;
-		std::string genericErr;
 };
 
 movement::movement(int defaultX=0, int defaultY=0) {
 	currentSquareX=defaultX;
 	currentSquareY=defaultY;
 	MapMaxSizeX=15, MapMaxSizeY=15, MapMaxSizeNgX=(-15), MapMaxSizeNgY=(-15);
-	std::string genericErr="\nYou can't move any further";
 };
 
 void movement::moveN() {
@@ -76,8 +74,8 @@ void movement::moveE() {
 };
 
 void movement::moveNE() {
-	if (currentSquareY==MapMaxSizeY && currentSquareX==MapMaxSizeX) {
-		cout << genericErr << "!";
+	if ((currentSquareY==MapMaxSizeY || currentSquareX==MapMaxSizeX)) {
+		cout << "\nYou can't move any further!";
 	}
 	else {
 		currentSquareY++;
@@ -87,8 +85,8 @@ void movement::moveNE() {
 };
 
 void movement::moveNW() {
-	if (currentSquareY==MapMaxSizeY && currentSquareX==MapMaxSizeX) {
-		cout << genericErr << "!";
+	if (currentSquareY==MapMaxSizeY || currentSquareX==MapMaxSizeX) {
+		cout << "\nYou can't move any further!";
 	}
 	else {
 		currentSquareY--;
@@ -98,8 +96,8 @@ void movement::moveNW() {
 };
 
 void movement::moveSE() {
-	if (currentSquareY==MapMaxSizeY && currentSquareX==MapMaxSizeX) {
-		cout << genericErr << "!";
+	if (currentSquareY==MapMaxSizeY || currentSquareX==MapMaxSizeNgX) {
+		cout << "\nYou can't move any further!";
 	}
 	else {
 		currentSquareY++;
@@ -109,8 +107,8 @@ void movement::moveSE() {
 };
 
 void movement::moveSW() {
-	if (currentSquareY==MapMaxSizeY && currentSquareX==MapMaxSizeX) {
-		cout << genericErr << "!";
+	if (currentSquareY==MapMaxSizeNgY || currentSquareX==MapMaxSizeNgX) {
+		cout << "\nYou can't move any further!";
 	}
 	else {
 		currentSquareY--;
@@ -118,4 +116,4 @@ void movement::moveSW() {
 		cout << "\nMoved south-west.";
 	}
 };
-		
+

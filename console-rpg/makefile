@@ -20,17 +20,17 @@ test: all
 	movement
 
 crpg: crpg.o
-	$(CPP) $(OFLAG)crpg crpg.o
+	$(CPP) $(OFLAG) crpg crpg.o
 
 crpg.o : crpg.cpp
 
 player: player.o
-	$(CPP) $(OFLAG)player player.o
+	$(CPP) $(OFLAG) player player.o
 
 player.o : player.cpp
 
 movement: movement.o
-	$(CPP) $(OFLAG)movement movement.o
+	$(CPP) $(OFLAG) movement movement.o
 
 movement.o : movement.cpp
 

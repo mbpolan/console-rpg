@@ -4,7 +4,7 @@ using namespace std;
 class player {
 	public:
 		player(int fixedHP, int fixedMP); // our constructor
-		~player() {};
+		~player();
 		int getHP() const {return *currentHP;}
 		void setHP(int hp) {*currentHP=hp;}
 		
@@ -23,11 +23,18 @@ class player {
 };
 
 player::player(int fixedHP, int fixedMP) {
-	currentHP=new int;
-	currentMP=new int;
+	currentHP=new int(fixedHP);
+	currentMP=new int(fixedMP);
 	playerName=new std::string;
-	*currentHP=fixedHP;
-	*currentMP=fixedMP;
 	*playerName="Arbba";
+};
+
+player::~player() {
+	delete currentHP;
+	delete currentMP;
+	delete playerName;
+	currentHP=NULL;
+	currentMP=NULL;
+	playerName=NULL;
 };
 

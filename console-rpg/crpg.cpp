@@ -1,3 +1,4 @@
+// crpg.cpp: main file
 #include <iostream>
 #include "player.cpp"
 #include "movement.cpp"
@@ -5,8 +6,7 @@
 using namespace std;
 
 main(int argc, char *argv[]) {
-	player Player(500, 200);
-	movement grid;
-	cout << "Console RPG 0.1...\n\n" << endl;
-	menu();
+	player Player(500, 200); // player HP/MP
+	cout << "\nConsole-RPG 0.1\n\n" << endl;
+	menu(Player);
 }
