@@ -26,7 +26,7 @@
 #include "items.h"
 #include "map.h"
 
-enum vocation {warrior,mage,archer};
+enum VOCATION {WARRIOR,MAGE,ARCHER};
 
 class map;
 
@@ -63,8 +63,8 @@ class player: public creature {
 		void setDefense(int _defense) {defense=_defense;}
 		int getDefense() const {return defense;}
 		
-		void setVoc(vocation _vocation) {playerVocation=_vocation;}
-		vocation getVoc() const {return playerVocation;}
+		void setVoc(VOCATION _vocation) {playerVocation=_vocation;}
+		VOCATION getVoc() const {return playerVocation;}
 		
 		// level related stat accessors
 		void setLevel(int _level) {level=_level;}
@@ -136,7 +136,7 @@ class player: public creature {
 		item *bootEq;
 		
 		// vocation
-		vocation playerVocation;
+		VOCATION playerVocation;
 };
 
 #endif

@@ -22,12 +22,12 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
-#include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
 // nessesary includes
 #include "map.h"
+#include "utilities.h"
+using namespace utilities;
 
 // map class constructor
 map::map(int X,int Y,int NgY,int NgX) {
@@ -227,7 +227,7 @@ int map::loadMapData(int game) {
 			xmlNodePtr npcs=ptr->children;
 			
 			for (int i=0;i<npcCount;i++) {
-				std::string npcName=item::atos((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "name"));
+				std::string npcName=atos((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "name"));
 				int X=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "x"));
 				int Y=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "y"));
 				int HP=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "hp"));

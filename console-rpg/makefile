@@ -43,8 +43,8 @@ all: \
 	crpg
 
 # object files
-crpg: crpg$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) npc$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX)
-	$(CPP) crpg$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) npc$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX) $(LINKFLAGS) $(OFLAG) crpg$(EXT)
+crpg: crpg$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) npc$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX) utilities$(OSUFFIX)
+	$(CPP) crpg$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) npc$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX) utilities$(OSUFFIX) $(LINKFLAGS) $(OFLAG) crpg$(EXT)
 
 crpg$(OSUFFIX): crpg.cpp definitions.h
 	$(CPP) $(CPPFLAGS) $(CFLAG) crpg.cpp $(OFLAG) crpg$(OSUFFIX)
@@ -63,6 +63,9 @@ player$(OSUFFIX): player.cpp player.h items.h creature.h
 
 movement$(OSUFFIX): movement.cpp movement.h map.h
 	$(CPP) $(CPPFLAGS) $(CFLAG) movement.cpp $(OFLAG) movement$(OSUFFIX)
+
+utilities$(OSUFFIX): utilities.cpp utilities.h player.h
+	$(CPP) $(CPPFLAGS) $(CFLAG) utilities.cpp $(OFLAG) utilities$(OSUFFIX)
 
 # clean the directory
 clean: 

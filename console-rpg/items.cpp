@@ -86,43 +86,39 @@ TYPE item::checkType() {
 };
 
 // check if this item can be equipped on head slot
-bool item::isHeadItem(item *thisItem) {
-	TYPE result=thisItem->checkType();
-	if (result==head)
-		return 1;
+bool item::isHeadItem() {
+	if (itemTYPE==head)
+		return true;
 	else
-		return 0;
+		return false;
 };
 
 // check if this item can be equipped on armor slot
-bool item::isTorsoItem(item *thisItem) {
-	TYPE result=thisItem->checkType();
-	if (result==torso)
-		return 1;
+bool item::isTorsoItem() {
+	if (itemTYPE==torso)
+		return true;
 	else
-		return 0;
+		return false;
 };
 
 // check if this item can be equipped on legs slot
-bool item::isLegsItem(item *thisItem) {
-	TYPE result=thisItem->checkType();
-	if (result==legs)
-		return 1;
+bool item::isLegsItem() {
+	if (itemTYPE==legs)
+		return true;
 	else
-		return 0;
+		return false;
 };
 
 // check if this item can be equipped on boots slot
-bool item::isBootsItem(item *thisItem) {
-	TYPE result=thisItem->checkType();
-	if (result==boots)
-		return 1;
+bool item::isBootsItem() {
+	if (itemTYPE==boots)
+		return true;
 	else
-		return 0;
+		return false;
 };
 
 // method for making items unusable
-void item::invalidateItem(item *thisItem) {
+void item::invalidateItem() {
 	isValid=false;
 };
 
@@ -157,58 +153,52 @@ xmlNodePtr item::compressToXML() {
 
 void item::parseItem(int id) {
 	switch(id) {
+		// item ids are compared in hex values to avoid the user editing
+		// the map file and messing stuff up =\
+		
 		// generic
-		case 0: itemName="nothing"; itemTYPE=npe; break;
-		// inanimate objects
-		case 1: itemName="a bush"; itemTYPE=npe; break;
-		case 2: itemName="a rock"; itemTYPE=npe; break;
-		case 3: itemName="sunflowers"; itemTYPE=npe; break;
-		case 4: itemName="a fern"; itemTYPE=npe; break;
-		case 5: itemName="an herb"; itemTYPE=npe; break;
-		case 6: itemName=""; itemTYPE=npe; break;
+		case 0x00: itemName="nothing"; itemTYPE=npe; break;
+		
+		// inanimate objectsvocation
+		case 0x01: itemName="a bush"; itemTYPE=npe; break;
+		case 0x02: itemName="a rock"; itemTYPE=npe; break;
+		case 0x03: itemName="sunflowers"; itemTYPE=npe; break;
+		case 0x04: itemName="a fern"; itemTYPE=npe; break;
+		case 0x05: itemName="an herb"; itemTYPE=npe; break;
+		case 0x06: itemName="a puddle"; itemTYPE=npe; break;
 		
 		// equipment
 		// armors
-		case 100: itemName="Jacket"; itemTYPE=torso; break;
-		case 101: itemName="Leather Armor"; itemTYPE=torso; break;
-		case 102: itemName="Chain Mail"; itemTYPE=torso; break;
-		case 103: itemName="Full Chain Armor"; itemTYPE=torso; break;
-		case 104: itemName="Steel Mail"; itemTYPE=torso; break;
-		case 105: itemName="Full Steel Armor"; itemTYPE=torso; break;
+		case 0x64: itemName="Jacket"; itemTYPE=torso; break;
+		case 0x65: itemName="Leather Armor"; itemTYPE=torso; break;
+		case 0x66: itemName="Chain Mail"; itemTYPE=torso; break;
+		case 0x67: itemName="Full Chain Armor"; itemTYPE=torso; break;
+		case 0x68: itemName="Steel Mail"; itemTYPE=torso; break;
+		case 0x69: itemName="Full Steel Armor"; itemTYPE=torso; break;
 		
 		// legs
-		case 114: itemName="Leather Legs"; itemTYPE=legs; break;
-		case 115: itemName="Chain Legs"; itemTYPE=legs; break;
-		case 116: itemName="Light Steel Legs"; itemTYPE=legs; break;
-		case 117: itemName="Heavy Steel Legs"; itemTYPE=legs; break;
-		case 118: itemName="Fighter Legs"; itemTYPE=legs; break;
-		case 119: itemName="Noble Legs"; itemTYPE=legs; break;
-		case 120: itemName="Warrior Legs"; itemTYPE=legs; break;
+		case 0x72: itemName="Leather Legs"; itemTYPE=legs; break;
+		case 0x73: itemName="Chain Legs"; itemTYPE=legs; break;
+		case 0x74: itemName="Light Steel Legs"; itemTYPE=legs; break;
+		case 0x75: itemName="Heavy Steel Legs"; itemTYPE=legs; break;
+		case 0x76: itemName="Fighter Legs"; itemTYPE=legs; break;
+		case 0x77: itemName="Noble Legs"; itemTYPE=legs; break;
+		case 0x78: itemName="Warrior Legs"; itemTYPE=legs; break;
 		
 		// boots
-		case 130: itemName="Boots"; itemTYPE=boots; break;
-		case 131: itemName="War Boots"; itemTYPE=boots; break;
-		case 132: itemName="Ares Boots"; itemTYPE=boots; break;
+		case 0x82: itemName="Boots"; itemTYPE=boots; break;
+		case 0x83: itemName="War Boots"; itemTYPE=boots; break;
+		case 0x84: itemName="Ares Boots"; itemTYPE=boots; break;
 		
 		// helmets
-		case 140: itemName="Leather Cap"; itemTYPE=head; break;
-		case 141: itemName="Chain Helmet"; itemTYPE=head; break;
-		case 142: itemName="Light Steel Helmet"; itemTYPE=head; break;
-		case 143: itemName="Heavy Steel Helmet"; itemTYPE=head; break;
-		case 144: itemName="Fighter Helmet"; itemTYPE=head; break;
-		case 145: itemName="Noble Helmet"; itemTYPE=head; break;
-		case 146: itemName="Warrior Helmet"; itemTYPE=head; break;
+		case 0x8C: itemName="Leather Cap"; itemTYPE=head; break;
+		case 0x8D: itemName="Chain Helmet"; itemTYPE=head; break;
+		case 0x8E: itemName="Light Steel Helmet"; itemTYPE=head; break;
+		case 0x8F: itemName="Heavy Steel Helmet"; itemTYPE=head; break;
+		case 0x90: itemName="Fighter Helmet"; itemTYPE=head; break;
+		case 0x91: itemName="Noble Helmet"; itemTYPE=head; break;
+		case 0x92: itemName="Warrior Helmet"; itemTYPE=head; break;
 		
 		default: itemName=""; itemTYPE=npe; break;
 	}
-};
-
-std::string item::atos(const char* cstring) {
-	std::stringstream ss;
-	
-	for (int i=0;i<strlen(cstring);i++) {
-		ss << cstring[i];
-	}
-	
-	return ss.str();
 };

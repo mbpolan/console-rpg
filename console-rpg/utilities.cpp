@@ -18,57 +18,73 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
- #ifndef item_h
- #define item_h
- 
-// items.h: holds item class and declarations
-#include <iostream>
-#include <sstream>
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
+#include "utilities.h"
 
-// enumerate the types of items
-enum TYPE {head,torso,legs,boots,npe};
-
-class item {
-	public:
-		item();
-		item(item*); // copy constructor
-		item(int id); // lesser constructor
-		item(int id,TYPE); // type inclusive constructor
-		item(int id,int x,int y); // our constructor
-		item(int,const char*,const char*,const char*);
-		
-		virtual ~item();
-
-		void setItemID(int id) {itemID=id;};
-		void setItemName(std::string nameOfItem) {itemName=nameOfItem;}
-		
-		std::string getName() const {return itemName;}
-		void setName(std::string name) {itemName=name;}
-
-		int getItemID() const {return itemID;}
-
-		bool isHeadItem();
-		bool isTorsoItem();
-		bool isLegsItem();
-		bool isBootsItem();
-
-		TYPE checkType();
-		void invalidateItem();
-		
-		xmlNodePtr compressToXML();
-		void parseItem(int);
-
-		int x,y;
-		static int itemCount;
-
-	private:
-		int itemID;
-		bool isValid;
-
-		std::string itemName;
-		TYPE itemTYPE;
+// convert a char array to an std::string
+std::string utilities::atos(const char* cstring) {
+	std::stringstream ss;
+	
+	for (int i=0;i<strlen(cstring);i++) {
+		ss << cstring[i];
+	}
+	
+	return ss.str();
 };
 
-#endif
+// convert a vocation to an int
+int utilities::vtoi(VOCATION myvoc) {
+	int voc;
+	
+	switch(myvoc) {
+		case WARRIOR: voc=0;break;
+		case MAGE: voc=1;break;
+		case ARCHER: voc=2;break;
+		default: voc=0;break;
+	}
+	
+	return voc;
+};
+
+// convert an int to a player vocation
+VOCATION utilities::itov(int voc) {
+	VOCATION myvoc;
+	
+	switch(voc) {
+		case 0: myvoc=WARRIOR;break;
+		case 1: myvoc=MAGE;break;
+		case 2: myvoc=ARCHER;break;
+		default: myvoc=WARRIOR;break;
+	}
+	
+	return myvoc;
+};
+
+// delete the temporary directory (99)
+int utilities::removeTemp() {
+	// last time we need to check the client's system and
+	// use the appropriate file separator.
+	char path[256];
+	char delCommand[256];
+	
+	#ifdef __LINUX__
+	sprintf(path,"data/game99/savefile1.dat");
+	sprintf(delCommand,"rm -rf data/game99");
+	#endif
+	
+	#ifdef __WINDOWS__
+	sprintf(path,"data\\game99\\savefile1.dat");
+	sprintf(delCommand,"rm -rf data\\game99");
+	#endif
+
+	std::ifstream fin;
+	
+	// first we attempt to load a savefile from the temporary
+	// directory. if it fails, then there is no need to remove
+	// the directory since it doesn't exist. otherwise, remove it!
+	fin.open(path);
+	
+	if (fin) {
+		fin.close();
+		system(delCommand);
+	}
+};

@@ -20,11 +20,12 @@
 
  #include <iostream>
  #include <fstream>
- #include <libxml/xmlmemory.h>
  #include <libxml/parser.h>
 
 // player.cpp: declarations for player functions
 #include "player.h"
+#include "utilities.h"
+using namespace utilities;
 
 // player class default constructor
 player::player() {
@@ -33,7 +34,7 @@ player::player() {
 	name="Arbba";
 	hairOutfit="brown", legsOutfit="blue", torsoOutfit="brown";
 	luck=0,power=0,strength=0,defense=0;
-	playerVocation=warrior;
+	playerVocation=WARRIOR;
 
 	headEq=new item(0,head);
 	torsoEq=new item(100,torso);
@@ -57,7 +58,7 @@ player::player(int fixedHP, int fixedMP, int id) {
 	strength=0;
 	defense=0;
 	hairOutfit="brown", legsOutfit="blue", torsoOutfit="brown";
-	playerVocation=warrior;
+	playerVocation=WARRIOR;
 	
 	headEq=new item(0,head);
 	torsoEq=new item(100,torso);
@@ -81,7 +82,7 @@ player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense,int id)
 
 	name="Arbba";
 	hairOutfit="brown", legsOutfit="blue", torsoOutfit="brown";
-	playerVocation=warrior;
+	playerVocation=WARRIOR;
 
 	headEq=new item(0,head);
 	torsoEq=new item(100,torso);
@@ -164,7 +165,7 @@ void player::setLook() {
 		exp=0;
 		level=1;
 		std::cout << "\nYou are now a warrior.\n";
-		playerVocation=warrior;
+		playerVocation=WARRIOR;
 	}
 
 	if (userVocation=="mage") { // set mage class stats
@@ -175,7 +176,7 @@ void player::setLook() {
 		exp=0;
 		level=1;
 		std::cout << "\nYou are now a mage.\n";
-		playerVocation=mage;
+		playerVocation=MAGE;
 	}
 
 	if (userVocation=="archer") { // set archer class stats
@@ -186,7 +187,7 @@ void player::setLook() {
 		exp=0;
 		level=1;
 		std::cout << "\nYou are now an archer.\n";
-		playerVocation=archer;
+		playerVocation=ARCHER;
 	}
 
 	std::cout << "\nWhat is your hair color? ";
@@ -326,6 +327,10 @@ int player::savePlayerData(int player,int game,bool ignoreTemp) {
 	xmlSetProp(info,(const xmlChar*) "y",(const xmlChar*) ss.str().c_str());
 	ss.str("");
 	
+	ss << utilities::vtoi(playerVocation);
+	xmlSetProp(info,(const xmlChar*) "vocation",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
 	xmlAddChild(doc->children,info);
 	
 	////////////////////////
@@ -444,16 +449,17 @@ int player::loadPlayerData(int player,int game) {
 		ptr=root->children;
 		
 		// load the basic info
-		this->name=item::atos((const char*) xmlGetProp(ptr,(xmlChar*) "name"));
+		this->name=atos((const char*) xmlGetProp(ptr,(xmlChar*) "name"));
 		this->x=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "x"));
 		this->y=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "y"));
+		this->playerVocation=itov((int) xmlGetProp(ptr,(xmlChar*) "vocation"));
 		
 		ptr=ptr->next;
 		
 		// get the entity of the player
-		this->hairOutfit=item::atos((const char*) xmlGetProp(ptr,(xmlChar*) "hair"));
-		this->torsoOutfit=item::atos((const char*) xmlGetProp(ptr,(xmlChar*) "torso"));
-		this->legsOutfit=item::atos((const char*) xmlGetProp(ptr,(xmlChar*) "legs"));
+		this->hairOutfit=atos((const char*) xmlGetProp(ptr,(xmlChar*) "hair"));
+		this->torsoOutfit=atos((const char*) xmlGetProp(ptr,(xmlChar*) "torso"));
+		this->legsOutfit=atos((const char*) xmlGetProp(ptr,(xmlChar*) "legs"));
 		
 		this->currentHP=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "hp"));
 		this->currentMP=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "mp"));
@@ -532,35 +538,4 @@ int player::loadFromIndex(int game,int &playersOnGame) {
 	
 	fin >> playersOnGame; fin.clear();
 	fin.close();
-};
-	
-// delete the temporary directory (99)
-int player::removeTemp() {
-
-	// last time we need to check the client's system and
-	// use the appropriate file separator.
-	char path[256];
-	char delCommand[256];
-	
-	#ifdef __LINUX__
-	sprintf(path,"data/game99/savefile1.dat");
-	sprintf(delCommand,"rm -rf data/game99");
-	#endif
-	
-	#ifdef __WINDOWS__
-	sprintf(path,"data\\game99\\savefile1.dat");
-	sprintf(delCommand,"rm -rf data\\game99");
-	#endif
-
-	std::ifstream fin;
-	
-	// first we attempt to load a savefile from the temporary
-	// directory. if it fails, then there is no need to remove
-	// the directory since it doesn't exist. otherwise, remove it!
-	fin.open(path);
-	
-	if (fin) {
-		fin.close();
-		system(delCommand);
-	}
 };

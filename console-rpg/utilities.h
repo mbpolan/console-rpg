@@ -17,58 +17,25 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-
- #ifndef item_h
- #define item_h
  
-// items.h: holds item class and declarations
+#ifndef utilities_h
+#define utilities_h
+
+// utilities.h: various methods that don't fit to any specific class
 #include <iostream>
 #include <sstream>
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
+#include <fstream>
 
-// enumerate the types of items
-enum TYPE {head,torso,legs,boots,npe};
-
-class item {
-	public:
-		item();
-		item(item*); // copy constructor
-		item(int id); // lesser constructor
-		item(int id,TYPE); // type inclusive constructor
-		item(int id,int x,int y); // our constructor
-		item(int,const char*,const char*,const char*);
-		
-		virtual ~item();
-
-		void setItemID(int id) {itemID=id;};
-		void setItemName(std::string nameOfItem) {itemName=nameOfItem;}
-		
-		std::string getName() const {return itemName;}
-		void setName(std::string name) {itemName=name;}
-
-		int getItemID() const {return itemID;}
-
-		bool isHeadItem();
-		bool isTorsoItem();
-		bool isLegsItem();
-		bool isBootsItem();
-
-		TYPE checkType();
-		void invalidateItem();
-		
-		xmlNodePtr compressToXML();
-		void parseItem(int);
-
-		int x,y;
-		static int itemCount;
-
-	private:
-		int itemID;
-		bool isValid;
-
-		std::string itemName;
-		TYPE itemTYPE;
+#include "player.h"
+ 
+namespace utilities {
+	// some methods to preform conversions
+	std::string atos(const char*);
+	VOCATION itov(int);
+	int vtoi(VOCATION);
+	
+	// method to remove a temp directory
+	int removeTemp();
 };
 
 #endif

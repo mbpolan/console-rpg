@@ -28,9 +28,12 @@
 #include <stdlib.h> // for atoi()
 #include <sstream> // for stringstream
 
+// nessesary headers
 #include "player.h"
 #include "playerlist.h"
 #include "movement.h"
+#include "utilities.h"
+using namespace utilities;
    
 #ifdef __LINUX__
 typedef unsigned long long __int64;
@@ -460,7 +463,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
         continue;
 
       else {
-        list[playerNow]->removeTemp(); // remove the temporary directory
+        removeTemp(); // remove the temporary directory
 	CRPG_CLEAR_SCREEN;
         exit(0);
       }
@@ -503,15 +506,14 @@ int generic::loadGame() {
    movement *grid=new movement; // movement grid
    map *karte=new map(PMAX,PMAX,NMAX,NMAX); // world map
    
-//   grid->spawnMapItems(karte);
-
-   int success=karte->loadMapData(slot);
-   if (success==0)
-   	return 0;
+   // load the map data from xml
+   if (karte->loadMapData(slot)==0)
+       return 0;
 
    // start the loop to fill up array with saved player data
    for (int i=0;i<players;i++) {
        list[i]=new player;
+       player::setPlayersOn(players);
 
 	   #ifdef __LINUX__
 	   sprintf(path,"data/game%d/savefile%d.xml",slot,i+1);
@@ -533,8 +535,11 @@ int generic::loadGame() {
           return 0;
        }
 
-       if (list[i]->loadPlayerData(i+1,slot))
+       if (list[i]->loadPlayerData(i+1,slot)) {
+          list[i]->setPlayerID(i+1);
           karte->players.push_back(list[i]);
+       }
+	  
 	  
        else {
           std::cout << "\nUnable to load player data!\n";
