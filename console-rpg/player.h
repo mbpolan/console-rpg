@@ -46,8 +46,8 @@ class player: public creature {
 		int getMP() const {return currentMP;}
 		void setMP(int mp) {currentMP=mp;}
 		
-		void setName(std::string initialName) {playerName=initialName;}
-		std::string getName() const {return playerName;}
+		void setName(std::string initialName) {creature::name=initialName;}
+		std::string getName() const {return creature::name;}
 		
 		void setLuck(int _luck) {luck=_luck;};
 		int getLuck() const {return luck;}
@@ -71,16 +71,7 @@ class player: public creature {
 		int getExp() const {return exp;}
 		
 		void increaseExp(int _exp) {exp+=_exp;} 
-		void increaseLevel();
-		
-		// visual accessors
-		void setLook();
-		void setHair(std::string hairColor) {hairOutfit=hairColor;}
-		void setTorso(std::string torsoColor) {torsoOutfit=torsoColor;}
-		void setLegs(std::string legsColor) {legsOutfit=legsColor;}
-		std::string getHair() const {return hairOutfit;}
-		std::string getTorso() const {return torsoOutfit;}
-		std::string getLegs() const {return legsOutfit;}
+		void increaseLevel(int);
 		
 		// for saving the data to a savefile
 		int savePlayerData(map*,int,int,bool);
@@ -113,6 +104,7 @@ class player: public creature {
 		int getPlayerID() const {return playerID;}
 		void setPlayersOn(int players) {playersOn=players;}
 		int getPlayersOn() {return playersOn;}
+		void setLook();
 		
 	private:
 		static int playersOn; // count of all the players on the game
@@ -120,8 +112,6 @@ class player: public creature {
 		// stats and id
 		int playerID;
 		int currentHP,currentMP,luck,strength,power,defense,level,exp;
-		std::string playerName;
-		std::string hairOutfit, legsOutfit, torsoOutfit;
 		
 		// equipment
 		item *headEq;

@@ -47,6 +47,19 @@ class creature {
 		
 		virtual void setDefense(int) =0;
 		virtual int getDefense() const =0;
+		
+		// visual accessors
+		void setHair(std::string hairColor) {hairOutfit=hairColor;}
+		void setTorso(std::string torsoColor) {torsoOutfit=torsoColor;}
+		void setLegs(std::string legsColor) {legsOutfit=legsColor;}
+		
+		std::string getHair() const {return hairOutfit;}
+		std::string getTorso() const {return torsoOutfit;}
+		std::string getLegs() const {return legsOutfit;}
+		
+	protected:
+		std::string name;
+		std::string hairOutfit, legsOutfit, torsoOutfit;
 
 };
 

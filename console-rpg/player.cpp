@@ -28,7 +28,7 @@
 player::player() {
 	currentHP=100;
 	currentMP=10;
-	playerName="Arbba";
+	name="Arbba";
 	hairOutfit="brown", legsOutfit="blue", torsoOutfit="brown";
 	luck=0,power=0,strength=0,defense=0;
 	playerVocation=warrior;
@@ -46,7 +46,7 @@ player::player() {
 player::player(int fixedHP, int fixedMP, int id) {
 	currentHP=fixedHP;
 	currentMP=fixedMP;
-	playerName="Arbba";
+	name="Arbba";
 
 	luck=0;
 	power=0;
@@ -73,7 +73,7 @@ player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense,int id)
 	power=Power;
 	defense=Defense;
 
-	playerName="Arbba";
+	name="Arbba";
 	hairOutfit="brown", legsOutfit="blue", torsoOutfit="brown";
 	playerVocation=warrior;
 
@@ -105,7 +105,7 @@ player &player::operator=(const player &r_player) {
 	power=r_player.getStrength();
 	defense=r_player.getDefense();
 
-	playerName=r_player.getName();
+	name=r_player.getName();
 	hairOutfit=r_player.getHair(),torsoOutfit=r_player.getTorso(),legsOutfit=r_player.getLegs();
 	playerVocation=r_player.getVoc();
 
@@ -127,7 +127,7 @@ bool player::operator==(const player &r_player) {
 		    
 		    headEq==r_player.getHeadItem() && torsoEq==r_player.getTorsoItem() &&
 		    legEq==r_player.getLegsItem() && bootEq==r_player.getBootsItem() &&
-		    playerName==r_player.getName() && playerVocation==r_player.getVoc())
+		    creature::name==r_player.getName() && playerVocation==r_player.getVoc())
 			return true;
 	}
 	
@@ -182,13 +182,13 @@ void player::setLook() {
 	}
 	
 	std::cout << "\nWhat is your hair color? ";
-	std::cin >> hairOutfit;
+	std::cin >> creature::hairOutfit;
 	
 	std::cout << "\nWhat is your shirt color? ";
-	std::cin >> torsoOutfit;
+	std::cin >> creature::torsoOutfit;
 
 	std::cout << "\nWhat is your pants color? ";
-	std::cin >> legsOutfit;
+	std::cin >> creature::legsOutfit;
 };
 
 // display player's inventory
@@ -203,10 +203,10 @@ void player::displayInventory() {
 // remove item from inventory
 void player::removeInventoryItem(int theType) {
 	switch(theType) {
-		case 0: headEq->setName("nothing");break;
-		case 1: torsoEq->setName("nothing");break;
-		case 2: legEq->setName("nothing");break;
-		case 3: bootEq->setName("nothing");break;
+		case 0: headEq=new item("nothing",head);;break;
+		case 1: torsoEq=new item("nothing",torso);break;
+		case 2: legEq=new item("nothing",legs);break;
+		case 3: bootEq=new item("nothing",boots);break;
 		default: std::cout << "This item is not equiped!";
 	}
 };
@@ -214,10 +214,10 @@ void player::removeInventoryItem(int theType) {
 // add item to inventory
 void player::addInventoryItem(TYPE theType,item *thisItem) {
 	switch(theType) {
-		case 0: headEq=thisItem;break;
-		case 1: torsoEq=thisItem;break;
-		case 2: legEq=thisItem;break;
-		case 3: bootEq=thisItem;break;
+		case head: headEq=thisItem;break;
+		case torso: torsoEq=thisItem;break;
+		case legs: legEq=thisItem;break;
+		case boots: bootEq=thisItem;break;
 		default: std::cout << "This item cannot be equiped!";
 	}
 };
@@ -231,21 +231,21 @@ int player::searchInventory(std::string itemName) {
 	std::string bootsItem=bootEq->getName();
 	
 	if (locator==headItem)
-		return 0;
+		return head;
 	if (locator==torsoItem)
-		return 1;
+		return torso;
 	if (locator==legsItem)
-		return 2;
+		return legs;
 	if (locator==bootsItem)
-		return 3;
+		return boots;
 	else {
-		return 4; // not found
+		return npe; // not found
 	}
 };
 
 // increase the player's current level
-void player::increaseLevel() {
-		level++;
+void player::increaseLevel(int increase) {
+		level+=increase;
 		std::cout << "\nYou advanced to level " << level << "!\n";
 };
 
@@ -332,7 +332,7 @@ int player::savePlayerData(map *karte,int player,int game,bool ignoreTemp) {
 		return 0;
 	}
 	
-	fout << playerName;
+	fout << creature::name;
 	fout.close();
 	
 	saveToIndex(game);
@@ -403,7 +403,7 @@ int player::loadPlayerData(map *karte,int player,int game) {
 		return 0;
 	}
 	
-	fin >> playerName;
+	fin >> creature::name;
 	fin.close();
 
 };

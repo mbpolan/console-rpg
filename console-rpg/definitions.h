@@ -37,8 +37,7 @@ int player::playersOn=0;
 // first we place all the function prototypes
 // into a generic namespace. this hopefully makes
 // it more organized ;)
-namespace generic
-{
+namespace generic {
   int menu();
   int configurePlayers(playerList<player*>&,int);
   void preGame(movement*,map*,playerList<player*>&,int);
@@ -46,13 +45,12 @@ namespace generic
   void optionMenu();
 }
 // menu function: display menu and options
-int generic::menu()
-{ // takes a reference to player
+int generic::menu() {
+  // takes a reference to player
   char a_menuChoice[5];
   int menuChoice;
 
-  for(;;)
-  {
+  for(;;) {
     std::cout << "\nMain Menu\n"
     << "---------" << std::endl;
     std::cout << "(1) Start a new game.\n"
@@ -65,8 +63,7 @@ int generic::menu()
     std::cin.ignore(); // remove the newline
 
     // the user wants to start a new game
-    if (menuChoice==1)
-    {
+    if (menuChoice==1) {
 
       int players; // the amount of players
       std::cout << "\nHow many players in this game? ";
@@ -79,8 +76,7 @@ int generic::menu()
       list[0]->setPlayersOn(players);
 
       // fill up this array
-      for (int i=0;i<players;i++)
-      {
+      for (int i=0;i<players;i++) {
         list[i]=new player(5,0,i); // player HP/MP/id
       }
 
@@ -89,8 +85,7 @@ int generic::menu()
       return 0;
     }
 
-    if (menuChoice==2)
-    {
+    if (menuChoice==2) {
 
       // ask the user which slot to load from
       int slot;
@@ -125,8 +120,7 @@ int generic::menu()
 
       // start the loop to fill up array with saved player data
       char path[256];
-      for (int i=0;i<players;i++)
-      {
+      for (int i=0;i<players;i++) {
         list[i]=new player;
         player *pPlayer=new player;
 
@@ -134,8 +128,7 @@ int generic::menu()
 
         fin.open(path);
 
-        if (!fin)
-        {
+        if (!fin) {
           std::cout << "\nGame: " << slot;
           std::cout << "\nSavefile " << i << " is either corrupt or not present. Aborting...\n";
           return 0;
@@ -161,8 +154,8 @@ int generic::menu()
 }
 
 // configurePlayers: (formerly mainMenu) configure all players
-int generic::configurePlayers(playerList<player*> &r_list,int playerCount)
-{ // takes an array of players and count
+int generic::configurePlayers(playerList<player*> &r_list,int playerCount) {
+  // takes an array of players and count
 
   movement *grid=new movement; // make a new movement grid
   map *karte=new map(30,30,-30,-30); // make a new map
@@ -170,20 +163,19 @@ int generic::configurePlayers(playerList<player*> &r_list,int playerCount)
   grid->spawnMapItems(grid,karte); // spawn items on map NOW
 
   char cVar; // confirmation variable
+  
+  // we need to set name and look
+  // make a temporary player object
+  player *pPlayer=new player;
 
   // loop for as long as there are players
-  for (int i=0;i<playerCount;i++)
-  {
+  for (int i=0;i<playerCount;i++) {
     // now we configure each player's character
     std::cout << "\n==========================";
     std::cout << "\nPlayer " << i+1 << " Configuration\n";
     std::cout << "\nEnter player name: ";
     std::string name;
     std::getline(std::cin,name,'\n');
-
-    // we need to set name and look
-    // make a temporary player object
-    player *pPlayer=new player;
 
     pPlayer->setPlayerID(i+1);
     pPlayer->setName(name);
@@ -195,17 +187,18 @@ int generic::configurePlayers(playerList<player*> &r_list,int playerCount)
     std::cin.ignore();
     std::cout << "==========================\n";
   }
+  
+  // delete allocated memory for temporary player
+  delete pPlayer;
 
   std::cout << "\nStart a new game? (y,n) ";
   std::cin >> cVar;
   cVar=toupper(cVar);
 
-  if (cVar=='Y')
-  {
+  if (cVar=='Y') {
     generic::preGame(grid,karte,r_list,playerCount);
   }
-  else
-  {
+  else {
     std::cout << "\nQuitting...\n";
     return 0;
   }
@@ -218,13 +211,11 @@ int generic::configurePlayers(playerList<player*> &r_list,int playerCount)
 
 // function to preform certain actions before start of
 // new turn or game.
-void generic::preGame(movement *rhs,map *karte,playerList<player*> &r_list,int playerCount)
-{
+void generic::preGame(movement *rhs,map *karte,playerList<player*> &r_list,int playerCount) {
   int j=0; // counter variable
   int turns=1; // amount of turns
 
-  for (;;)
-  {
+  for (;;) {
     // reset the counter
     if (j==playerCount)
       j=0;
@@ -241,14 +232,12 @@ void generic::preGame(movement *rhs,map *karte,playerList<player*> &r_list,int p
 }
 
 // optionMenu: function for displaying option menu (finish this later)
-void generic::optionMenu()
-{
+void generic::optionMenu() {
   std::cout << "\nNo options avaliable at this time.\n";
 }
 
 // startGame function: this will start the actual game
-void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int playerNow,int playerCount,int &turns)
-{
+void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int playerNow,int playerCount,int &turns) {
 
   bool firstTurn=true; // first turn flag
   int moves=10; // moves remaining
@@ -263,8 +252,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
 
   // reset the coordinates for the next player as long as it's
   // still his first turn.
-  if (firstTurn)
-  {
+  if (firstTurn) {
     karte->setCurrentSpaceX(0);
     karte->setCurrentSpaceY(0);
   }
@@ -274,8 +262,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
   if (!firstTurn)
     list[playerNow]->loadPlayerData(karte,list[playerNow]->getPlayerID(),99);
 
-  while(moves>0)
-  {
+  while(moves>0) {
     int count=rhs->getStepCount(); // count the amount of spaces moved
 
     std::cout << "\nMove: ";
@@ -285,101 +272,86 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
 
     // for debugging purposes only!
 #ifdef DEBUG
-    if (moverVar=="mod")
-    {
+    if (moverVar=="mod") {
       list[playerNow]->setHP(0);
     }
 #endif
 
     // if this is the final move, then make sure to save the player's
     // stats before passing in the next player
-    if (moves==1)
-    {
+    if (moves==1) {
       moverVar="end";
     }
 
-    if (moverVar=="n")
-    {
+    if (moverVar=="n") {
       rhs->moveN(karte);
       rhs->controlTime(count);
       moves--;
     }
 
-    if (moverVar=="s")
-    {
+    if (moverVar=="s") {
       rhs->moveS(karte);
       rhs->controlTime(count);
       moves--;
     }
 
-    if (moverVar=="w")
-    {
+    if (moverVar=="w") {
       rhs->moveW(karte);
       rhs->controlTime(count);
       moves--;
     }
 
-    if (moverVar=="e")
-    {
+    if (moverVar=="e") {
       rhs->moveE(karte);
       rhs->controlTime(count);
       moves--;
     }
 
-    if (moverVar=="nw")
-    {
+    if (moverVar=="nw") {
       rhs->moveNW(karte);
       rhs->controlTime(count);
       moves--;
     }
 
-    if (moverVar=="ne")
-    {
+    if (moverVar=="ne") {
       rhs->moveNE(karte);
       rhs->controlTime(count);
       moves--;
     }
 
-    if (moverVar=="sw")
-    {
+    if (moverVar=="sw") {
       rhs->moveSW(karte);
       rhs->controlTime(count);
       moves--;
     }
 
-    if (moverVar=="se")
-    {
+    if (moverVar=="se") {
       rhs->moveSE(karte);
       rhs->controlTime(count);
       moves--;
     }
 
-    if (moverVar=="stats")
-    {
+    if (moverVar=="stats") {
       list[playerNow]->displayStats();
     }
 
-    if (moverVar=="pos")
-    {
+    if (moverVar=="pos") {
       rhs->getCurrentPosition(karte);
     }
 
-    if (moverVar=="look")
-    {
+    if (moverVar=="look") {
       rhs->checkTime();
       rhs->look(karte);
     }
 
-    if (moverVar=="help")
-    {
+    if (moverVar=="help") {
       std::cout << "\nYou may move around the map using the following directions:\n"
       << "n, w, e, s, nw, ne, sw, se."
       << "\nType 'quit' to exit the game. Further instructions are provided\n"
       << "in the documentation that came with this game.\n";
     }
 
-    if (moverVar=="save")
-    {
+    if (moverVar=="save") {
       int slot;
       std::cout << "\nSave to which slot (1-9)? ";
       std::cin >> slot;
@@ -388,39 +360,34 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       // since the slot doesn't yet exist, we pass in 'false' as the
       // parameter to make the slot directory. loop until every players'
       // stats are saved in the slot.
-      for (int i=0;i<playerCount;i++)
-      {
+      for (int i=0;i<playerCount;i++) {
         list[i]->savePlayerData(karte,list[i]->getPlayerID(),slot,false);
       }
       karte->saveMapData(slot);
       std::cout << "\nPlayer and map saved!\n";
     }
 
-    if (moverVar=="inv")
-    {
+    if (moverVar=="inv") {
       list[playerNow]->displayInventory();
     }
 
-    if (moverVar=="equip")
-    {
+    if (moverVar=="equip") {
       int x=karte->getCurrentSpaceX();
       int y=karte->getCurrentSpaceY();
 
-      if (karte->itemExists(karte,x,y))
-      {
+      if (karte->itemExists(karte,x,y)) {
         TYPE type=karte->checkItemType(karte);
         char confirm;
         item *targetItem=karte->identifyItem(karte);
 
 	// if the target item is NULL, then disable equipping since
 	// it will mostly likely cause a segfault
-        if (targetItem!=NULL)
-        {
+        if (targetItem!=NULL) {
           std::cout << "\nEquip " << targetItem->getName() << "? ";
           std::cin >> confirm;
           confirm=toupper(confirm);
-          if (confirm=='Y')
-          {
+	  
+          if (confirm=='Y') {
             list[playerNow]->addInventoryItem(type,targetItem);
             rhs->removeItem(karte);
             //std::cout << targetItem->getName(); << " was equipped.\n";
@@ -438,8 +405,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
         std::cout << "\nThere is no item here that can be equipped.\n";
     }
 
-    if (moverVar=="unequip")
-    {
+    if (moverVar=="unequip") {
       std::cout << "\nUnequip which item? ";
       std::string targetItem;
       std::cin.ignore();
@@ -447,13 +413,11 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
 
       bool equiped=false;
       int itemString=list[playerNow]->searchInventory(targetItem);
-      if (itemString>=0 && itemString<=3)
-      {
+      if (itemString>=0 && itemString<=3) {
         list[playerNow]->removeInventoryItem(itemString);
         std::cout << std::endl << targetItem << " was unequipped.\n";
       }
-      if (itemString>3)
-      {
+      if (itemString>3) {
         std::cout << "\nThis item is not equipped!\n";
         equiped=false;
       }
@@ -461,8 +425,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
         std::cout << "\nYou unequipped the " << targetItem << ".\n";
     }
 
-    if (moverVar=="end")
-    {
+    if (moverVar=="end") {
       bool ignore=false; // should we ignore making a temp directory?
 
       // after the first player ends his turn, then the temp directory is made.
@@ -476,14 +439,13 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
     }
 
     std::string quitVer;
-    if (moverVar=="quit")
-    {
+    if (moverVar=="quit") {
       std::cout << "\nAre you sure you want to quit the game? (y,n)  ";
       std::cin >> quitVer;
       if (quitVer=="n")
         continue;
-      else
-      {
+
+      else {
         list[playerNow]->removeTemp(); // remove the temporary directory
         exit(0);
       }

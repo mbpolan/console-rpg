@@ -18,59 +18,47 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
  
-#ifndef map_h
-#define map_h
+#include "npc.h"
 
-// map.h: map class and related stuff
-#include "items.h"
-
-// our maximum map size (+/-)
-#define max 30
-
-class map {
-	public:
-		map(int,int,int,int);
-		virtual ~map();
-		
-		// public accessors
-		int getCurrentSpaceX() const {return currentSquareX;}
-		int getCurrentSpaceY() const {return currentSquareY;}
-		void setCurrentSpaceX(int x) {currentSquareX=x;}
-		void setCurrentSpaceY(int y) {currentSquareY=y;}
-		
-		int getMapMaxSizeX() const {return MapMaxSizeX;}
-		int getMapMaxSizeY() const {return MapMaxSizeY;}
-		int getMapMaxSizeNgX() const {return MapMaxSizeNgX;}
-		int getMapMaxSizeNgY() const {return MapMaxSizeNgY;}
-		
-		// map methods
-		void addItemX(item*,int);
-		void addItemY(item*,int);
-		void removeItemX(int);
-		void removeItemY(int);
-		
-		// misc methods for map
-		bool itemExists(map*,int,int);
-		item* identifyItem(map*);
-		std::string parseGroundID(int);
-		TYPE checkItemType(map*);
-		int getGroundID() const {return groundID;}
-		int saveMapData(int);
-		int loadMapData(int);
-		
-	private:
-		int MapMaxSizeX,MapMaxSizeY,MapMaxSizeNgY,MapMaxSizeNgX;
-		int currentSquareX,currentSquareY,groundID;
-
-		// the item coordinate arrays
-		int itemSquareX[max],itemSquareY[max];
-		int itemSquareNgX[max],itemSquareNgY[max];
-
-		// the item object arrays
-		item *itemLineX[max];
-		item *itemLineY[max];
-		item *itemLineNgX[max];
-		item *itemLineNgY[max];
+// npc class default constructor
+npc::npc() {
+	name="Arbba";
+	posx=0;
+	posy=0;
 };
 
-#endif
+// npc class constructor
+npc::npc(int x,int y,std::string _name) {
+	name=_name;
+	posx=x;
+	posy=y;
+};
+
+// npc class destructor
+npc::~ npc() {
+};
+
+// method for determining where to move
+void npc::preformMove() {
+	srand(time(NULL));
+	
+	int action=(rand()%7);
+	
+	switch(action) {
+		case MOVE_NORTH: posx++;break;
+		case MOVE_SOUTH: posx--;break;
+		case MOVE_WEST: posy--;break;
+		case MOVE_EAST: posy++;break;
+		case MOVE_NW: posx++; posy--;break;
+		case MOVE_NE: posx++; posy++;break;
+		case MOVE_SW: posx--; posy--;break;
+		case MOVE_SE: posx--; posy++;break;
+		default: posx++;break;
+	}
+	
+	#ifdef DEBUG
+	std::cout << "\nNPC moved to x: " << posx << "/y: " << posy << std::endl;
+	#endif
+	
+	return;
+};

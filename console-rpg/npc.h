@@ -18,59 +18,40 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
  
-#ifndef map_h
-#define map_h
+#ifndef npc_h
+#define npc_h
 
-// map.h: map class and related stuff
-#include "items.h"
+// npc.h: NPC class declaration for most (if not all) NPC creatures
 
-// our maximum map size (+/-)
-#define max 30
+// needed libraries
+#include <iostream>
+#include <time.h>
 
-class map {
+// needed headers
+#include "creature.h"
+
+// enumerated actions the NPC can preform
+enum actions {
+	MOVE_NORTH,
+	MOVE_SOUTH,
+	MOVE_WEST,
+	MOVE_EAST,
+	MOVE_NW,
+	MOVE_NE,
+	MOVE_SW,
+	MOVE_SE
+};
+ 
+class npc: public creature {
 	public:
-		map(int,int,int,int);
-		virtual ~map();
+		npc();
+		npc(int,int,std::string _name); // our constructor
+		~npc();
 		
-		// public accessors
-		int getCurrentSpaceX() const {return currentSquareX;}
-		int getCurrentSpaceY() const {return currentSquareY;}
-		void setCurrentSpaceX(int x) {currentSquareX=x;}
-		void setCurrentSpaceY(int y) {currentSquareY=y;}
-		
-		int getMapMaxSizeX() const {return MapMaxSizeX;}
-		int getMapMaxSizeY() const {return MapMaxSizeY;}
-		int getMapMaxSizeNgX() const {return MapMaxSizeNgX;}
-		int getMapMaxSizeNgY() const {return MapMaxSizeNgY;}
-		
-		// map methods
-		void addItemX(item*,int);
-		void addItemY(item*,int);
-		void removeItemX(int);
-		void removeItemY(int);
-		
-		// misc methods for map
-		bool itemExists(map*,int,int);
-		item* identifyItem(map*);
-		std::string parseGroundID(int);
-		TYPE checkItemType(map*);
-		int getGroundID() const {return groundID;}
-		int saveMapData(int);
-		int loadMapData(int);
+		void preformMove();
 		
 	private:
-		int MapMaxSizeX,MapMaxSizeY,MapMaxSizeNgY,MapMaxSizeNgX;
-		int currentSquareX,currentSquareY,groundID;
-
-		// the item coordinate arrays
-		int itemSquareX[max],itemSquareY[max];
-		int itemSquareNgX[max],itemSquareNgY[max];
-
-		// the item object arrays
-		item *itemLineX[max];
-		item *itemLineY[max];
-		item *itemLineNgX[max];
-		item *itemLineNgY[max];
+		int posx, posy;
 };
 
 #endif

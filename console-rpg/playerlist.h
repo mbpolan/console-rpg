@@ -24,7 +24,7 @@
  
 #include <iostream>
   
-const int size=100; // fixed size for template
+#define size 100; // fixed size for template
 
 // our template class
 template <class T>

@@ -43,8 +43,8 @@ test: all
 	crpg
 
 # object files
-crpg: crpg$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX)
-	$(CPP) crpg$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX) $(OFLAG) crpg$(EXT)
+crpg: crpg$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) npc$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX)
+	$(CPP) crpg$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) npc$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX) $(OFLAG) crpg$(EXT)
 
 crpg$(OSUFFIX): crpg.cpp definitions.h
 	$(CPP) $(CPPFLAGS) $(CFLAG) crpg.cpp $(OFLAG) crpg$(OSUFFIX)
@@ -54,6 +54,9 @@ items$(OSUFFIX): items.cpp items.h
 
 map$(OSUFFIX): map.cpp map.h items.h
 	$(CPP) $(CPPFLAGS) $(CFLAG) map.cpp $(OFLAG) map$(OSUFFIX)
+
+npc$(OSUFFIX): npc.cpp npc.h creature.h
+	$(CPP) $(CPPFLAGS) $(CFLAG) npc.cpp $(OFLAG) npc$(OSUFFIX)
 
 player$(OSUFFIX): player.cpp player.h items.h creature.h
 	$(CPP) $(CPPFLAGS) $(CFLAG) player.cpp $(OFLAG) player$(OSUFFIX)

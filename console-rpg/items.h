@@ -24,6 +24,7 @@
 // items.h: holds item class and declarations
 #include <iostream>
 
+// enumerate the types of items
 enum TYPE {head,torso,legs,boots,npe};
 
 class item {
