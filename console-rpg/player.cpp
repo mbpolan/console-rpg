@@ -1,3 +1,26 @@
+/***************************************************************************
+ *   Copyright (C) 2004 by KanadaKid                                       *
+ *   kanadakid@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
+ #include <iostream>
+ #include <fstream>
+ 
 // player.cpp: declarations for player functions
 #include "player.h"
 
@@ -20,7 +43,7 @@ player::player() {
 };
 
 // player class overloaded constructor
-player::player(int fixedHP, int fixedMP, int fixedHeight, int fixedAge) {
+player::player(int fixedHP, int fixedMP, int fixedHeight, int fixedAge, int id) {
 	currentHP=fixedHP;
 	currentMP=fixedMP;
 	playerHeight=fixedHeight;
@@ -36,8 +59,10 @@ player::player(int fixedHP, int fixedMP, int fixedHeight, int fixedAge) {
 	
 	headEq="nothing";
 	torsoEq="Jacket";
-	legEq="Travel_Pants";
+	legEq="Travel Pants";
 	bootEq="Boots";
+	
+	playerID=id;
 	
 };
 
@@ -56,7 +81,7 @@ player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense) {
 
 	headEq="nothing";
 	torsoEq="nothing";
-        legEq="Travel_Pants";
+        legEq="Travel Pants";
         bootEq="Boots";
 };
 
@@ -88,63 +113,62 @@ player &player::operator=(const player &r_player) {
 };
 
 // let the player customize his character
-void player::setLook(player *r_player) {
-	std::string userVocation;
-	std::string userHair, userBody, userLegs;
+void player::setLook() {
 
+	std::string userVocation;
+	
 	std::cout << "\nPlease choose a vocation (warrior,mage,archer): ";
 	std::cin >> userVocation;
-
+	
+	if (userVocation!="warrior" && userVocation!="mage" && userVocation!="archer") {
+		std::cout << "\nThis vocation doesn't exist.\nDefault is warrior.\n";
+		userVocation="warrior";
+	}
+	
 	if (userVocation=="warrior") { // set warrior class stats
-		r_player->setLuck(5);
-		r_player->setStrength(10);
-		r_player->setPower(15);
-		r_player->setDefense(15);
-		r_player->setExp(0);
-		r_player->setLevel(1);
+		luck=5;
+		strength=10;
+		power=15;
+		defense=15;
+		exp=0;
+		level=1;
 		std::cout << "\nYou are now a warrior.\n";
-		r_player->setVoc(warrior);
+		playerVocation=warrior;
 	}
 
 	if (userVocation=="mage") { // set mage class stats
-		r_player->setLuck(10);
-		r_player->setStrength(5);
-		r_player->setPower(10);
-		r_player->setDefense(5);
-		r_player->setExp(0);
-		r_player->setLevel(1);
+		luck=10;
+		strength=5;
+		power=10;
+		defense=5;
+		exp=0;
+		level=1;
 		std::cout << "\nYou are now a mage.\n";
-		r_player->setVoc(mage);
+		playerVocation=mage;
 	}
 
 	if (userVocation=="archer") { // set archer class stats
-		r_player->setLuck(5);
-		r_player->setStrength(10);
-		r_player->setPower(15);
-		r_player->setDefense(10);
-		r_player->setExp(0);
-		r_player->setLevel(1);
+		luck=5;
+		strength=10;
+		power=15;
+		defense=10;
+		exp=0;
+		level=1;
 		std::cout << "\nYou are now an archer.\n";
-		r_player->setVoc(archer);
+		playerVocation=archer;
 	}
-
-	if (userVocation!="warrior" && userVocation!="mage" && userVocation!="archer") {
-		std::cout << "\nThis vocation doesn't exist.\nDefault is warrior.\n";
-	}
-
+	
 	std::cout << "\nWhat is your hair color? ";
-	std::cin >> userHair;
-	r_player->setHair(userHair);
+	std::cin >> hair;
+	
 	std::cout << "\nWhat is your shirt color? ";
-	std::cin >> userBody;
-	r_player->setTorso(userBody);
+	std::cin >> torso;
+
 	std::cout << "\nWhat is your pants color? ";
-	std::cin >> userLegs;
-	r_player->setLegs(userLegs);
+	std::cin >> legs;
 };
 
 // display player's inventory
-// BUG: there is a bug here, fix it!
 void player::displayInventory() {
 	std::cout << "\nYour Inventory:\n\n";
 	std::cout << "Head: " << headEq << "\n";
@@ -203,7 +227,7 @@ void player::increaseLevel() {
 };
 
 // display player statistics
-int player::displayStats(player *r_player) {
+int player::displayStats() {
 	std::cout << "\n\nStats\n";
 	std::cout << "HP: " << currentHP << std::endl;
 	std::cout << "MP: " << currentMP << std::endl;
@@ -211,4 +235,111 @@ int player::displayStats(player *r_player) {
 	std::cout << "Strength: " << strength << std::endl;
 	std::cout << "Power: " << power << std::endl;
 	std::cout << "Defense: " << defense << "\n\n";
+};
+
+// saves the current player status to file
+int player::savePlayerData(map *karte,int player,int game) {
+
+	// get the player's coordinates
+	int x=karte->getCurrentSpaceX();
+	int y=karte->getCurrentSpaceY();
+	
+	char savefile[256];
+	char targetDir[256];
+	
+	std::ofstream fout;
+	std::ifstream fin;
+	
+	sprintf(savefile,"data/game%d/savefile%d.dat",game,player);
+	
+	fin.open(savefile);
+	
+	if (!fin) {
+		sprintf(targetDir,"mkdir data/game%d/",game);
+		system(targetDir);
+	}
+	fin.close();
+	
+	// open our savefile and load the stats in
+	// follow each stat by a new line for loading
+	fout.open(savefile);
+	
+	if (!fout) {
+		std::cout << "\nUnable to save file!";
+		return 0;
+	}
+	
+	fout.write((char*) &playerName,sizeof(playerName));
+	fout.write((char*) &x,sizeof(x));
+	fout.write((char*) &y,sizeof(y));
+	fout.write((char*) &currentHP,sizeof(currentHP));
+	fout.write((char*) &currentMP,sizeof(currentMP));
+	
+	fout.write((char*) &luck,sizeof(luck));
+	fout.write((char*) &strength,sizeof(strength));
+	fout.write((char*) &power,sizeof(power));
+	fout.write((char*) &defense,sizeof(defense));
+	
+	fout.close();
+};
+
+// load the savefstreamfile and continue the game
+int player::loadPlayerData(map *karte,int player,int game) {
+	std::fstream fin;
+	int x,y;
+	char savefile[256];
+	
+	sprintf(savefile,"data/game%d/savefile%d.dat",game,player);
+	
+	fin.open(savefile);
+
+	if (!fin) {
+		std::cout << "\nFailed to load savefile!";
+		return 0;
+	}
+	
+	fin.read((char*) &playerName,sizeof(playerName));
+	fin.clear();
+
+	fin.read((char*) &x,sizeof(x));
+	karte->setCurrentSpaceX(x);
+	fin.clear();
+
+	fin.read((char*) &y,sizeof(y));
+	karte->setCurrentSpaceY(y);
+	fin.clear();
+	
+	fin.read((char*) &currentHP,sizeof(currentHP));
+	fin.clear();
+	
+	fin.read((char*) &currentMP,sizeof(currentMP));
+	fin.clear();
+
+	fin.read((char*) &luck,sizeof(luck));
+	fin.clear();
+
+	fin.read((char*) &strength,sizeof(strength));
+	fin.clear();
+
+	fin.read((char*) &power,sizeof(power));
+	fin.clear();
+
+	fin.read((char*) &defense,sizeof(defense));
+	fin.clear(); fin.close();
+
+};
+
+// delete the temporary directory (99)
+int player::removeTemp() {
+	std::ifstream fin;
+	
+	// first we attempt to load a savefile from the temporary
+	// directory. if it fails, then there is no need to remove
+	// the directory since it doesn't exist. otherwise, remove it!
+	fin.open("data/game99/savefile1.dat");
+	
+	if (fin)
+		system("rm -rf data/game99/");
+		
+	fin.close();
 };

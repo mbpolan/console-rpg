@@ -7,10 +7,11 @@
 CPP = g++
 OFLAG = -c
 OSUFFIX = .o
+CPPFLAGS = -DDEBUG
 DEL = rm -f
 .SUFFIXES : .o .cpp
 .cpp.o :
-	$(CPP) $(CPPGLAGS) -c $<
+	$(CPP) $(CPPFLAGS) -c $<
 
 # compile this
 all: \
@@ -25,7 +26,7 @@ crpg: crpg.o items.o map.o player.o movement.o
 	$(CPP) crpg.o items.o map.o player.o movement.o -o crpg
 
 crpg.o: crpg.cpp definitions.h
-	$(CPP) $(OFLAG) crpg.cpp -o crpg.o
+	$(CPP) $(OFLAG) $(CPPFLAGS) crpg.cpp -o crpg.o
 
 items.o: items.cpp items.h
 	$(CPP) $(OFLAG) items.cpp -o items.o

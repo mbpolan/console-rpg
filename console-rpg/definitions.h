@@ -1,6 +1,28 @@
+/***************************************************************************
+ *   Copyright (C) 2004 by KanadaKid                                       *
+ *   kanadakid@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
+ #ifndef definitions_h
+ #define definitions_h
+ 
 // definitions.h: holds function declarations and definitions
 #include <iostream>
-#include <fstream>
 #include <ctype.h> // for toupper()
 
 #include "player.h"
@@ -8,32 +30,58 @@
 
 // our prototypes
 // move these into classes later
-int mainMenu(player*);
-int savePlayerData(player*,map*);
-int loadPlayerData(player*,map*);
-void startGame(movement*,map*,player*);
+int mainMenu(player**,int);
+void startGame(movement*,map*,player*,int);
 void optionMenu();
-void spawnMapItems(movement*,map*);
 
 // menu function: display menu and options
-int menu(player *r_player) { // takes a reference to player
+int menu() { // takes a reference to player
 	std::string menuChoice;
 	for(;;) {
 		std::cout << "\nMain Menu\n"
 		     << "---------" << std::endl;
 		std::cout << "(1) Start a new game.\n"
-		     << "(2) Options\n"
-		     << "(3) Quit\n"
+		     << "(2) Continue playing\n"
+		     << "(3) Options\n"
+		     << "(4) Quit\n"
 		     << "---------\n> ";
 		std::cin >> menuChoice;
+		std::cin.ignore(); // remove the newline
 		
+		// the user wants to start a new game
 		if (menuChoice=="1") {
-			mainMenu(r_player); // pass in the character
+		
+			int players; // the amount of players
+			std::cout << "\nHow many players in this game? ";
+			std::cin >> players;
+			std::cin.ignore(); // remove the newline
+			
+			// make an array of current players
+			player *playerList[players];
+			
+			// fill up this array
+			for (int i=0;i<players;i++) {
+				playerList[i]=new player(5,0,0,0,i); // player HP/MP/Height(ft)/age/id
+			}
+			
+			mainMenu(playerList,players); // pass in the character list
+			delete [] playerList; // delete all players
+			
 			return 0;
 		}
 		
-		if( menuChoice=="2")
-			optionMenu();
+		if (menuChoice=="2") {
+			
+			std::cout << "\nLoading from data/ directory...";
+			
+			int players;
+			//player *playerList[players];
+			//std::cout << 
+		}
+			
+		
+		if( menuChoice=="3")
+			optionMenu(); // display options (todo)
 		
 		else
 			return 0;
@@ -41,38 +89,65 @@ int menu(player *r_player) { // takes a reference to player
 }
 
 // mainMenu: function for displaying the main menu
-int mainMenu(player *r_player2) { // takes a reference to player
-	movement *grid=new movement;
-	map *karte=new map(30,30,-30,-30);
-	char cVar;
+int mainMenu(player **r_list,int playerCount) { // takes an array of players and count
+
+	movement *grid=new movement; // make a new movement grid
+	map *karte=new map(30,30,-30,-30); // make a new map
+	char cVar; // confirmation variable
 	
-	std::cout << "\nEnter player name: ";
-	std::string name;
-	std::cin >> name;
+	// loop for as long as there are players
+	for (int i=0;i<playerCount;i++) {
+		// now we configure each player's character
+		std::cout << "\n==========================";
+		std::cout << "\nPlayer " << i+1 << " Configuration\n";
+		std::cout << "\nEnter player name: ";
+		std::string name;
+		std::getline(std::cin,name,'\n');
 	
-	r_player2->setName(name);
-	std::cout << "\nCustomize your character? (y,n) ";
+		// we need to set name and look
+		// make a temporary player object
+		player *pPlayer=new player;
+		
+		pPlayer->setPlayerID(i+1);
+		pPlayer->setName(name);
+		pPlayer->setLook();
+		
+		// put this temporary object into the array for good
+		r_list[i]=pPlayer;
+		
+		std::cin.ignore();
+		std::cout << "==========================\n";
+	}
+	
+	std::cout << "\nStart a new game? (y,n) ";
 	std::cin >> cVar;
 	cVar=toupper(cVar);
-	if (cVar=='Y')
-		r_player2->setLook(r_player2);
-	else;
-	std::cout << "\nStart a new game? (y,n) ";
-	char connect;
-	std::cin >> connect;
-	connect=toupper(connect);
-	if (connect=='Y') {
-		std::cout << "\nWelcome to Console RPG, " << r_player2->getName() << std::endl
-		     << "Type 'help' to display a help menu.";
-		startGame(grid,karte,r_player2); // this is where we actually start
-		delete grid; // we are done with the grid map; delete it
-		delete karte; // we are done with the world map; delete it
-		grid=0;
+	
+	if (cVar=='Y') {
+		int j=0; // counter variable
+		 
+		for (;;) {
+			// reset the counter
+			if (j==playerCount)
+				j=0;
+			
+			std::cout << "\n*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*";
+			std::cout << "\nWelcome to Console RPG, " << r_list[j]->getName() << std::endl
+			<< "Type 'help' to display a help menu.";
+			std::cout << "\n*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*";
+			startGame(grid,karte,r_list[j],playerCount); // this is where we actually start
+			j++;
+		}
 	}
 	else {
-		std::cout << "\nQuitting...";
+		std::cout << "\nQuitting...\n";
 		return 0;
 	}
+	
+	delete grid; // we are done with the grid map; delete it
+	delete karte; // we are done with the world map; delete it
+	grid=0;
+	karte=0;
 }
 
 // optionMenu: function for displaying option menu (finish this later)
@@ -80,10 +155,33 @@ void optionMenu() {
 	std::cout << "\nNo options avaliable at this time.\n";
 }
 
+int turns=0; // amount of turns
 // startGame function: this will start the actual game
-void startGame(movement *rhs,map *karte,player *r_player) {
-	for(;;) {
-		
+void startGame(movement *rhs,map *karte,player* r_player,int playerCount) {
+	
+	bool firstTurn=true; // first turn flag
+	
+	std::cout << "\nTURN: " << turns << std::endl;
+	
+	// if amount of turns is greater than the amount of players,
+	// then flag firstTurn to false so we can load the player's
+	// stats before he starts.
+	if (turns>=playerCount)
+		firstTurn=false;
+	
+	// reset the coordinates for the next player as long as it's
+	// still his first turn.
+	if (firstTurn) {
+		karte->setCurrentSpaceX(0);
+		karte->setCurrentSpaceY(0);
+	}
+	
+	// if it is NOT the first turn
+	// 99 is the temporary directory number for saved files
+	if (!firstTurn)
+		r_player->loadPlayerData(karte,r_player->getPlayerID(),99);
+
+	while(1) {
 		int count=rhs->getStepCount(); // count the amount of spaces moved
 		rhs->spawnMapItems(rhs,karte); // spawn items on map NOW
 	
@@ -140,7 +238,7 @@ void startGame(movement *rhs,map *karte,player *r_player) {
 		}
 
 		if (moverVar=="stats") {
-			r_player->displayStats(r_player);
+			r_player->displayStats();
 		}
 		
 		if (moverVar=="pos") {
@@ -159,16 +257,19 @@ void startGame(movement *rhs,map *karte,player *r_player) {
 				<< "In the documentation that came with this game.\n";
 		}
 		
+		if (moverVar=="load")
+			r_player->loadPlayerData(karte,r_player->getPlayerID(),1);
+		
+		
 		if (moverVar=="save") {
-			savePlayerData(r_player,karte);
+			int slot;
+			std::cout << "\nWhich slot to save to (1-9)? ";
+			std::cin >> slot;
+			std::cin.ignore();
+			
+			r_player->savePlayerData(karte,r_player->getPlayerID(),slot);
 			karte->saveMapData();
-			printf("%s","\nPlayer and map saved!\n");
-		}
-
-		if (moverVar=="load") {
-			loadPlayerData(r_player,karte);
-			karte->loadMapData();
-			std::cout << "\nLoading NOW!\n";
+			std::cout << "\nPlayer and map saved!\n";
 		}
 		
 		if (moverVar=="inv") {
@@ -189,143 +290,54 @@ void startGame(movement *rhs,map *karte,player *r_player) {
 					r_player->addInventoryItem(type,targetItem);
 					karte->removeItemX(x); // now remove the item from X
 					karte->removeItemY(y); // now remove the item from Y
-					std::cout << targetItem << " was equiped.\n";
+					std::cout << targetItem << " was equipped.\n";
 				}
 				if (confirm=='N')
-					std::cout << std::endl << targetItem << " was not equiped.\n";
+					std::cout << std::endl << targetItem << " was not equipped.\n";
 			}
 			else
 				std::cout << "\nThere is no item here that can be equipped.\n";
 		}
 		
 		if (moverVar=="unequip") {
-			std::cout << "\nRemove which item? ";
+			std::cout << "\nUnequip which item? ";
 			std::string targetItem;
-			std::cin >> targetItem;
+			std::cin.ignore();
+			std::getline(std::cin,targetItem,'\n');
 			
 			bool equiped=false;
 			int itemString=r_player->searchInventory(r_player,targetItem);
 			if (itemString>=0 && itemString<=3) {
 				r_player->removeInventoryItem(itemString);
-				std::cout << std::endl << itemString << " was unequiped.\n";
+				std::cout << std::endl << targetItem << " was unequipped.\n";
 			}
 			if (itemString>3) {
-				std::cout << "\nThis item is not equiped!\n";
+				std::cout << "\nThis item is not equipped!\n";
 				equiped=false;
 			}
 			if (equiped)
-				std::cout << "\nYou removed the " << targetItem << ".\n";
+				std::cout << "\nYou unequipped the " << targetItem << ".\n";
+		}
+		
+		if (moverVar=="end") {
+			turns++; // increment the turns
+			r_player->savePlayerData(karte,r_player->getPlayerID(),99); // save the player's data
+			break;
 		}
 
 		std::string quitVer;
 		if (moverVar=="quit") {
-			std::cout << "\nAre you sure you want to quit? (y,n)  ";
+			std::cout << "\nAre you sure you want to quit the game? (y,n)  ";
 			std::cin >> quitVer;
 			if (quitVer=="n")
 				continue;
-			else
-				break;
-		}
-	}
+			else {
+				r_player->removeTemp(); // remove the temporary directory
+				exit(0);
+			}
+		} // if (moverVar=="quit")
+	} // while(1)
 		
-}
+} // void startGame(movement *rhs,map *karte,player* r_player,int playerCount)
 
-// savePlayerData: saves the current player status to file
-// (Todo: encrypt the save file so the user can't edit it)
-int savePlayerData(player *r_player, map *karte) {
-
-	std::string playerName(r_player->getName());
-	
-	// do these later //
-//	std::string playerHair(r_player->getHair());
-//	std::string playerTorso(r_player->getTorso());
-//	std::string playerLegs(r_player->getLegs());
-//	int playerAge=r_player->getAge();
-//	int playerHeight=r_player->getHeight();
-	
-	// End of customization part. Start physical part //
-	
-	int playerCurrentHP=r_player->getHP();
-	int playerCurrentMP=r_player->getMP();
-	int luck=r_player->getLuck();
-	int strength=r_player->getStrength();
-	int power=r_player->getPower();
-	int defense=r_player->getDefense();
-
-	// get the player's coordinates
-	int x=karte->getCurrentSpaceX();
-	int y=karte->getCurrentSpaceY();
-	
-	std::ofstream fout;
-	
-	// open our savefile and load the stats in
-	// follow each stat by a new line for loading
-	fout.open("data/savefile.dat");
-	
-	if (!fout) {
-		std::cout << "\nUnable to save file!";
-		return 0;
-	}
-	
-	fout.write((char*) &playerName,sizeof(playerName));
-	fout.write((char*) &x,sizeof(x));
-	fout.write((char*) &y,sizeof(y));
-	fout.write((char*) &playerCurrentHP,sizeof(playerCurrentHP));
-	fout.write((char*) &playerCurrentMP,sizeof(playerCurrentMP));
-	
-	fout.write((char*) &luck,sizeof(luck));
-	fout.write((char*) &strength,sizeof(strength));
-	fout.write((char*) &power,sizeof(power));
-	fout.write((char*) &defense,sizeof(defense));
-	
-	fout.close();
-}
-
-// loadPlayerData: load the savefile and continue the game
-int loadPlayerData(player *r_player, map *karte) {
-	std::fstream fin;
-	std::string name;
-	int hp,mp,luck,strength,power,defense;
-	int x,y;
-	
-	fin.open("data/savefile.dat");
-
-	if (!fin) {
-		std::cout << "\nFailed to load savefile!";
-		return 0;
-	}
-	
-	fin.read((char*) &name,sizeof(name));
-	r_player->setName(name);
-	fin.clear();
-
-	fin.read((char*) &x,sizeof(x));
-	karte->setCurrentSpaceX(x);
-	fin.clear();
-
-	fin.read((char*) &y,sizeof(y));
-	karte->setCurrentSpaceY(y);
-	fin.clear();
-	
-	fin.read((char*) &hp,sizeof(hp));
-	r_player->setHP(hp);
-	fin.clear();
-	
-	fin.read((char*) &mp,sizeof(mp));
-	r_player->setMP(mp);
-	fin.clear();
-
-	fin.read((char*) &luck,sizeof(luck)); r_player->setLuck(luck);
-	fin.clear();
-
-	fin.read((char*) &strength,sizeof(strength)); r_player->setStrength(strength);
-	fin.clear();
-
-	fin.read((char*) &power,sizeof(power)); r_player->setPower(power);
-	fin.clear();
-
-	fin.read((char*) &defense,sizeof(defense)); r_player->setDefense(defense);
-	fin.clear(); fin.close();
-
-}
-
+#endif

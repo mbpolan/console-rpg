@@ -1,18 +1,37 @@
-// player.h: holds player class and member data
-#include <iostream>
-
-#include "creature.h"
-#include "items.h"
-
+/***************************************************************************
+ *   Copyright (C) 2004 by KanadaKid                                       *
+ *   kanadakid@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+ 
 #ifndef player_h
 #define player_h
+
+// player.h: holds player class and member data
+#include "creature.h"
+#include "items.h"
+#include "map.h"
 
 enum vocation {warrior,mage,archer};
 
 class player: public creature {
 	public:
 		player();
-		player(int,int,int,int); // new player constructor
+		player(int,int,int,int,int); // new player constructor
 		player(int,int,int,int,int,int); // enhanced constructor
 		virtual ~player();
 
@@ -60,7 +79,7 @@ class player: public creature {
 		void increaseLevel();
 		
 		// visual accessors
-		void setLook(player*);
+		void setLook();
 		void setHair(std::string hairColor) {hair=hairColor;}
 		void setTorso(std::string torsoColor) {torso=torsoColor;}
 		void setLegs(std::string legsColor) {legs=legsColor;}
@@ -69,7 +88,9 @@ class player: public creature {
 		std::string getLegs() const {return legs;}
 		
 		// for saving the data to a savefile
-		int savePlayerData(player*);
+		int savePlayerData(map*,int,int);
+		int loadPlayerData(map*,int,int);
+		int removeTemp();
 		
 		// item actions
 		void setHeadItem(item*);
@@ -88,9 +109,14 @@ class player: public creature {
 
 		// to display player's stats
 		void displayInventory();
-		int displayStats(player*);
+		int displayStats();
+		
+		// misc methods
+		void setPlayerID(int id) {playerID=id;}
+		int getPlayerID() const {return playerID;}
 		
 	private:
+		int playerID;
 		int currentHP,currentMP,luck,strength,power,defense,level,exp;
 		int playerHeight,playerAge;
 		std::string playerName;
