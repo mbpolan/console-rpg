@@ -28,6 +28,8 @@
 
 enum vocation {warrior,mage,archer};
 
+class map;
+
 class player: public creature {
 	public:
 		player();
