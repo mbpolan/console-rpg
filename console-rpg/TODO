@@ -1,0 +1,39 @@
+TODO List
+=========
+Lasted updated: 8/5/04
+
+Here are the features that you can expect with each release. It may change, so I don't guarantee
+that all the features may be implemented according to the release. Some features may not be fully
+complete, as marked off by pre-alpha, alpha, and beta.
+
+v0.1.2
+------
+> diagonal movement
+> player names
+> main menu
+
+v0.1.5
+------
+> player customization (age, height, etc.)
+> (alpha) items
+> larger map (~30x30)
+
+v0.1.8
+------
+> (beta) items
+> (alpha) equipment
+> leveling system
+
+v0.1.9
+------
+> items
+> (beta) equipment
+> (pre-alpha) NPC's
+
+v0.2.0
+------
+> equipment
+> (alpha) NPC's
+> (pre-alpha) multiplayer
+
+This list will be expanded as soon as I figure out what I'll put in next.
