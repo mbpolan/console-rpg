@@ -36,3 +36,4 @@ movement.o : movement.cpp
 
 clean: 
 	rm -rf *.o
+	rm crpg

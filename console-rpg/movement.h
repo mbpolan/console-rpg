@@ -3,26 +3,36 @@ using namespace std;
 
 class movement {
 	public:
-		movement(int defaultX, int defaultY);
+		// movement() {};
+		movement(int defaultX, int defaultY); // our constructor
 		~movement() {};
+
+		// movement methods
 		void moveN();
 		void moveS();
 		void moveW();
 		void moveE();
+		void moveNE();
+		void moveNW();
+		void moveSE();
+		void moveSW();
+
+		// public accessors
 		signed int getCurrentPosition() const {cout << "\nX: " << currentSquareX << ". Y: " << currentSquareY;}
 		signed int getMapMaxSizeX() const {return MapMaxSizeX;}
 		signed int getMapMaxSizeY() const  {return MapMaxSizeY;}
+		
 	private:
 		signed int MapMaxSizeX, MapMaxSizeY, MapMaxSizeNgX, MapMaxSizeNgY;
 		signed int currentSquareX, currentSquareY;
+		std::string genericErr;
 };
-
-//movement::movement(): MapMaxSizeX(15), MapMaxSizeY(15), MapMaxSizeNgY(-15), MapMaxSizeNgX(-15) {};
 
 movement::movement(int defaultX=0, int defaultY=0) {
 	currentSquareX=defaultX;
 	currentSquareY=defaultY;
 	MapMaxSizeX=15, MapMaxSizeY=15, MapMaxSizeNgX=(-15), MapMaxSizeNgY=(-15);
+	std::string genericErr="\nYou can't move any further";
 };
 
 void movement::moveN() {
@@ -64,3 +74,48 @@ void movement::moveE() {
 		cout << "\nMoved east.";
 	}
 };
+
+void movement::moveNE() {
+	if (currentSquareY==MapMaxSizeY && currentSquareX==MapMaxSizeX) {
+		cout << genericErr << "!";
+	}
+	else {
+		currentSquareY++;
+		currentSquareX++;
+		cout << "\nMove north-east.";
+	}
+};
+
+void movement::moveNW() {
+	if (currentSquareY==MapMaxSizeY && currentSquareX==MapMaxSizeX) {
+		cout << genericErr << "!";
+	}
+	else {
+		currentSquareY--;
+		currentSquareX++;
+		cout << "\nMoved north-west.";
+	}
+};
+
+void movement::moveSE() {
+	if (currentSquareY==MapMaxSizeY && currentSquareX==MapMaxSizeX) {
+		cout << genericErr << "!";
+	}
+	else {
+		currentSquareY++;
+		currentSquareX--;
+		cout << "\nMoved south-east.";
+	}
+};
+
+void movement::moveSW() {
+	if (currentSquareY==MapMaxSizeY && currentSquareX==MapMaxSizeX) {
+		cout << genericErr << "!";
+	}
+	else {
+		currentSquareY--;
+		currentSquareX--;
+		cout << "\nMoved south-west.";
+	}
+};
+		
