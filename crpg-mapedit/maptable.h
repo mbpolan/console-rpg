@@ -4,6 +4,7 @@
 #include <qtable.h>
 
 class QAction;
+class fillDialog;
 
 class mapTable: public QTable {
        Q_OBJECT
@@ -32,6 +33,8 @@ class mapTable: public QTable {
 	   void setPenTo5();
 	   
 	  void contextMenuEvent(QContextMenuEvent*);
+	  
+	  void fillMap();
 	   
        protected:
 	   int rows;
@@ -42,6 +45,9 @@ class mapTable: public QTable {
 	   bool pen2;
 	   bool pen3;
 	   bool pen5;
+	   
+	   // dialogs
+	   fillDialog *fill_Dialog;
 	   
 	   // actions
 	   QAction *removeItemAct;

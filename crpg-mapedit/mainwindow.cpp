@@ -1,5 +1,6 @@
 #include <qapplication.h>
 #include <qpopupmenu.h>
+#include <qlineedit.h>
 #include <qimage.h>
 #include <qpixmap.h>
 #include <qtoolbar.h>
@@ -28,7 +29,7 @@ mainWindow::mainWindow(QWidget *parent,const char *name): QMainWindow(parent,nam
     setCaption("Console RPG Map Editor 0.1 ~ Coded by KanadaKid");
     setMinimumSize(800,600);
     
-     // now we make the actual map editor tables...
+    // now we make the actual map editor tables...
     map=new mapTable(50,50,this,"map");
     this->setCentralWidget(map);
     
@@ -42,10 +43,6 @@ mainWindow::mainWindow(QWidget *parent,const char *name): QMainWindow(parent,nam
     
     // make some connections
     connect(map,SIGNAL(tileClicked(int,int)),position,SLOT(update(int,int)));
-    
-    // create our dialogs
-    new_Dialog=new newDialog(this);
-    goToCell_Dialog=new goToDialog(this);    
 };
 
 // make the actions used by menus, toolbars, etc.
@@ -121,6 +118,14 @@ void mainWindow::makeActions() {
     setPen5Act=new QAction(tr("Pen 5x5"),tr(""),this);
     setPen5Act->setStatusTip("Set the pen to 5x5 tile");
     connect(setPen5Act,SIGNAL(activated()),map,SLOT(setPenTo5()));
+    
+    prefAct=new QAction(tr("Preferences"),tr(""),this);
+    prefAct->setStatusTip("Edit preferences");
+    connect(prefAct,SIGNAL(activated()),this,SLOT(openPrefDialog()));
+    
+    fillAct=new QAction(tr("Fill"),tr(""),this);
+    fillAct->setStatusTip("Fill the map with one tile or object");
+    connect(fillAct,SIGNAL(activated()),map,SLOT(fillMap()));
 };
 
 // create our menus
@@ -135,10 +140,14 @@ void mainWindow::makeMenus() {
     
     edit=new QPopupMenu(this);
     goToCellAct->addTo(edit);
+    fillAct->addTo(edit);
+    
+    edit->insertSeparator();
+    prefAct->addTo(edit);
     
     options=new QPopupMenu(this);
     penOps=new QPopupMenu(options);
-
+    
     options->insertItem(tr("&Pen"),penOps);
     setPen1Act->addTo(penOps);
     setPen2Act->addTo(penOps);    
@@ -179,12 +188,26 @@ void mainWindow::makeToolbars() {
 };
 
 // slot to make a new map
-void mainWindow::makeNew() {    
+void mainWindow::makeNew() {
+    new_Dialog=new newDialog(this);
+    
     new_Dialog->show();
     new_Dialog->raise();
     new_Dialog->setActiveWindow();
+    
+    if (new_Dialog->exec()) {
+	QString sx=new_Dialog->sizeEditX->text();
+	QString sy=new_Dialog->sizeEditY->text();
 	
-    connect(new_Dialog,SIGNAL(sizesChanged(int,int)),this,SLOT(handleSizes(int,int)));   
+	if (sx.isNull() || sy.isNull()) {
+	    QMessageBox::warning(this,"Error",
+				 "You must enter a size in rows and columns (x/y)!");
+	}
+	
+	handleSizes(atoi(sx.ascii()),atoi(sy.ascii()));
+    }
+    
+    delete new_Dialog;
     
 };
 
@@ -192,8 +215,8 @@ void mainWindow::makeNew() {
 void mainWindow::makeToolbox() {
     toolbox=new QDockWindow(this,"toolbox");
     toolbox->setCaption("Toolbox");
-
-//    toolbox->setHorizontallyStretchable(false);
+    
+    //    toolbox->setHorizontallyStretchable(false);
     toolbox->setMovingEnabled(false);
     moveDockWindow(toolbox,Qt::Left);
     
@@ -220,7 +243,7 @@ void mainWindow::makeOpen() {
 	// check to see if this is a console rpg map file
 	if (xmlStrcmp(root->name,(const xmlChar*) "crpg-map")!=0) {
 	    QMessageBox::warning(this,"Invalid map file",
-			              "<p>Invalid map file! Please select another.</p>");
+				 "<p>Invalid map file! Please select another.</p>");
 	}
 	
 	// loadMapData(doc);
@@ -240,21 +263,36 @@ void mainWindow::makeSaveAs() {
 };
 
 // display dialog for gotocell
-void mainWindow::goToCellDialog() {     
+void mainWindow::goToCellDialog() {   
+    goToCell_Dialog=new goToDialog(this);    
+    
     goToCell_Dialog->show();
     goToCell_Dialog->raise();
     goToCell_Dialog->setActiveWindow();
-    connect(goToCell_Dialog,SIGNAL(valueChanged(int,int)),this,SLOT(goToCell(int,int)));
+    
+    if (goToCell_Dialog->exec()) {
+	QString row=goToCell_Dialog->lineRow->text();
+	QString col=goToCell_Dialog->lineCol->text();
+	
+	if (row.isEmpty() || col.isEmpty()) {
+	    QMessageBox::warning(this,"Error",
+				 "You must enter a valid pair of coordinates!");
+	}
+	
+	goToCell(atoi(row.ascii()),atoi(col.ascii()));
+    }
+    
+    delete goToCell_Dialog;
 };
 
 // our about dialog 
 void mainWindow::aboutDialog() {
     QMessageBox::about(this,"About",
 		       "<h2>CRPG Map Editor 0.1</h2>"
-		      "<p>Written by KanadaKid using the Qt library.</p>"
-		      "<p>This map editor is used to edit and make maps"
-		      " for Console RPG versions 0.2.0 and higher.</p>"
-		      "<p> Email: kanadakid@gmail.com</p>");
+		       "<p>Written by KanadaKid using the Qt library.</p>"
+		       "<p>This map editor is used to edit and make maps"
+		       " for Console RPG versions 0.2.0 and higher.</p>"
+		       "<p> Email: kanadakid@gmail.com</p>");
 };
 
 // our help dialog
@@ -271,14 +309,21 @@ void mainWindow::handleSizes(int x,int y) {
 	return;
     }
     
+    int choice=QMessageBox::warning(this,"Proceed?",
+				    "Generating the map may take awhile depending on your system. "
+				    "Are you sure you want to continue?",QMessageBox::Yes,QMessageBox::No,QMessageBox::NoButton);
+    
+    if (choice==QMessageBox::No)
+	return;
+    
     rows=y;
     cols=x;
     
+    map->setNumRows(rows);
+    map->setNumCols(cols);
+    
     map->clear();
-        
-    map->setNumRows(y);
-    map->setNumCols(x);
-        
+    
     map->resync(y,x);
     map->redraw();
 };
@@ -288,7 +333,21 @@ void mainWindow::goToCell(int row,int col) {
     if (row > map->numRows() || col > map->numCols()) {
 	QMessageBox::warning(this,"Error",
 			     "You can only go to a tile on this map!");
+	return;
     }
     
     map->setCurrentCell(row,col);
+};
+
+void mainWindow::openPrefDialog() {
+    pref_Dialog=new prefDialog(this);
+    
+    pref_Dialog->show();
+    pref_Dialog->raise();
+    pref_Dialog->setActiveWindow();
+    
+    if (pref_Dialog->exec()) {
+    }
+    
+    delete pref_Dialog;
 };

@@ -1,13 +1,14 @@
 #include <qapplication.h>
-#include <qprogressdialog.h>
 #include <qimage.h>
 #include <qaction.h>
 #include <qpopupmenu.h>
 #include <qpixmap.h>
 #include <qeventloop.h>
+#include <qcombobox.h>
 
 #include "tiles.dat"
 
+#include "dialogs.h"
 #include "maptable.h"
 #include "tile.h"
 
@@ -37,7 +38,7 @@ mapTable::mapTable(int row,int col,QWidget *parent,const char *name): QTable(row
 	for (int j=0;j<col;j++)
 	    setItem(i,j,(new tile(0,this)));
     }
-	    
+    
     setColumnMovingEnabled(false);
     setRowMovingEnabled(false);	  
     
@@ -61,16 +62,9 @@ void mapTable::resync(int row,int col) {
 };
 
 // redraw the entire map
-void mapTable::redraw() {
-    QPixmap grassTile=QPixmap(grass);    
-    
-    QProgressDialog progress("Generating a map","Cancel",rows);
-    progress.setModal(true);           
-    progress.setMinimumDuration(0);
-    
+void mapTable::redraw() {    
     for (int i=0;i<rows;i++) {
 	for (int j=0;j<cols;j++) {
-	    progress.setProgress(rows);
 	    setItem(i,j,(new tile(0,this)));
 	}
 	qApp->eventLoop()->processEvents(QEventLoop::ExcludeUserInput);
@@ -81,7 +75,7 @@ void mapTable::redraw() {
 void mapTable::clear() {
     for (int i=0;i<numRows();i++) {
 	for (int j=0;j<numCols();j++)
-	clearCell(i,j);
+	    clearCell(i,j);
     }
 }
 
@@ -149,7 +143,7 @@ void mapTable::updateTile(int row,int col) {
 	setPixmap(row+2,col,regTile);
 	setPixmap(row-2,col,regTile);
 	
-
+	
 	setPixmap(row,col+1,regTile);
 	setPixmap(row,col-1,regTile);	
 	setPixmap(row,col+2,regTile);
@@ -219,6 +213,27 @@ void mapTable::contextMenuEvent(QContextMenuEvent *p) {
 
 // method to remove an item on the map and reset that tile
 void mapTable::removeItem(int row,int col) {
-//    setPixmap(row,col,grassTile);
+    //    setPixmap(row,col,grassTile);
     updateCell(row,col);
+};
+
+// the fill command dialog and actions
+void mapTable::fillMap() {
+    fill_Dialog=new fillDialog;
+    
+    fill_Dialog->show();
+    fill_Dialog->raise();
+    fill_Dialog->setActiveWindow();
+    
+    if (fill_Dialog->exec()) {
+	int item=fill_Dialog->tileCB->currentItem();
+	
+	for (int i=0;i<numRows();i++) {
+	    for (int j=0;j<numCols();j++)
+		setItem(i,j,(new tile(item,this)));
+	    qApp->eventLoop()->processEvents(QEventLoop::ExcludeUserInput);
+	}
+    }
+    
+    delete fill_Dialog;
 };

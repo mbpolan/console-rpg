@@ -14,11 +14,8 @@ class goToDialog: public QDialog {
        public:
 	   goToDialog(QWidget *parent=0,const char *name=0);
 	   
-       signals:
-	   void valueChanged(int,int);
-	   
-       public slots:
-	   void broadcastTiles();
+	   QLineEdit *lineRow;
+	   QLineEdit *lineCol;
 	   
        private:
 	   QGridLayout *grid;
@@ -29,9 +26,6 @@ class goToDialog: public QDialog {
 	   QLabel *title;
 	   QLabel *trow;
 	   QLabel *tcol;
-	   
-	   QLineEdit *lineRow;
-	   QLineEdit *lineCol;
 };
 
 #endif

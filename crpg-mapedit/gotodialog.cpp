@@ -34,19 +34,6 @@ goToDialog::goToDialog(QWidget *parent,const char *name): QDialog(parent,name) {
     grid->addWidget(goButton,1,2);
     grid->addWidget(cancelButton,2,2);
     
-    connect(goButton,SIGNAL(clicked()),this,SLOT(broadcastTiles()));
+    connect(goButton,SIGNAL(clicked()),this,SLOT(accept()));
     connect(cancelButton,SIGNAL(clicked()),this,SLOT(reject()));
-};
-
-void goToDialog::broadcastTiles() {
-    int col=atoi(lineRow->text().ascii());
-    int row=atoi(lineCol->text().ascii());
-    
-    if (row==NULL || col==NULL) {
-	QMessageBox::warning(this,"Error",
-			     "You must enter a pair of coordinates!");
-    }
-    
-    if (row>=0 && col>=0)
-	emit valueChanged(row,col);
 };

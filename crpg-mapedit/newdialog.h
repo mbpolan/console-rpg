@@ -13,12 +13,9 @@ class newDialog: public QDialog {
     
        public:
 	   newDialog(QWidget *parent=0,const char *name=0);
-	  
-       signals:
-	   void sizesChanged(int,int);
 	   
-       public slots:
-	   void broadcastSizes();
+	   QLineEdit *sizeEditX;
+	   QLineEdit *sizeEditY;
 	   
        private:
 	   QGridLayout *grid;
@@ -29,9 +26,6 @@ class newDialog: public QDialog {
 	   QLabel *title;
 	   QLabel *sizeX;
 	   QLabel *sizeY;
-	   
-	   QLineEdit *sizeEditX;
-	   QLineEdit *sizeEditY;
 };
 
 #endif

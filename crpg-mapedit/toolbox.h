@@ -2,11 +2,9 @@
 #define toolbox_h
 
 #include <qwidget.h>
-#include <qtable.h>
 
 class QTabWidget;
-class toolBoxTable;
-class toolBoxTableCell;
+class QTable;
 
 class toolBox: public QWidget {
        Q_OBJECT
@@ -20,32 +18,18 @@ class toolBox: public QWidget {
 	   
        public slots:
 	   void broadcastNewTile(int);
-	   void broadcastNewObj(int);
+	   void broadcastNewObj(int,int);
 	   void highliteCell(int,int);	   
 	   
 	   
        private:
 	   QTabWidget *mainFrame;
 	   
-	   toolBoxTable *items;
-	   toolBoxTable *objects;
+	   QTable *items;
+	   QTable *objects;
 	   
 	   int irows;
 	   int icols;
-};
-
-class toolBoxTable: public QTable {
-       Q_OBJECT   
-    
-       public:
-	   toolBoxTable(int rows,int cols,QWidget *parent=0,const char *name=0);
-	   
-	   static void parsePixmap(QPixmap);
-};
-
-class toolBoxTableCell: public QTableItem {
-       public:
-	   toolBoxTableCell(QTable *parent);
 };
 
 #endif

@@ -2,6 +2,7 @@
 #define tile_h
 
 #include <qtable.h>
+#include <iostream>
 
 class QTable;
 
@@ -14,7 +15,10 @@ class tile: public QTableItem {
 	   void setItem(bool t) {isItem=t;}
 	   
 	   static QPixmap parseID(int);
-	   void setPic(int); // set the pixmap	   
+	   static std::string parseIDToName(int);
+	   void setPic(int); // set the pixmap	
+	   
+	   virtual int rtti() const {return 1001;}
 	   
        private:
 	   bool isItem; // is an item here?

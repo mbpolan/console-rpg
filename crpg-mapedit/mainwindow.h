@@ -7,6 +7,7 @@
 #include "gotodialog.h"
 #include "maptable.h"
 #include "newdialog.h"
+#include "prefdialog.h"
 #include "tileindicator.h"
 #include "toolbox.h"
 
@@ -19,7 +20,7 @@ class QTable;
 
 // the main window of the map editor
 class mainWindow: public QMainWindow {
-     Q_OBJECT
+    Q_OBJECT
     
       public:
 	  mainWindow(QWidget *parent=0,const char *name=0); // our constructor
@@ -33,7 +34,7 @@ class mainWindow: public QMainWindow {
       signals:
 	  // none for now
 	  
-      // our public slots
+	  // our public slots
       public slots:
 	  void makeNew();
 	  void makeOpen();
@@ -46,6 +47,7 @@ class mainWindow: public QMainWindow {
 	  
 	  void handleSizes(int,int);
 	  void goToCell(int,int);
+	  void openPrefDialog();
 	  
       private:
 	  // our mapedit body
@@ -57,6 +59,7 @@ class mainWindow: public QMainWindow {
 	  // needed dialogs
 	  goToDialog *goToCell_Dialog;
 	  newDialog *new_Dialog;
+	  prefDialog *pref_Dialog;
 	  
 	  // extras
 	  toolBox *itemBox;
@@ -88,11 +91,14 @@ class mainWindow: public QMainWindow {
 	  QAction *setPen3Act;
 	  QAction *setPen5Act;
 	  
+	  QAction *prefAct;
+	  QAction *fillAct;
+	  
 	  // path to our open map file
 	  QString mapFilePath;
 	  
 	  // map sizes
 	  int rows,cols;
-};
-    
+      };
+
 #endif

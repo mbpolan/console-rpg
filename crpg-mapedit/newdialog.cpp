@@ -12,7 +12,6 @@ newDialog::newDialog(QWidget *parent,const char *name): QDialog(parent,name) {
     setSizeGripEnabled(false);
     setModal(true);
     setCaption("New map");
- //   setIsResizable(false);
     
     grid=new QGridLayout(this,4,3);
     
@@ -28,7 +27,7 @@ newDialog::newDialog(QWidget *parent,const char *name): QDialog(parent,name) {
     okButton=new QPushButton("&OK",this);
     cancelButton=new QPushButton("&Cancel",this);
     
-    connect(okButton,SIGNAL(clicked()),this,SLOT(broadcastSizes()));
+    connect(okButton,SIGNAL(clicked()),this,SLOT(accept()));
     connect(cancelButton,SIGNAL(clicked()),this,SLOT(reject()));
     
     // syntax is rows then columns
@@ -40,17 +39,4 @@ newDialog::newDialog(QWidget *parent,const char *name): QDialog(parent,name) {
     grid->addWidget(sizeEditY,2,1);
     grid->addWidget(okButton,1,2);
     grid->addWidget(cancelButton,2,2);
-};
-
-void newDialog::broadcastSizes() {
-    QString sx=sizeEditX->text();
-    QString sy=sizeEditY->text();
-    
-    if ((!sx.isEmpty()) && (!sy.isEmpty())) {
-	int x=atoi(sx.ascii());
-	int y=atoi(sy.ascii());
-	emit sizesChanged(x,y);
-    }
-    
-    this->accept();
 };
