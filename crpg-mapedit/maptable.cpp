@@ -1,10 +1,32 @@
+/***************************************************************************
+ *   Copyright (C) 2004 by KanadaKid                                       *
+ *   kanadakid@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
 #include <qapplication.h>
 #include <qimage.h>
 #include <qaction.h>
 #include <qpopupmenu.h>
+#include <qprogressdialog.h>
 #include <qpixmap.h>
 #include <qeventloop.h>
 #include <qcombobox.h>
+#include <qlineedit.h>
 #include <sstream>
 
 #include "tiles.dat"
@@ -18,11 +40,16 @@ mapTable::mapTable(int row,int col,QWidget *parent,const char *name): QTable(row
     pen2=false;
     pen3=false;
     pen5=false;
+    penNpc=false;
     
     regTileID=0;   
     regTile=tile::parseID(0);
     rows=row;
     cols=col;
+    
+    editNpcAct=new QAction(tr("Edit NPC"),tr(""),this);
+    editNpcAct->setEnabled(false);
+    connect(editNpcAct,SIGNAL(activated()),SLOT(openEditNpc()));
     
     removeItemAct=new QAction(tr("Remove items"),tr(""),this);
     removeItemAct->setEnabled(false);
@@ -48,6 +75,7 @@ mapTable::mapTable(int row,int col,QWidget *parent,const char *name): QTable(row
     
     // if a tile was clicked on the map, update it
     connect(this,SIGNAL(clicked(int,int,int,const QPoint&)),SLOT(updateTile(int,int)));
+    connect(this,SIGNAL(contextMenuRequested(int,int,const QPoint&)),SLOT(openContextMenu(int,int,const QPoint&)));
 };
 
 // resync the rows and columns
@@ -103,12 +131,21 @@ void mapTable::registerObj(int _id) {
     regTile=tile::parseID(_id);
 };
 
+void mapTable::registerNpc(QString _name,int _health) {
+    npcName=_name;
+    npcHealth=_health;
+};
+
 // update a tile on the map
 void mapTable::updateTile(int row,int col) {
-    // if pen 1x1 is set
-    if (pen1) {
-	fillSelection(regTileID,row,row+1,col,col+1);
+    // if we are placing an npc
+    if (penNpc) {
+	placeNpc(row,col);
     }
+    
+    // if pen 1x1 is set
+    if (pen1)
+	fillSelection(regTileID,row,row+1,col,col+1);
     
     // if pen 2x2 is set
     if (pen2)
@@ -124,6 +161,10 @@ void mapTable::updateTile(int row,int col) {
     
     // broadcast that this tile was clicked
     emit tileClicked(row,col);
+    
+    // reset the pen
+    if (penNpc)
+	setPenTo1();
 };
 
 // method for setting the pen to 1x1
@@ -132,6 +173,7 @@ void mapTable::setPenTo1() {
     pen2=false;
     pen3=false;
     pen5=false;
+    penNpc=false;    
 };
 
 // method for setting the pen to 2x2
@@ -140,6 +182,7 @@ void mapTable::setPenTo2() {
     pen1=false;
     pen3=false;
     pen5=false;
+    penNpc=false;    
 };
 
 // method for setting the pen to 3x3
@@ -148,6 +191,7 @@ void mapTable::setPenTo3() {
     pen1=false;
     pen2=false;
     pen5=false;
+    penNpc=false;    
 };
 
 // method to set the pen to 5x5
@@ -156,13 +200,34 @@ void mapTable::setPenTo5() {
     pen1=false;
     pen2=false;
     pen3=false;
+    penNpc=false;    
+};
+
+void mapTable::setNpcPen() {
+    penNpc=true;    
+    pen1=false;
+    pen2=false;
+    pen3=false;
+    pen5=false;
 };
 
 // method to spawn the right-click context menu
-void mapTable::contextMenuEvent(QContextMenuEvent *p) {
+void mapTable::openContextMenu(int row,int col,const QPoint &p) {
     QPopupMenu context(this);
+    editNpcAct->addTo(&context);
     removeItemAct->addTo(&context);
-    context.exec(p->globalPos());
+    
+    // check if an npc is here. if yes, then enable editNpcAct
+    QTableItem *Tile=item(row,col);
+    if (Tile && ((tile*) Tile)->hasNpc())
+	editNpcAct->setEnabled(true);
+    else
+	editNpcAct->setEnabled(false);
+    
+    cxMenuRow=row;
+    cxMenuCol=col;
+    
+    context.exec(p);
 };
 
 // method for fillin a range of tiles
@@ -173,6 +238,11 @@ void mapTable::fillSelection(int id,int start_row,int end_row,int start_col,int 
 	
 	qApp->processEvents();
     }
+};
+
+// method for placing npcs
+void mapTable::placeNpc(int row,int col) {
+    setItem(row,col,(new tile(0,true,npcName,npcHealth,this)));
 };
 
 // the fill command dialog and actions
@@ -186,12 +256,54 @@ void mapTable::fillMap() {
     if (fill_Dialog->exec()) {
 	int item=fill_Dialog->tileCB->currentItem();
 	
+	QProgressDialog progress("Filling map...",0,numRows(),this,"fillMapDialog",true);
+	progress.setMinimumDuration(0);
+	
 	for (int i=0;i<numRows();i++) {
-	    for (int j=0;j<numCols();j++)
+	    for (int j=0;j<numCols();j++) {
+		progress.setProgress(i);
 		setItem(i,j,(new tile(item,this)));
+	    }
+	    
 	    qApp->eventLoop()->processEvents(QEventLoop::ExcludeUserInput);
 	}
     }
     
     delete fill_Dialog;
+};
+
+// slot to open the npc dialog and modify an npc
+void mapTable::openEditNpc() {
+    eNpc_Dialog=new editNpcDialog(this);
+    std::stringstream ss;
+    
+    // get the target tile
+    QTableItem *Tile=item(cxMenuRow,cxMenuCol);
+    if (Tile) {
+	// current npc data
+	QString tileNpcName=((tile*) Tile)->Npc.name;
+	int tileNpcHealthInt=((tile*) Tile)->Npc.health;
+	
+	ss << tileNpcHealthInt;
+	QString tileNpcHealth=ss.str();
+    
+	// send npc data to the dialog and update the fields
+	eNpc_Dialog->nameEdit->setText(tileNpcName);
+	eNpc_Dialog->healthEdit->setText(tileNpcHealth);
+    
+	// show our dialog
+	eNpc_Dialog->show();
+	eNpc_Dialog->raise();
+	eNpc_Dialog->setActiveWindow();
+    
+	if (eNpc_Dialog->exec()) {
+	    // get the user's modifications
+	    tileNpcName=eNpc_Dialog->nameEdit->text();
+	    tileNpcHealthInt=atoi(eNpc_Dialog->healthEdit->text().ascii());
+	    
+	    // and update the npc
+	    ((tile*) Tile)->Npc.name=tileNpcName;
+	    ((tile*) Tile)->Npc.health=tileNpcHealthInt;
+	}
+    }
 };

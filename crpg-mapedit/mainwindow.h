@@ -1,3 +1,23 @@
+/***************************************************************************
+ *   Copyright (C) 2004 by KanadaKid                                       *
+ *   kanadakid@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
 #ifndef mainwindow_h
 #define mainwindow_h
 
@@ -29,6 +49,9 @@ class mainWindow: public QMainWindow {
 	  void makeMenus();
 	  void makeToolbars();
 	  void makeToolbox();
+	  	
+	  // other components
+	  QDockWindow *toolbox;	  
 	  
       signals:
 	  // none for now
@@ -49,18 +72,21 @@ class mainWindow: public QMainWindow {
 	  void openPrefDialog();
 	  
 	  void updateMapHeader(QString text) {mapHeaderInfo=text;}  // update the map's header
+	  void sendDock(bool t) {if (!t) moveDockWindow(toolbox,Qt::Left);}
+	  
+	  void makeNpc();
 	  
       private:
 	  // our mapedit body
 	  mapTable *map;
 	  
-	  // other components
-	  QDockWindow *toolbox;
-	  
 	  // needed dialogs
 	  goToDialog *goToCell_Dialog;
 	  newDialog *new_Dialog;
 	  prefDialog *pref_Dialog;
+	  genDialog *gen_Dialog;
+	  
+	  makeNpcDialog *mNpc_Dialog; // make an npc
 	  
 	  // extras
 	  toolBox *itemBox;
@@ -71,6 +97,7 @@ class mainWindow: public QMainWindow {
 	  QPopupMenu *options;
 	  QPopupMenu *help;
 	  QPopupMenu *penOps;
+	  QPopupMenu *npc;
 	  
 	  QToolBar *fileToolbar;
 	  QToolBar *editToolbar;
@@ -94,6 +121,8 @@ class mainWindow: public QMainWindow {
 	  
 	  QAction *prefAct;
 	  QAction *fillAct;
+	  
+	  QAction *makeNpcAct;
 	  
 	  // path to our open map file
 	  QString mapFilePath;

@@ -1,3 +1,23 @@
+/***************************************************************************
+ *   Copyright (C) 2004 by KanadaKid                                       *
+ *   kanadakid@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
 #include <qapplication.h>
 #include <qpopupmenu.h>
 #include <qlineedit.h>
@@ -15,6 +35,7 @@
 #include <qprogressdialog.h>
 #include <qcheckbox.h>
 #include <libxml/parser.h>
+#include <libxml/tree.h>
 #include <sstream>
 #include <fstream>
 
@@ -135,6 +156,10 @@ void mainWindow::makeActions() {
     fillAct=new QAction(tr("Fill"),tr(""),this);
     fillAct->setStatusTip("Fill the map with one tile or object");
     connect(fillAct,SIGNAL(activated()),map,SLOT(fillMap()));
+    
+    makeNpcAct=new QAction(tr("Make NPC"),tr("Alt+N"),this);
+    makeNpcAct->setStatusTip("Make a new NPC");
+    connect(makeNpcAct,SIGNAL(activated()),this,SLOT(makeNpc()));
 };
 
 // create our menus
@@ -170,9 +195,13 @@ void mainWindow::makeMenus() {
     helpAct->addTo(help);
     aboutAct->addTo(help);
     
+    npc=new QPopupMenu(this);
+    makeNpcAct->addTo(npc);
+    
     menuBar()->insertItem(tr("&File"),file);
     menuBar()->insertItem(tr("&Edit"),edit);
     menuBar()->insertItem(tr("&Options"),options);
+    menuBar()->insertItem(tr("&NPC"),npc);
     menuBar()->insertItem(tr("&Help"),help);
     
     // our tile indicator on the status bar
@@ -211,6 +240,7 @@ void mainWindow::makeNew() {
 	if (sx.isNull() || sy.isNull()) {
 	    QMessageBox::warning(this,"Error",
 				 "You must enter a size in rows and columns (x/y)!");
+	    return;
 	}
 	
 	handleSizes(atoi(sx.ascii()),atoi(sy.ascii()));
@@ -246,13 +276,14 @@ void mainWindow::makeOpen() {
     xmlDocPtr doc=xmlParseFile((const char*)mapFilePath.ascii());
     
     if (doc) {
-	xmlNodePtr root,ptr,items;
+	xmlNodePtr root, ptr, items, npcs;
 	root=xmlDocGetRootElement(doc);
 	
 	// check to see if this is a console rpg map file
 	if (xmlStrcmp(root->name,(const xmlChar*) "crpg-map")!=0) {
 	    QMessageBox::warning(this,"Invalid map file",
 				 "<p>Invalid map file! Please select another.</p>");
+	    return;
 	}
 	
 	ptr=root->children;
@@ -264,6 +295,7 @@ void mainWindow::makeOpen() {
 	    
 	    QProgressDialog progress("Loading map...",0,itemCount,this,"saveMapDialog",true);
 	    progress.setMinimumDuration(0);	
+	    
 	    for (int i=0;i<itemCount;i++) {
 		progress.setProgress(i);
 		int _id=atoi((const char*) xmlGetProp(items,(xmlChar*) "id"));
@@ -279,7 +311,28 @@ void mainWindow::makeOpen() {
 	    }
 	    
 	    ptr=ptr->next;
-	}
+	        
+	    // now we load in the npcs
+	    int npcCount=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "count"));
+	    npcs=ptr->children;
+	    
+	    // renew the progress bar dialog
+	    progress.setProgress(0,npcCount);
+	    for (int i=0;i<npcCount;i++) {
+		progress.setProgress(i);
+		
+		const char *_name=(const char*) xmlGetProp(npcs,(xmlChar*) "name");
+		int _x=atoi((const char*) xmlGetProp(npcs,(xmlChar*) "x"));
+		int _y=atoi((const char*) xmlGetProp(npcs,(xmlChar*) "y"));
+		
+		int _hp=atoi((const char*) xmlGetProp(npcs,(xmlChar*) "hp"));
+		int _mp=atoi((const char*) xmlGetProp(npcs,(xmlChar*) "mp"));
+		
+		map->setItem(_y,_x,new tile(0,true,_name,_hp,map));
+		
+		npcs=npcs->next;
+	    }
+	} // if (ptr)...
 	
 	xmlFreeDoc(doc);
 	return;
@@ -296,7 +349,6 @@ void mainWindow::makeSave() {
     }
     
     std::ifstream fin;
-    std::ofstream fout;
     fin.open(savePath.ascii());
     
     if (fin && firstSave) {
@@ -309,27 +361,29 @@ void mainWindow::makeSave() {
     fin.close();
     
     std::stringstream ss;
-    if (!savePath.isNull()) {
+    if (savePath!=".xml") {
 	firstSave=false;
-	
-	// add the header first
-/*	fout.open(savePath.ascii());
-	fout << "<? " << mapHeaderInfo.ascii() << " ?>" << std::endl;
-	
-	fout.close();*/
 	
 	// save info in xml format
 	xmlDocPtr doc;
 	xmlNodePtr root,nodePtr,ptr;
 	
+	// add header along with xml version
 	doc=xmlNewDoc((const xmlChar*) "1.0");
 	
-	doc->children=xmlNewDocNode(doc,0,(const xmlChar*) "crpg-map",0);
-	root=doc->children;
+	root=xmlNewDocNode(doc,0,(const xmlChar*) "crpg-map",0);
 	
-	nodePtr=xmlNewChild(doc->children,0,(const xmlChar*) "items",0);
+	// if the user has added  a custom header
+	if (!mapHeaderInfo.isNull()) {
+	    ptr=xmlNewDocComment(doc,(const xmlChar*) mapHeaderInfo.ascii());
+	    xmlDocSetRootElement(doc,ptr);
+	}
 	
-	QTableItem *Item;	
+	xmlDocSetRootElement(doc,root);
+	
+	nodePtr=xmlNewChild(root,0,(const xmlChar*) "items",0);
+	
+	QTableItem *Item;
 	int itemCount=0;
 	
 	// get a count of items on the map
@@ -346,9 +400,9 @@ void mainWindow::makeSave() {
 	xmlSetProp(nodePtr,(const xmlChar*) "count",(const xmlChar*) ss.str().c_str()); // item count
 	ss.str("");
 	
-	QProgressDialog progress("Saving map...",0,map->numRows(),this,"saveMapDialog",true);
+	QProgressDialog progress("Saving map items",0,map->numRows(),this,"saveMapDialog",true);
 	progress.setMinimumDuration(0);
-//	progress->show();
+	
 	// save our item to an xmlNodePtr and add it
 	for(int i=0;i<map->numRows();i++) {
 	    for (int j=0;j<map->numCols();j++) {
@@ -379,9 +433,58 @@ void mainWindow::makeSave() {
 	    qApp->eventLoop()->processEvents(QEventLoop::ExcludeUserInput);
 	}
 	
-	// TODO: save npcs
-	nodePtr=xmlNewChild(doc->children,0,(const xmlChar*) "npcs",0);
-	xmlSetProp(nodePtr,(const xmlChar*) "count",(const xmlChar*) "0");
+	// get a count on npcs
+	int npcCount=0;
+	for (int i=0;i<map->numRows();i++) {
+	    for (int j=0;j<map->numCols();j++) {
+		Item=map->item(i,j);
+		
+		if (((tile*) Item)->hasNpc())
+		    npcCount+=1;
+	    }
+	}
+	
+	ss << npcCount;
+	nodePtr=xmlNewChild(root,0,(const xmlChar*) "npcs",0);
+	xmlSetProp(nodePtr,(const xmlChar*) "count",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	// progress.setLabel(new QLabel("Saving NPCs",0));
+	progress.setProgress(0,map->numRows());
+	
+	// now save each npc to the map
+	for (int i=0;i<map->numRows();i++) {
+	    for (int j=0;j<map->numCols();j++) {
+		progress.setProgress(i);
+		Item=map->item(i,j);
+		
+		if (Item && ((tile*) Item)->hasNpc()) {
+		    ptr=xmlNewNode(0,(const xmlChar*) "npc");
+		    
+		    ss << ((tile*) Item)->Npc.name.ascii();
+		    xmlSetProp(ptr,(const xmlChar*) "name",(const xmlChar*) ss.str().c_str());
+		    ss.str("");
+		    
+		    ss << i;
+		    xmlSetProp(ptr,(const xmlChar*) "x",(const xmlChar*) ss.str().c_str());
+		    ss.str("");
+		    
+		    ss << j;
+		    xmlSetProp(ptr,(const xmlChar*) "y",(const xmlChar*) ss.str().c_str());
+		    ss.str("");
+		    
+		    ss << ((tile*) Item)->Npc.health;
+		    xmlSetProp(ptr,(const xmlChar*) "hp",(const xmlChar*) ss.str().c_str());
+		    ss.str("");
+		    
+		    xmlSetProp(ptr,(const xmlChar*) "mp",(const xmlChar*) "0");
+		    
+		    xmlAddChild(nodePtr,ptr);
+		}
+		
+	    qApp->eventLoop()->processEvents(QEventLoop::ExcludeUserInput);		
+	    }
+	}
 	
 	xmlKeepBlanksDefault(1);
 	xmlSaveFile(savePath.ascii(),doc);
@@ -411,6 +514,7 @@ void mainWindow::goToCellDialog() {
 	if (row.isEmpty() || col.isEmpty()) {
 	    QMessageBox::warning(this,"Error",
 				 "You must enter a valid pair of coordinates!");
+	    return;
 	}
 	
 	goToCell(atoi(row.ascii()),atoi(col.ascii()));
@@ -423,9 +527,10 @@ void mainWindow::goToCellDialog() {
 void mainWindow::aboutDialog() {
     QMessageBox::about(this,"About",
 		       "<h2>CRPG Map Editor 0.1</h2>"
-		       "<p>Written by KanadaKid using the Qt library.</p>"
+		       "<p>Written by KanadaKid using the Qt 3 library.</p>"
+		       "<p>Licensed under the GNU GPL license.</p>"
 		       "<p>This map editor is used to edit and make maps"
-		       " for Console RPG versions 0.2.0 and higher.</p>"
+		       " for Console RPG versions 0.2.5 and higher.</p>"
 		       "<p> Email: kanadakid@gmail.com</p>");
 };
 
@@ -450,6 +555,13 @@ void mainWindow::handleSizes(int x,int y) {
     if (choice==QMessageBox::No)
 	return;
     
+    gen_Dialog=new genDialog(this);
+    gen_Dialog->show();
+    gen_Dialog->raise();
+    gen_Dialog->setActiveWindow();    
+    
+    qApp->eventLoop()->processEvents(QEventLoop::ExcludeUserInput);
+    
     rows=y;
     cols=x;
     
@@ -460,6 +572,8 @@ void mainWindow::handleSizes(int x,int y) {
     
     map->resync(y,x);
     map->redraw();
+    
+    delete gen_Dialog;
 };
 
 // slot for going to a particular cell
@@ -480,5 +594,24 @@ void mainWindow::openPrefDialog() {
     pref_Dialog->setActiveWindow();
     
     connect(pref_Dialog,SIGNAL(dockSidebarChecked(bool)),itemBox,SLOT(dockSidebar(bool)));
+    connect(pref_Dialog,SIGNAL(dockSidebarChecked(bool)),this,SLOT(sendDock(bool)));
     connect(pref_Dialog,SIGNAL(mapHeader(QString)),this,SLOT(updateMapHeader(QString)));
+};
+
+// slot to make a new npc
+void mainWindow::makeNpc() {
+    mNpc_Dialog=new makeNpcDialog(this);
+    mNpc_Dialog->show();
+    mNpc_Dialog->raise();
+    mNpc_Dialog->setActiveWindow();
+    
+    if (mNpc_Dialog->exec()) {
+	QString Name=mNpc_Dialog->nameEdit->text();
+	int Health=atoi(mNpc_Dialog->healthEdit->text().ascii());
+	
+	map->registerNpc(Name,Health);
+	map->setNpcPen();
+    }
+    
+    delete mNpc_Dialog;
 };

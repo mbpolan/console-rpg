@@ -1,3 +1,23 @@
+/***************************************************************************
+ *   Copyright (C) 2004 by KanadaKid                                       *
+ *   kanadakid@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
 #include <qlabel.h>
 #include <qcombobox.h>
 #include <qlayout.h>
@@ -7,10 +27,9 @@
 #include <qmessagebox.h>
 #include <ctype.h>
 
-#include "tiles.dat"
-
 #include "dialogs.h"
 #include "tile.h"
+#include "tiles.dat"
 
 // newDialog constructor
 newDialog::newDialog(QWidget *parent,const char *name): QDialog(parent,name) {
@@ -19,6 +38,8 @@ newDialog::newDialog(QWidget *parent,const char *name): QDialog(parent,name) {
     setCaption("New map");    
     
     grid=new QGridLayout(this,4,3);
+    grid->setMargin(5);
+    grid->setResizeMode(QLayout::Fixed);        
     
     title=new QLabel("Make a new map.",this,"title");
     title->setFont(QFont("Times",14,QFont::Bold));
@@ -36,7 +57,7 @@ newDialog::newDialog(QWidget *parent,const char *name): QDialog(parent,name) {
     connect(cancelButton,SIGNAL(clicked()),this,SLOT(reject()));
     
     // syntax is rows then columns
-    grid->addWidget(title,0,0);
+    grid->addMultiCellWidget(title,0,0,0,2);
     grid->addWidget(sizeX,1,0);
     grid->addWidget(sizeY,2,0);
     
@@ -51,6 +72,8 @@ goToDialog::goToDialog(QWidget *parent,const char *name): QDialog(parent,name) {
     setCaption("Go to Tile");
     
     grid=new QGridLayout(this,3,3);
+    grid->setMargin(5);
+    grid->setResizeMode(QLayout::Fixed);        
     
     goButton=new QPushButton("&Go",this,"goButton");
     cancelButton=new QPushButton("&Cancel",this,"cancelButton");
@@ -81,6 +104,8 @@ goToDialog::goToDialog(QWidget *parent,const char *name): QDialog(parent,name) {
 fillDialog::fillDialog(QWidget *parent,const char *name): QDialog(parent,name) {
     setCaption("Fill");
     grid=new QGridLayout(this,3,2,2);
+    grid->setMargin(5);
+    grid->setResizeMode(QLayout::Fixed);        
     
     title=new QLabel("Fill map",this,"title");
     title->setFont(QFont("Times",14,QFont::Bold));
@@ -109,11 +134,105 @@ fillDialog::fillDialog(QWidget *parent,const char *name): QDialog(parent,name) {
     grid->addWidget(cancelButton,2,1);
 };
 
+// init dialog constructor
 initDialog::initDialog(QWidget *parent,const char *name): QDialog(parent,name) {
     setCaption("Loading...");
-    setMinimumSize(230,20);
+    grid=new QGridLayout(this,1,1);
+    grid->setMargin(5);
+    grid->setResizeMode(QLayout::Fixed);
     
     msg=new QLabel("Loading map editor... Please wait.",this);
     msg->setFont(QFont("Times",16,QFont::Bold));
-    msg->setMinimumSize(230,20);
+    grid->addWidget(msg,0,0);
+};
+
+// gen dialog constructor
+genDialog::genDialog(QWidget *parent,const char *name): QDialog(parent,name) {
+    setCaption("Generating map");    
+    setModal(true);
+    
+    grid=new QGridLayout(this,1,1);
+    grid->setMargin(5);
+    grid->setResizeMode(QLayout::Fixed);    
+    
+    msg=new QLabel("Generating map",this);
+    msg->setFont(QFont("Times",16,QFont::Normal));
+    grid->addWidget(msg,0,0);
+};
+
+// dialog displayed when making a new npc
+makeNpcDialog::makeNpcDialog(QWidget *parent,const char *name): QDialog(parent,name) {
+    setCaption("Make NPC");
+    grid=new QGridLayout(this,5,2);
+    grid->setMargin(5);
+    grid->setResizeMode(QLayout::Fixed);    
+    
+    intro=new QLabel("Make an NPC first by supplying a name and health.\n" 
+		     "Click OK to place it on the map."
+		     "\n-----------------------------------------------------------------------------------------",this);
+    
+    nameLab=new QLabel("NPC Name",this);
+    healthLab=new QLabel("NPC Health",this);
+    
+    nameEdit=new QLineEdit(this);
+    healthEdit=new QLineEdit(this);
+    
+    okButton=new QPushButton("OK",this);
+    cancelButton=new QPushButton("Cancel",this);
+    cancelButton->setMaximumSize(okButton->width(),okButton->height());
+    
+    connect(okButton,SIGNAL(clicked()),this,SLOT(accept()));
+    connect(cancelButton,SIGNAL(clicked()),this,SLOT(reject()));
+    
+    // add our intro label from col 0 to 1
+    grid->addMultiCellWidget(intro,0,0,0,1);
+    grid->setRowSpacing(1,5);
+    
+    // add name labels
+    grid->addWidget(nameLab,2,0);
+    grid->addWidget(healthLab,3,0);    
+    
+    // add line edits
+    grid->addWidget(nameEdit,2,1);
+    grid->addWidget(healthEdit,3,1);
+    
+    // finally, add our buttons
+    grid->addWidget(okButton,4,0);
+    grid->addWidget(cancelButton,4,1);
+};
+
+editNpcDialog::editNpcDialog(QWidget *parent,const char *name): QDialog(parent,name) {
+    setCaption("Edit NPC");
+    grid=new QGridLayout(this,4,2);
+    grid->setMargin(5);
+    grid->setResizeMode(QLayout::Fixed);
+    
+    // set some spacing
+    grid->setSpacing(5);
+    
+    intro=new QLabel("Edit this NPC.",this);
+    nameLab=new QLabel("NPC Name",this);
+    healthLab=new QLabel("NPC Health",this);
+    
+    nameEdit=new QLineEdit(this);
+    healthEdit=new QLineEdit(this);
+    
+    okButton=new QPushButton("OK",this);
+    cancelButton=new QPushButton("Cancel",this);
+    
+    connect(okButton,SIGNAL(clicked()),SLOT(accept()));
+    connect(cancelButton,SIGNAL(clicked()),SLOT(reject()));
+    
+    // add our new widgets
+    grid->addMultiCellWidget(intro,0,0,0,1);
+    grid->setRowSpacing(0,10);
+    grid->addWidget(nameLab,1,0);
+    grid->addWidget(healthLab,2,0);
+    
+    grid->addWidget(nameEdit,1,1);
+    grid->addWidget(healthEdit,2,1);
+    
+    grid->setRowSpacing(3,40);
+    grid->addWidget(okButton,3,0);
+    grid->addWidget(cancelButton,3,1);    
 };
