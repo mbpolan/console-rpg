@@ -6,6 +6,7 @@
 # variables and other info
 CPP = g++
 OFLAG = -o
+OSUFFIX = .o
 .SUFFIXES : .o .cpp
 .cpp.o :
 	$(CPP) $(CPPGLAGS) -c $<
@@ -26,5 +27,5 @@ crpg.o : crpg.cpp
 
 # clean the directory
 clean: 
-	rm -f *.o
+	rm -f crpg$(OSUFFIX)
 	rm -f crpg
