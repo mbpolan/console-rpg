@@ -1,0 +1,33 @@
+Console-RPG 0.1
+---------------
+(released: 8/3/04)
+
+
+Background
+-----------
+Console RPG is a simple text-based RPG game, focused on being a small,
+yet interesting game. You can expect everything from a regular RPG: 
+monsters, items, equipment, etc. 
+
+Package Info
+------------
+Initial release 0.1. Don't expect much in this version. The only thing
+you can really do is move around.
+
+Install
+-------
+Type the following in a shell:
+1)$ make
+2) chmod a+x crpg
+3) ./crpg
+
+Console-RPG should now start.
+
+What's New?
+-----------
+The only thing now is walking around in the compass directions. Expect
+much more in future releases.
+
+Credits
+-------
+KanadaKid - main developer/admin
