@@ -11,6 +11,7 @@
 #include <qfiledialog.h>
 #include <qdockwindow.h>
 #include <qdialog.h>
+#include <qeventloop.h>
 #include <libxml/parser.h>
 #include <sstream>
 
@@ -259,24 +260,63 @@ void mainWindow::makeSave() {
     
     if (!savePath.isNull()) {
 	xmlDocPtr doc;
-	xmlNodePtr root,ptr;
+	xmlNodePtr root,nodePtr,ptr;
 	
 	doc=xmlNewDoc((const xmlChar*) "1.0");
 	
 	doc->children=xmlNewDocNode(doc,0,(const xmlChar*) "crpg-map",0);
 	root=doc->children;
 	
-	ptr=xmlNewChild(doc->children,0,(const xmlChar*) "items",0);
+	nodePtr=xmlNewChild(doc->children,0,(const xmlChar*) "items",0);
 	
-	ss << map->size();
-	xmlSetProp(ptr,(const xmlChar*) "count",(const xmlChar*) ss.str().c_str());
+	QTableItem *Item;	
+	int itemCount=0;
+	
+	for(int i=0;i<map->numRows();i++) {
+	    for (int j=0;j<map->numCols();j++) {
+		Item=map->item(i,j);
+		
+		if (Item && ((tile*) Item)->getID()>0)
+		    itemCount+=1;
+	    }
+	}
+		
+	ss << itemCount;
+	xmlSetProp(nodePtr,(const xmlChar*) "count",(const xmlChar*) ss.str().c_str());
 	ss.str("");
 	
-	std::list<mapItem*>::iterator it;
-	for (it=map->items.begin();it!=map->items.end();++it) {
-	    if ((*it))
-		xmlAddChild(ptr,(*it)->compressToXML());
+//	QProgressDialog progr
+	for(int i=0;i<map->numRows();i++) {
+	    for (int j=0;j<map->numCols();j++) {
+		Item=map->item(i,j);
+		
+		if (Item && ((tile*) Item)->getID()>0) {
+		        ptr=xmlNewNode(0,(const xmlChar*) "item");
+		    
+		        ss << ((tile*) Item)->getID();
+                                        xmlSetProp(ptr,(const xmlChar*) "id",(const xmlChar*) ss.str().c_str());
+                                        ss.str("");
+    
+		        ss << j;
+		        xmlSetProp(ptr,(const xmlChar*) "x",(const xmlChar*) ss.str().c_str());
+                                        ss.str("");
+    
+		        ss << i;
+		        xmlSetProp(ptr,(const xmlChar*) "y",(const xmlChar*) ss.str().c_str());
+		        ss.str("");
+    
+		        xmlSetProp(ptr,(const xmlChar*) "valid",(const xmlChar*) "1");
+		        ss.str("");
+			
+		        xmlAddChild(nodePtr,ptr);
+		    }
+	    }
+	    qApp->eventLoop()->processEvents(QEventLoop::ExcludeUserInput);
 	}
+	
+	
+	nodePtr=xmlNewChild(doc->children,0,(const xmlChar*) "npcs",0);
+	xmlSetProp(nodePtr,(const xmlChar*) "count",(const xmlChar*) "0");
 	
 	xmlKeepBlanksDefault(1);
 	xmlSaveFile(savePath.ascii(),doc);

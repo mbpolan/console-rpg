@@ -21,4 +21,5 @@ HEADERS	+= mainwindow.h \
 # Input
 TEMPLATE	=app
 INCLUDEPATH	+= .
+LIBS	+= -lxml2
 LANGUAGE	= C++

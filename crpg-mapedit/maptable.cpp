@@ -107,10 +107,7 @@ void mapTable::registerObj(int _id) {
 void mapTable::updateTile(int row,int col) {
     // if pen 1x1 is set
     if (pen1) {
-	setPixmap(row,col,regTile);
-	
-	if (regTileID>=1)
-	    addItem(regTileID,col,row);
+	fillSelection(regTileID,row,row+1,col,col+1);
     }
     
     // if pen 2x2 is set
@@ -168,34 +165,11 @@ void mapTable::contextMenuEvent(QContextMenuEvent *p) {
     context.exec(p->globalPos());
 };
 
-// method for adding new items to the list
-void mapTable::addItem(int id,int row,int col) {
-    std::list<mapItem*>::iterator it;
-    for (it=items.begin();it!=items.end();++it) {
-	if ((*it)) {
-	    if ((*it)->x==col && (*it)->y==row && (*it)->getID()==id)
-		return;
-	}
-    }
-    
-    items.push_back(new mapItem(id,col,row));
-};
-
-// method to remove an item on the map and reset that tile
-void mapTable::removeItem(int row,int col) {
-    //    setPixmap(row,col,grassTile);
-    updateCell(row,col);
-};
-
 // method for fillin a range of tiles
 void mapTable::fillSelection(int id,int start_row,int end_row,int start_col,int end_col) {
     for (int i=start_row;i<end_row;i++) {
-	for (int j=start_col;j<end_col;j++) {
+	for (int j=start_col;j<end_col;j++)
 	    setItem(i,j,(new tile(id,this)));
-	
-	    if (regTileID>=1)
-		addItem(regTileID,i,j);
-	}
 	
 	qApp->processEvents();
     }
@@ -220,40 +194,4 @@ void mapTable::fillMap() {
     }
     
     delete fill_Dialog;
-};
-
-///////////////////////////////////////////////////////////////////////////////
-// Start definitions of mapItem class...                  
-///////////////////////////////////////////////////////////////////////////////
-
-// mapItem constructor
-mapItem::mapItem(int id,int x,int y) {
-    this->x=x;
-    this->y=y;
-    this->id=id;
-};
-
-// method to compress data into a xmlNodePtr
-xmlNodePtr mapItem::compressToXML() {
-    xmlNodePtr ptr;
-    std::stringstream ss;
-    
-    ptr=xmlNewNode(0,(const xmlChar*) "item");
-    
-    ss << id;
-    xmlSetProp(ptr,(const xmlChar*) "id",(const xmlChar*) ss.str().c_str());
-    ss.str("");
-    
-    ss << x;
-    xmlSetProp(ptr,(const xmlChar*) "x",(const xmlChar*) ss.str().c_str());
-    ss.str("");
-    
-    ss << y;
-    xmlSetProp(ptr,(const xmlChar*) "y",(const xmlChar*) ss.str().c_str());
-    ss.str("");
-    
-    xmlSetProp(ptr,(const xmlChar*) "valid",(const xmlChar*) "1");
-    ss.str("");
-    
-    return ptr;
 };
