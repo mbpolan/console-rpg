@@ -270,7 +270,7 @@ void movement::spawnMapItems(map *karte) {
 		int x=(rand()%100);
 		int y=(rand()%100);
 		int id=(rand()%5)+1;
-		int layer=(rand()%1)-5;
+		int layer=(rand()%6)*(-1);
 		
 		// syntax for new item is id,x,y
 		placeItem(new item(id, x, y, layer), karte);
