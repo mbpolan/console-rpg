@@ -3,6 +3,7 @@
 
 class player {
 	public:
+		player();
 		player(int fixedHP, int fixedMP, int fixedHeight, int fixedAge); // our constructor
 		virtual ~player();
 		
@@ -42,7 +43,7 @@ class player {
 		std::string displayInventory(player*);
 		
 		void removeInventoryItem(int);
-		void addInventoryItem(item*);
+		void addInventoryItem(TYPE,std::string);
 		int searchInventory(player*,std::string);
 		
 	private:

@@ -1,7 +1,7 @@
+// movement.h: definitions for movement class
 #include "movement.h"
 
 movement::movement(int defaultX=0, int defaultY=0) {
-//	groundID=0; // for now, make the ground grass
 	itemWarning="\nThere is an item here.";
 };
 
@@ -14,8 +14,6 @@ void movement::moveN(map *karte) {
 		int y=karte->getCurrentSpaceY();
 		karte->setCurrentSpaceX(++x);
 		std::cout << "\nMoved North.";
-                if (x==karte->getItemSquareX() && y==karte->getItemSquareY())
-                        std::cout << itemWarning;
 	}
 };
 
@@ -28,8 +26,6 @@ void movement::moveS(map *karte) {
 		int y=karte->getCurrentSpaceY();
 		karte->setCurrentSpaceX(--x);
 		std::cout << "\nMoved south.";
-                if (x==karte->getItemSquareX() && y==karte->getItemSquareY())
-                        std::cout << itemWarning;
 	}
 };
 
@@ -42,8 +38,6 @@ void movement::moveW(map *karte) {
 		int x=karte->getCurrentSpaceX();
 		karte->setCurrentSpaceY(--y);
 		std::cout << "\nMoved west.";
-                if (x==karte->getItemSquareX() && y==karte->getItemSquareY())
-                        std::cout << itemWarning;
 	}
 };
 
@@ -56,8 +50,6 @@ void movement::moveE(map *karte) {
 		int x=karte->getCurrentSpaceX();
 		karte->setCurrentSpaceY(++y);
 		std::cout << "\nMoved east.";
-                if (x==karte->getItemSquareX() && y==karte->getItemSquareY())
-                        std::cout << itemWarning;
 	}
 };
 
@@ -72,8 +64,6 @@ void movement::moveNE(map *karte) {
 		karte->setCurrentSpaceY(++y);
 		karte->setCurrentSpaceX(++x);
 		std::cout << "\nMove northeast.";
-                if (x==karte->getItemSquareX() && y==karte->getItemSquareY())
-                        std::cout << itemWarning;
 	}
 };
 
@@ -88,8 +78,6 @@ void movement::moveNW(map *karte) {
 		karte->setCurrentSpaceY(--y);
 		karte->setCurrentSpaceX(++x);
 		std::cout << "\nMoved northwest.";
-                if (x==karte->getItemSquareX() && y==karte->getItemSquareY())
-                        std::cout << itemWarning;
 	}
 };
 
@@ -104,8 +92,6 @@ void movement::moveSE(map *karte) {
 		karte->setCurrentSpaceY(++y);
 		karte->setCurrentSpaceX(--x);
 		std::cout << "\nMoved southeast.";
-                if (x==karte->getItemSquareX() && y==karte->getItemSquareY())
-                        std::cout << itemWarning;
 	}
 };
 
@@ -120,8 +106,6 @@ void movement::moveSW(map *karte) {
 		karte->setCurrentSpaceY(--y);
 		karte->setCurrentSpaceX(--x);
 		std::cout << "\nMoved southwest.";
-                if (x==karte->getItemSquareX() && y==karte->getItemSquareY())
-                        std::cout << itemWarning;
 	}
 };
 	
@@ -137,8 +121,10 @@ void movement::look(map *karte) {
 		default: groundType="grass"; break;
 	}
 	
-	if (karte->getCurrentSpaceX()==karte->getItemSquareX() && karte->getCurrentSpaceY()==karte->getItemSquareY())
-		std::cout << "\nThere is an item here...";
+	if (karte->itemExists(karte,karte->getCurrentSpaceX(),karte->getCurrentSpaceY())) {
+		std::string theName=karte->identifyItem(karte);
+		std::cout << "\nYou see a " << theName << ".\n";
+	}
 	else
 		std::cout << "\nYou see " << groundType << ".";
 	// If there is an item on the ground, then display item instead
@@ -148,13 +134,40 @@ void movement::look(map *karte) {
 void movement::placeItem(item *thisItem,map *karte) {
 	int itemX=(thisItem->getLocationX());
 	int itemY=(thisItem->getLocationY());
-	karte->setItemSquareX(itemX);
-	karte->setItemSquareY(itemY);
+	karte->addItemX(thisItem,itemX);
+	karte->addItemY(thisItem,itemY);
+};
+
+void movement::removeItem(item *thisItem,map *karte) {
+	int itemX=(thisItem->getLocationX());
+	int itemY=(thisItem->getLocationY());
+	karte->removeItemX(itemX);
+	karte->removeItemY(itemY);
 };
 
 int movement::getCurrentPosition(map *karte) const {
 	int x=karte->getCurrentSpaceX();
 	int y=karte->getCurrentSpaceY();
 	std::cout << "X: " << x << " Y: " << y << std::endl;
+};
+
+void movement::spawnMapItems(movement *rhs,map *karte) {
+	item *plant0=new item("fern",1,2,npe);
+	rhs->placeItem(plant0,karte);
+
+	item *rock0=new item("rock",-1,-1,npe);
+	rhs->placeItem(rock0,karte);
+
+	item *plant1=new item("herb",-2,3,npe);
+	rhs->placeItem(plant1,karte);
+
+	item *plant2=new item("bush",-10,5,npe);
+	rhs->placeItem(plant2,karte);
+
+	item *plant3=new item("sunflowers",20,5,npe);
+	rhs->placeItem(plant3,karte);
+
+	item *equip=new item("Adamant_Armor1",4,6,torso);
+	rhs->placeItem(equip,karte);
 };
 

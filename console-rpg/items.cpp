@@ -1,19 +1,27 @@
 // items.cpp: declarations for item functions
 #include "items.h"
 
-item::item(std::string fixedItemName, int spawnX, int spawnY) {
+item::item() {
+	itemLocationX=new int(0);
+	itemLocationY=new int(0);
+	itemName=new std::string("NULL");
+	itemTYPE=npe;
+};
+
+item::item(std::string fixedItemName,int spawnX,int spawnY,TYPE thisType) {
 	itemLocationX=new int(spawnX);
 	itemLocationY=new int(spawnY);
 	itemName=new std::string(fixedItemName);
+	itemTYPE=thisType;
 };
 
 item::~item() {
 	delete itemLocationX;
 	delete itemLocationY;
 	delete itemName;
+	itemName=0;
 	itemLocationX=0;
 	itemLocationY=0;
-	itemName=0;
 };
 
 void item::setLocationX(int XLOCATION) {
@@ -31,7 +39,7 @@ void item::setLocationY(int YLOCATION) {
 };
 
 TYPE item::checkType() {
-	return itemType;
+	return itemTYPE;
 };
 
 bool item::isHeadItem(item *thisItem) {
@@ -65,3 +73,4 @@ bool item::isBootsItem(item *thisItem) {
 	else
 		return 0;
 };
+

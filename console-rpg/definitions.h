@@ -2,10 +2,11 @@
 #include <iostream>
 #include <fstream>
 
-void startGame(movement*,map*,player*);
 int mainMenu(player*);
 int savePlayerData(player*);
+void startGame(movement*,map*,player*);
 void optionMenu();
+void spawnMapItems(movement*,map*);
 
 // menu function: display menu and options
 int menu(player *r_player) { // takes a reference to player
@@ -36,20 +37,24 @@ int menu(player *r_player) { // takes a reference to player
 int mainMenu(player *r_player2) { // takes a reference to player
 	movement *grid=new movement;
 	map *karte=new map(30,30,-30,-30);
-	std::string cVar;
+	char cVar;
+	
 	std::cout << "\nEnter player name: ";
 	std::string name;
 	std::cin >> name;
+	
 	r_player2->setName(name);
-	std::cout << "\nCustomize your character? (n,y)";
+	std::cout << "\nCustomize your character? (y,n) ";
 	std::cin >> cVar;
-	if (cVar=="y")
+	cVar=toupper(cVar);
+	if (cVar=='Y')
 		r_player2->setLook(r_player2);
 	else;
-	std::cout << "\nStart a new game? (n,y) ";
-	std::string connect;
+	std::cout << "\nStart a new game? (y,n) ";
+	char connect;
 	std::cin >> connect;
-	if (connect=="y") {
+	connect=toupper(connect);
+	if (connect=='Y') {
 		std::cout << "\nWelcome to Console RPG, " << r_player2->getName() << std::endl
 		     << "Type 'help' to display a help menu.";
 		startGame(grid,karte,r_player2); // this is where we actually start
@@ -70,9 +75,10 @@ void optionMenu() {
 
 // startGame function: this will start the actual game
 void startGame(movement *rhs,map *karte,player *r_player) {
-	while(1) {
-		item *torch=new item("torch",1,1);
-		rhs->placeItem(torch,karte);
+	for(;;) {
+		
+		rhs->spawnMapItems(rhs,karte); // spawn items on map NOW
+	
 		std::cout << "\nMove: ";
 		
 		std::string moverVar;
@@ -110,7 +116,7 @@ void startGame(movement *rhs,map *karte,player *r_player) {
 			rhs->moveSE(karte);
 		}
 		
-		if (moverVar=="position") {
+		if (moverVar=="pos") {
 			rhs->getCurrentPosition(karte);
 		}
 		
@@ -121,50 +127,64 @@ void startGame(movement *rhs,map *karte,player *r_player) {
 		if (moverVar=="help") {
 			std::cout << "\nYou may move around the map using the following directions:\n"
 				<< "n, w, e, s, nw, ne, sw, se."
-				<< "\nType 'quit' to exit the game or 'look' to check out\n"
-				<< "what is on the ground.";
+				<< "\nType 'quit' to exit the game. Further instructions are provided\n"
+				<< "In the documentation that came with this game.\n";
 		}
 		
 		if (moverVar=="save") {
 			savePlayerData(r_player);
 		}
-		
-		if (moverVar=="inventory") {
+		/* ********************************************** *
+		 * Displaying the inventory results in a loop bug *
+		 * Fix it before making equipment spawnable!      *
+		 * ********************************************** *
+		if (moverVar=="inv") {
 			r_player->displayInventory(r_player);
 		}
+		* End bug segment code */
 		
-		/* *******************************
-		 * Fix addInventoryItem() method *
-		 * Remove for now to avoid bugs  *
-		 *********************************
-		if (moverVar=="equip" {
-			r_player->addInventoryItem();
-		}; */
+		if (moverVar=="equip") {
+			if (karte->itemExists(karte,karte->getCurrentSpaceX(),karte->getCurrentSpaceY())) {
+				TYPE type=karte->checkItemType(karte);
+				char confirm;
+				std::string targetItem=karte->identifyItem(karte);
+				std::cout << "\nEquip " << targetItem << "? ";
+				std::cin >> confirm;
+				confirm=toupper(confirm);
+				if (confirm=='Y') {
+					r_player->addInventoryItem(type,targetItem);
+					karte->removeItemX(karte->getCurrentSpaceX()); // now remove the item from X
+					karte->removeItemY(karte->getCurrentSpaceY()); // now remove the item from Y
+					std::cout << targetItem << " was equiped.\n";
+				}
+				if (confirm=='N')
+					std::cout << std::endl << targetItem << " was not equiped.\n";
+			}
+			else
+				std::cout << "\nThere is no item here that can be equipped.\n";
+		}
 		
-		/* **********************************
-		 * Add removeInventoryItem() method *
-		 * after the add~ method is done    *
-		 ************************************
-		if (moverVar=="remove") {
+		if (moverVar=="unequip") {
 			std::cout << "\nRemove which item? ";
 			std::string targetItem;
 			std::cin >> targetItem;
+			bool equiped=false;
 			int itemString=r_player->searchInventory(r_player,targetItem);
-			if (itemString<=3)
+			if (itemString>=0 && itemString<=3) {
 				r_player->removeInventoryItem(itemString);
-			if (itemString>3) {
-				std::cout << "This item is not equiped!";
-				#define _noEq
+				std::cout << std::endl << itemString << " was unequiped.\n";
 			}
-			#ifndef _noEq
-			std::cout << "\nYou removed the " << targetItem << ".";
-			#endif
-			#undef _noEq
-		} */
+			if (itemString>3) {
+				std::cout << "\nThis item is not equiped!\n";
+				equiped=false;
+			}
+			if (equiped)
+				std::cout << "\nYou removed the " << targetItem << ".\n";
+		}
 
 		std::string quitVer;
 		if (moverVar=="quit") {
-			std::cout << "\nAre you sure you want to quit? (n,y)  ";
+			std::cout << "\nAre you sure you want to quit? (y,n)  ";
 			std::cin >> quitVer;
 			if (quitVer=="n")
 				continue;

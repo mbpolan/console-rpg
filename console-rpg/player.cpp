@@ -1,12 +1,26 @@
 // player.cpp: declarations for player functions
 #include "player.h"
 
+player::player() {
+	currentHP=new int(100);
+	currentMP=new int(10);
+	playerHeight=new int(6);
+	playerAge=new int(18);
+	playerName=new std::string("Arbba");
+	hair="brown", legs="blue", torso="brown";
+
+	headEq="nothing";
+	torsoEq="nothing";
+	legEq="nothing";
+	bootEq="nothing";
+
+};
+
 player::player(int fixedHP, int fixedMP, int fixedHeight, int fixedAge) {
 	currentHP=new int(fixedHP);
 	currentMP=new int(fixedMP);
 	playerHeight=new int(fixedHeight);
 	playerAge=new int(fixedAge);
-	playerName=new std::string;
 	playerName=new std::string("Arbba");
 	hair="brown", legs="blue", torso="brown";
 	
@@ -61,19 +75,15 @@ void player::removeInventoryItem(int theType) {
 	}
 };
 
-/************************* 
- *this needs to be FIXED!*
- *************************
-void player::addInventoryItem(item *thisItem) {
-	TYPE result=thisItem->checkType();
-	switch(result) {
-		case 0: headEq=thisItem->getName();break;
-		case 1: torsoEq=thisItem->getName();break;
-		case 2: legEq=thisItem->getName();break;
-		case 3: bootEq=thisItem->getName();break;
+void player::addInventoryItem(TYPE theType,std::string name) {
+	switch(theType) {
+		case 0: headEq=name;break;
+		case 1: torsoEq=name;break;
+		case 2: legEq=name;break;
+		case 3: bootEq=name;break;
 		default: std::cout << "This item cannot be equiped!";
 	}
-};*/
+};
 
 int player::searchInventory(player *r_player,std::string itemName) {
 	std::string locator=itemName;
@@ -94,3 +104,4 @@ int player::searchInventory(player *r_player,std::string itemName) {
 		return 4; // not found
 	}
 };
+

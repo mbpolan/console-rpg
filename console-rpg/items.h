@@ -1,11 +1,12 @@
 // items.h: holds item class and declarations
 #include <iostream>
 
-enum TYPE {head,torso,legs,boots};
+enum TYPE {head,torso,legs,boots,npe};
 
 class item {
 	public:
-		item(std::string fixedItemName, int spawnX, int spawnY); // our constructor
+		item();
+		item(std::string,int,int,TYPE); // our constructor
 		virtual ~item();
 
 		void setLocationX(int);
@@ -30,7 +31,6 @@ class item {
 		int *itemLocationY;
 		int *itemID;
 		std::string *itemName;
-		TYPE itemType;
+		TYPE itemTYPE;
 };
-
 
