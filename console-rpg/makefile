@@ -1,39 +1,30 @@
 # CRPG source makefile
 # This file should be able to
 # compile on most systems 
-# 8/03/04 - KanadaKid
+# 8/13/04 - KanadaKid
 
+# variables and other info
 CPP = g++
 OFLAG = -o
 .SUFFIXES : .o .cpp
 .cpp.o :
 	$(CPP) $(CPPGLAGS) -c $<
 
+# compile this
 all: \
-	crpg \
-	player \
-	movement \
+	crpg
 	
+# test the program
 test: all
 	crpg
-	player
-	movement
 
+# object files
 crpg: crpg.o
 	$(CPP) $(OFLAG) crpg crpg.o
 
 crpg.o : crpg.cpp
 
-player: player.o
-	$(CPP) $(OFLAG) player player.o
-
-player.o : player.cpp
-
-movement: movement.o
-	$(CPP) $(OFLAG) movement movement.o
-
-movement.o : movement.cpp
-
+# clean the directory
 clean: 
-	rm -rf *.o
-	rm crpg
+	rm -f *.o
+	rm -f crpg

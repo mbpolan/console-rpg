@@ -1,5 +1,5 @@
+// player.h: holds player class and member data
 #include <iostream>
-using namespace std;
 
 class player {
 	public:
@@ -12,9 +12,7 @@ class player {
 		void setMP(int mp) {*currentMP=mp;}
 		
 		void setName(std::string initialName) {*playerName=initialName;}
-		std::string getName() {return *playerName;}
-
-//		void gameWorld(); // may tie this in with the map later
+		std::string getName() const {return *playerName;}
 
 	private:
 		int *currentHP;
@@ -33,8 +31,8 @@ player::~player() {
 	delete currentHP;
 	delete currentMP;
 	delete playerName;
-	currentHP=NULL;
-	currentMP=NULL;
-	playerName=NULL;
+	currentHP=0;
+	currentMP=0;
+	playerName=0;
 };
 

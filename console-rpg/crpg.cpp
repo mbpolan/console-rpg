@@ -8,5 +8,5 @@ using namespace std;
 main(int argc, char *argv[]) {
 	player Player(500, 200); // player HP/MP
 	cout << "\nConsole-RPG 0.1\n\n" << endl;
-	menu(Player);
+	menu(Player); // call menu() and pass Player in
 }
