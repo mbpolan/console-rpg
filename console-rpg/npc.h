@@ -29,9 +29,11 @@
 
 // needed headers
 #include "creature.h"
+#include "map.h"
+#include "player.h"
 
 // enumerated actions the NPC can preform
-enum actions {
+enum ACTIONS {
 	MOVE_NORTH,
 	MOVE_SOUTH,
 	MOVE_WEST,
@@ -39,17 +41,26 @@ enum actions {
 	MOVE_NW,
 	MOVE_NE,
 	MOVE_SW,
-	MOVE_SE
+	MOVE_SE,
+	TALK,
+	DROP_ITEM,
+
+	MOVE, // this is generic
+	DO_NOTHING // stand still
 };
- 
+
+class map;
+
 class npc: public creature {
 	public:
 		npc();
 		npc(int,int,std::string _name); // our constructor
 		~npc();
-		
-		void preformMove();
-		
+
+		ACTIONS preformThink(map*);
+		void preformMove(map*,bool);
+		void preformAction(int,ACTIONS);
+
 	private:
 		int posx, posy;
 		std::string name;

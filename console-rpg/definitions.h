@@ -41,6 +41,7 @@ typedef unsigned long long __int64;
 #define CRPG_CLEAR_SCREEN system("cls") // clear screen macro
 #endif
 
+// are we loading a savefile?
 bool load=false;
 
 // set the static number of players to 0
@@ -261,7 +262,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
   while(moves>0) {
     int count=rhs->getStepCount(); // count the amount of spaces moved
 
-    std::cout << "\nMove: ";
+    std::cout << "\nAction: ";
 
     std::string moverVar;
     std::cin >> moverVar;

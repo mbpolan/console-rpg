@@ -31,6 +31,7 @@
 #define max 30
 
 class player;
+class npc;
 
 class map {
 	public:

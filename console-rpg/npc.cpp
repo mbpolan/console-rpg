@@ -39,26 +39,108 @@ npc::~ npc() {
 };
 
 // method for determining where to move
-void npc::preformMove() {
+void npc::preformMove(map *karte,bool dest) {
 	srand(time(NULL));
-	
-	int action=(rand()%7);
-	
-	switch(action) {
-		case MOVE_NORTH: posx++;break;
-		case MOVE_SOUTH: posx--;break;
-		case MOVE_WEST: posy--;break;
-		case MOVE_EAST: posy++;break;
-		case MOVE_NW: posx++; posy--;break;
-		case MOVE_NE: posx++; posy++;break;
-		case MOVE_SW: posx--; posy--;break;
-		case MOVE_SE: posx--; posy++;break;
-		default: posx++;break;
-	}
-	
+	int action; // our action
+
+	// should we preform a random move or a controlled move?
+	// no destination; move anywhere...
+	if (!dest)
+		action=(rand()%7);
+
+	// we have a destination! this npc should think before moving
+	else if (dest)
+		action=preformThink(karte);
+
+	preformAction(action,MOVE);
+
 	#ifdef DEBUG
 	std::cout << "\nNPC moved to x: " << posx << "/y: " << posy << std::endl;
 	#endif
 	
 	return;
+};
+
+// method for making an npc "think"
+ACTIONS npc::preformThink(map *karte) {
+	player *pPlayer;
+	int action;
+
+	srand(time(NULL));
+
+	// first we check if there are any players nearby and
+	// execute actions accordingly.
+	pPlayer=karte->players[posx++]; // player to north
+	if (pPlayer) {
+		action=(rand()%3)-1;
+	}
+
+	pPlayer=karte->players[posx--]; // player to south
+	if (pPlayer) {
+		do {
+		action=(rand()%3);
+		}
+		while(action!=MOVE_SOUTH);
+	}
+
+	pPlayer=karte->players[posy++]; // player to east
+	if (pPlayer) {
+		do {
+		action=(rand()%3);
+		}
+		while(action!=MOVE_EAST);
+	}
+
+	pPlayer=karte->players[posy--]; // player to west
+	if (pPlayer) {
+		do {
+		action=(rand()%3);
+		}
+		while(action!=MOVE_WEST);
+	}
+
+	// so there were no players...
+	else {
+		// do a random move for now
+		action=(rand()%7);
+
+		// todo: do an action other than move, such as talk
+		// to the player(s), etc.
+	}
+
+	delete pPlayer;
+
+	// parse the move and return it
+	switch(action) {
+		case MOVE_NORTH: return MOVE_NORTH;break;
+		case MOVE_SOUTH: return MOVE_SOUTH;break;
+		case MOVE_WEST: return MOVE_WEST;break;
+		case MOVE_EAST: return MOVE_EAST;break;
+		case MOVE_NW: return MOVE_NW;break;
+		case MOVE_NE: return MOVE_NE;break;
+		case MOVE_SW: return MOVE_SW;break;
+		case MOVE_SE: return MOVE_SE;break;
+		default: return DO_NOTHING;break;
+	}
+};
+
+// npc method for doing a certain action
+void npc::preformAction(int action,ACTIONS ACTION) {
+	// first we parse what this action is
+
+	// the npc wants to move
+	if (ACTION==MOVE) {
+		switch(action) {
+			case MOVE_NORTH: posx++;break;
+			case MOVE_SOUTH: posx--;break;
+			case MOVE_WEST: posy--;break;
+			case MOVE_EAST: posy++;break;
+			case MOVE_NW: posx++; posy--;break;
+			case MOVE_NE: posx++; posy++;break;
+			case MOVE_SW: posx--; posy--;break;
+			case MOVE_SE: posx--; posy++;break;
+			default: break;
+		}
+		return;
+	}
 };
