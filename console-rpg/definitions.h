@@ -543,7 +543,14 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       int itemString=list[playerNow]->searchInventory(targetItem);
 
       if (itemString>=0 && itemString<=3) {
-        list[playerNow]->removeInventoryItem(itemString);
+	item *Item=list[playerNow]->getInventoryItem(itemString);
+	if (Item) {
+		Item=new item(Item->getItemID(), list[playerNow]->x, list[playerNow]->y, list[playerNow]->getLayer());
+		rhs->placeItem(Item, karte);
+	}
+	
+	list[playerNow]->removeInventoryItem(itemString);
+	
         std::cout << std::endl << targetItem << " was unequipped.\n";
       }
 

@@ -235,10 +235,10 @@ void player::displayInventory() {
 // remove item from inventory
 void player::removeInventoryItem(int theType) {
 	switch(theType) {
-		case 0: headEq=new item(0,head);;break;
-		case 1: torsoEq=new item(0,torso);break;
-		case 2: legEq=new item(0,legs);break;
-		case 3: bootEq=new item(0,boots);break;
+		case 0: delete headEq; headEq=new item(0,head);break;
+		case 1: delete torsoEq; torsoEq=new item(0,torso);break;
+		case 2: delete  legEq; legEq=new item(0,legs);break;
+		case 3: delete bootEq; bootEq=new item(0,boots);break;
 		default: std::cout << "This item is not equiped!";
 	}
 };
@@ -246,10 +246,10 @@ void player::removeInventoryItem(int theType) {
 // add item to inventory
 void player::addInventoryItem(TYPE theType,item *thisItem) {
 	switch(theType) {
-		case head: headEq=(new item(thisItem));break;
-		case torso: torsoEq=(new item(thisItem));break;
-		case legs: legEq=(new item(thisItem));break;
-		case boots: bootEq=(new item(thisItem));break;
+		case head: headEq=thisItem; break;
+		case torso: torsoEq=thisItem; break;
+		case legs: legEq=thisItem; break;
+		case boots: bootEq=thisItem; break;
 		default: std::cout << "This item cannot be equiped!";
 	}
 };
@@ -272,6 +272,21 @@ int player::searchInventory(std::string itemName) {
 		return boots;
 	else {
 		return npe; // not found
+	}
+};
+
+// return a pointer to an item in the inventory
+item* player::getInventoryItem(int pos) {
+	#ifdef DEBUG
+	std::cout << "Getting inventory item at pos: " << pos << std::endl;
+	#endif
+	
+	switch(pos) {
+		case INV_HEAD: return headEq; break;
+		case INV_TORSO: return torsoEq; break;
+		case INV_LEGS: return legEq; break;
+		case INV_BOOTS: return bootEq; break;
+		default: return NULL; break;
 	}
 };
 

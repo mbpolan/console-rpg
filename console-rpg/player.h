@@ -30,7 +30,13 @@
 #include "movement.h"
 #include "npc.h"
 
+// enumeration of vocations
 enum VOCATION {WARRIOR,MAGE,ARCHER};
+
+#define INV_HEAD 0
+#define INV_TORSO 1
+#define INV_LEGS 2
+#define INV_BOOTS 3
 
 class battleAction;
 class map;
@@ -103,6 +109,7 @@ class player: public creature {
 		void removeInventoryItem(int);
 		void addInventoryItem(TYPE,item*);
 		int searchInventory(std::string);
+		item* getInventoryItem(int);
 
 		// to display player's stats
 		void displayInventory();
