@@ -6,9 +6,9 @@ class item {
 		item(std::string fixedItemName, int spawnX, int spawnY); // our constructor
 		~item();
 
-		void setLocationX(int*);
-		void setLocationY(int*);
-		void setItemID(int*);
+		void setLocationX(int);
+		void setLocationY(int);
+		void setItemID(int);
 		void setItemName(std::string nameOfItem) {*itemName=nameOfItem;}
 		
 		int getLocationX() const {return *itemLocationX;}
@@ -38,17 +38,17 @@ item::~item() {
 	itemName=0;
 };
 
-void item::setLocationX(int *XLOCATION) {
-	if (*XLOCATION==*itemLocationX)
-		*itemLocationX==*itemLocationX;
+void item::setLocationX(int XLOCATION) {
+	if (*itemLocationX==XLOCATION)
+		*itemLocationX=*itemLocationX;
 	else
-		*itemLocationX==*XLOCATION;
+		*itemLocationX=XLOCATION;
 };
 
-void item::setLocationY(int *YLOCATION) {
-	if (*YLOCATION==*itemLocationY)
-		*itemLocationY==*itemLocationY;
+void item::setLocationY(int YLOCATION) {
+	if (*itemLocationY==YLOCATION)
+		*itemLocationY=*itemLocationY;
 	else
-		*itemLocationY==*YLOCATION;
+		*itemLocationY=YLOCATION;
 };
 

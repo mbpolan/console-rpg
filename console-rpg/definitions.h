@@ -64,14 +64,11 @@ void optionMenu() {
 	std::cout << "\nNo options avaliable at this time.\n";
 }
 
-void spawnItem(movement *rhs) {
-	item *plant=new item("plant",0,0);
-	rhs->placeItem(plant,rhs);
-}
-
 // startGame function: this will start the movement system
 void startGame(movement *rhs) {
 	while(1) {
+		item *torch=new item("torch",1,1);
+		rhs->placeItem(torch,rhs);
 		std::cout << "\nMove: ";
 		std::string moverVar;
 		std::cin >> moverVar;
