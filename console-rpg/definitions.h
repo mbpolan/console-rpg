@@ -92,6 +92,10 @@ void startGame(movement *rhs,map *karte,player *r_player) {
 		std::string moverVar;
 		std::cin >> moverVar;
 		
+		if (moverVar=="mod") {
+			r_player->setHP(0);
+		}
+		
 		if (moverVar=="n") {
 			rhs->moveN(karte);
 			rhs->controlTime(count);
@@ -262,15 +266,17 @@ int savePlayerData(player *r_player, map *karte) {
 		return 0;
 	}
 	
-	fout << playerName << std::endl;
-	fout << x << std::endl;
-	fout << y << std::endl;
-	fout << playerCurrentHP << std::endl;
-	fout << playerCurrentMP << std::endl;
-	fout << luck << std::endl;
-	fout << strength << std::endl;
-	fout << power << std::endl;
-	fout << defense << std::endl;
+	fout.write((char*) &playerName,sizeof(playerName));
+	fout.write((char*) &x,sizeof(x));
+	fout.write((char*) &y,sizeof(y));
+	fout.write((char*) &playerCurrentHP,sizeof(playerCurrentHP));
+	fout.write((char*) &playerCurrentMP,sizeof(playerCurrentMP));
+	
+	fout.write((char*) &luck,sizeof(luck));
+	fout.write((char*) &strength,sizeof(strength));
+	fout.write((char*) &power,sizeof(power));
+	fout.write((char*) &defense,sizeof(defense));
+	
 	fout.close();
 }
 
@@ -288,37 +294,37 @@ int loadPlayerData(player *r_player, map *karte) {
 		return 0;
 	}
 	
-	
-	fin >> name;
+	fin.read((char*) &name,sizeof(name));
 	r_player->setName(name);
 	fin.clear();
 
-	fin >> x;
+	fin.read((char*) &x,sizeof(x));
 	karte->setCurrentSpaceX(x);
 	fin.clear();
 
-	fin >> y;
+	fin.read((char*) &y,sizeof(y));
 	karte->setCurrentSpaceY(y);
 	fin.clear();
 	
-	fin >> hp;
+	fin.read((char*) &hp,sizeof(hp));
 	r_player->setHP(hp);
 	fin.clear();
 	
-	fin >> mp;
+	fin.read((char*) &mp,sizeof(mp));
 	r_player->setMP(mp);
 	fin.clear();
 
-	fin >> luck; r_player->setLuck(luck);
+	fin.read((char*) &luck,sizeof(luck)); r_player->setLuck(luck);
 	fin.clear();
 
-	fin >> strength; r_player->setStrength(strength);
+	fin.read((char*) &strength,sizeof(strength)); r_player->setStrength(strength);
 	fin.clear();
 
-	fin >> power; r_player->setPower(power);
+	fin.read((char*) &power,sizeof(power)); r_player->setPower(power);
 	fin.clear();
 
-	fin >> defense; r_player->setDefense(defense);
+	fin.read((char*) &defense,sizeof(defense)); r_player->setDefense(defense);
 	fin.clear(); fin.close();
+
 }
 
