@@ -9,6 +9,7 @@
 #include <qstatusbar.h>
 #include <qfiledialog.h>
 #include <qdockwindow.h>
+#include <qdialog.h>
 #include <libxml/parser.h>
 
 #include "icons/filenew.xpm"
@@ -17,9 +18,7 @@
 #include "icons/filesaveas.xpm"
 #include "icons/quit.xpm"
 
-#include "tiles/grass.xpm"
-#include "tiles/water.xpm"
-
+#include "tiles.dat"
 #include "mainwindow.h"
 #include "tile.h"
 
@@ -38,6 +37,9 @@ mainWindow::mainWindow(QWidget *parent,const char *name): QMainWindow(parent,nam
     
     // make our toolbox dock window
     makeToolbox();
+    
+    // make some connections
+    connect(map,SIGNAL(tileClicked(int,int)),position,SLOT(update(int,int)));
 };
 
 // make the actions used by menus, toolbars, etc.
@@ -86,6 +88,10 @@ void mainWindow::makeActions() {
     showGridAct->setOn(map->showGrid());
     showGridAct->setStatusTip("Show or hide the grid");
     connect(showGridAct,SIGNAL(toggled(bool)),map,SLOT(enableGrid(bool)));
+    
+    goToCellAct=new QAction(tr("Go to Tile"),tr("Alt+G"),this);
+    goToCellAct->setStatusTip("Go to a tile on the map");
+    connect(goToCellAct,SIGNAL(activated()),this,SLOT(goToCellDialog()));
 };
 
 // create our menus
@@ -98,6 +104,9 @@ void mainWindow::makeMenus() {
     file->insertSeparator();
     closeAct->addTo(file);
     
+    edit=new QPopupMenu(this);
+    goToCellAct->addTo(edit);
+    
     options=new QPopupMenu(this);
     showGridAct->addTo(options);
     
@@ -106,25 +115,16 @@ void mainWindow::makeMenus() {
     aboutAct->addTo(help);
     
     menuBar()->insertItem(tr("&File"),file);
+    menuBar()->insertItem(tr("&Edit"),edit);
     menuBar()->insertItem(tr("&Options"),options);
     menuBar()->insertItem(tr("&Help"),help);
     
+    // our tile indicator on the status bar
+    position=new tileIndicator;
+    
     // build a status bar and put an inital message into it
     statusBar()->message("Welcome to Console RPG Map Editor");
-};
-
-// slot to handle map resizing
-void mainWindow::handleSizes(int x,int y) {
-    rows=x;
-    cols=y;
-    
-    map->clear();    
-    
-    map->setNumRows(x);
-    map->setNumCols(y);
-    
-    map->resync(x,y);
-    map->redraw();
+    statusBar()->addWidget(position,0,true);
 };
 
 // create our toolbars
@@ -137,7 +137,7 @@ void mainWindow::makeToolbars() {
 
 // slot to make a new map
 void mainWindow::makeNew() {
-    if (!new_Dialog)
+    if (!new_Dialog==NULL)
 	new_Dialog=new newDialog;
     
     new_Dialog->show();
@@ -147,45 +147,19 @@ void mainWindow::makeNew() {
     connect(new_Dialog,SIGNAL(sizesChanged(int,int)),this,SLOT(handleSizes(int,int)));
 };
 
+// create our tile toolbox
 void mainWindow::makeToolbox() {
     toolbox=new QDockWindow(this,"toolbox");
     toolbox->setCaption("Toolbox");
-    
-    toolbox->setHorizontallyStretchable(false);
+
+//    toolbox->setHorizontallyStretchable(false);
     toolbox->setMovingEnabled(false);
     moveDockWindow(toolbox,Qt::Left);
     
-    // we should really subclass the items qtable and place it elsewhere
-    // TODO: make a subclass of a widget that will be the cell in this table
-    /********** Start code block **********/
-    items=new QTable(5,1,toolbox,"item_box");
+    itemBox=new toolBox(toolbox,"itemToolBox");
+    toolbox->setWidget(itemBox);
     
-    for (int i=0;i<5;i++)
-	items->setRowHeight(i,32);
-    
-    for (int i=0;i<1;i++)
-	items->setColumnWidth(i,128);
-    
-    for (int i=0;i<5;i++) {
-	for (int j=0;j<1;j++)
-	    items->setItem(i,j,(new tile("grass",items)));
-    }
-    
-    connect(items,SIGNAL(clicked(int,int,int,const QPoint&)),map,SLOT(registerTile(int,int)));
-    
-    QPixmap grassTile=QPixmap(grass);
-    QPixmap waterTile=QPixmap(water);
-    
-    items->setText(0,0,"Grass");
-    items->setPixmap(0,0,grassTile);
-    items->setText(1,0,"Water");
-    items->setPixmap(1,0,waterTile);
-    /********** End code block **********/
-    
-    items->setShowGrid(true);
-    items->setTopMargin(0);
-    items->setLeftMargin(0);
-    toolbox->setWidget(items);
+    connect(itemBox,SIGNAL(tileChanged(int,int)),map,SLOT(registerTile(int,int)));
 };
 
 // slot to open a map file
@@ -223,13 +197,25 @@ void mainWindow::makeSaveAs() {
     return;
 };
 
+// display dialog for gotocell
+void mainWindow::goToCellDialog() {
+    if (!goToCell_Dialog==NULL)
+	goToCell_Dialog=new goToDialog;
+    
+    goToCell_Dialog->show();
+    goToCell_Dialog->raise();
+    goToCell_Dialog->setActiveWindow();
+    
+    connect(goToCell_Dialog,SIGNAL(valueChanged(int,int)),this,SLOT(goToCell(int,int)));
+};
+
 // our about dialog 
 void mainWindow::aboutDialog() {
     QMessageBox::about(this,"About",
 		       "<h2>CRPG Map Editor 0.1</h2>"
 		      "<p>Written by KanadaKid using the Qt library.</p>"
-		      "<p>his map editor is used to edit maps from Console RPG"
-		      " versions 0.2.0 and higher.</p>"
+		      "<p>This map editor is used to edit and make maps"
+		      " for Console RPG versions 0.2.0 and higher.</p>"
 		      "<p> Email: kanadakid@gmail.com</p>");
 };
 
@@ -239,3 +225,32 @@ void mainWindow::helpDialog() {
 			     "Need help? Go see a doctor. ;)");
 };
 
+// slot to handle map resizing
+void mainWindow::handleSizes(int x,int y) {
+    if (x>1000 || y>1000) {
+	QMessageBox::warning(this,"Error",
+			     "Map is too big! The maximum size is 1000/1000.");
+	return;
+    }
+    
+    rows=x;
+    cols=y;
+    
+    map->clear();    
+    
+    map->setNumRows(x);
+    map->setNumCols(y);
+    
+    map->resync(x,y);
+    map->redraw();
+};
+
+// slot for going to a particular cell
+void mainWindow::goToCell(int row,int col) {
+    if (row > map->numRows() || col > map->numCols()) {
+	QMessageBox::warning(this,"Error",
+			     "You can only go to a tile on this map!");
+    }
+    
+    map->setCurrentCell(row,col);
+};

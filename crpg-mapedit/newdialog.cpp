@@ -12,6 +12,7 @@ newDialog::newDialog(QWidget *parent,const char *name): QDialog(parent,name) {
     setSizeGripEnabled(false);
     setModal(true);
     setCaption("New map");
+ //   setIsResizable(false);
     
     grid=new QGridLayout(this,4,3);
     

@@ -4,8 +4,11 @@
 #include <qmainwindow.h>
 
 // nessesary includes
+#include "gotodialog.h"
 #include "maptable.h"
 #include "newdialog.h"
+#include "tileindicator.h"
+#include "toolbox.h"
 
 // forward declare some classes
 class QAction;
@@ -26,6 +29,7 @@ class mainWindow: public QMainWindow {
 	  void makeMenus();
 	  void makeToolbars();
 	  void makeToolbox();
+	  
       signals:
 	  // none for now
 	  
@@ -38,20 +42,25 @@ class mainWindow: public QMainWindow {
 	  
 	  void aboutDialog();
 	  void helpDialog();
+	  void goToCellDialog();
 	  
 	  void handleSizes(int,int);
+	  void goToCell(int,int);
 	  
       private:
 	  // our mapedit body
 	  mapTable *map;
 	  
 	  // needed dialogs
+	  goToDialog *goToCell_Dialog;
 	  newDialog *new_Dialog;
 	  
 	  // other components
 	  QDockWindow *toolbox;
 	  
-	  QTable *items;
+	  // extras
+	  toolBox *itemBox;
+	  tileIndicator *position;
 	  
 	  QPopupMenu *file;
 	  QPopupMenu *edit;
@@ -69,6 +78,7 @@ class mainWindow: public QMainWindow {
 	  QAction *aboutAct;
 	  QAction *helpAct;
 	  QAction *showGridAct;
+	  QAction *goToCellAct;
 	  
 	  // path to our open map file
 	  QString mapFilePath;

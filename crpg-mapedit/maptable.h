@@ -13,6 +13,9 @@ class mapTable: public QTable {
 	   void redraw();
 	   void clear();
 	   
+       signals:
+	   void tileClicked(int,int);
+	   
        public slots:
 	   void enableGrid(bool);
 	   void registerTile(int,int);
