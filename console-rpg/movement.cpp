@@ -150,9 +150,13 @@ void movement::look(map *karte) {
 	groundType=karte->parseGroundID(gID); // parse the id
 	
 	if (karte->itemExists(karte,karte->getCurrentSpaceX(),karte->getCurrentSpaceY())) {
-		std::string theName=karte->identifyItem(karte);
+		item* theName=karte->identifyItem(karte);
 		
-		std::cout << "\nYou see " << theName << ".\n";
+		if (theName!=NULL)
+			std::cout << "\nYou see " << theName->getName() << ".\n";
+		
+		else
+			std::cout << "\nYou see " << groundType << ".";
 	}
 	else
 		std::cout << "\nYou see " << groundType << ".";

@@ -29,14 +29,14 @@ player::player() {
 	currentHP=100;
 	currentMP=10;
 	playerName="Arbba";
-	hair="brown", legs="blue", torso="brown";
+	hairOutfit="brown", legsOutfit="blue", torsoOutfit="brown";
 	luck=0,power=0,strength=0,defense=0;
 	playerVocation=warrior;
 
-	headEq="nothing";
-	torsoEq="Jacket";
-	legEq="Travel Pants";
-	bootEq="Boots";
+	headEq=new item("nothing",head);
+	torsoEq=new item("Jacket",torso);
+	legEq=new item("Travel Pants",legs);
+	bootEq=new item("Boots",boots);
 	
 	playerID=0;
 
@@ -52,13 +52,13 @@ player::player(int fixedHP, int fixedMP, int id) {
 	power=0;
 	strength=0;
 	defense=0;
-	hair="brown",legs="blue",torso="brown";
+	hairOutfit="brown", legsOutfit="blue", torsoOutfit="brown";
 	playerVocation=warrior;
 	
-	headEq="nothing";
-	torsoEq="Jacket";
-	legEq="Travel Pants";
-	bootEq="Boots";
+	headEq=new item("nothing",head);
+	torsoEq=new item("Jacket",torso);
+	legEq=new item("Travel Pants",legs);
+	bootEq=new item("Boots",boots);
 	
 	playerID=id;;
 	
@@ -74,13 +74,13 @@ player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense,int id)
 	defense=Defense;
 
 	playerName="Arbba";
-	hair="brown",legs="blue",torso="brown";
+	hairOutfit="brown", legsOutfit="blue", torsoOutfit="brown";
 	playerVocation=warrior;
 
-	headEq="nothing";
-	torsoEq="Jacket";
-        legEq="Travel Pants";
-        bootEq="Boots";
+	headEq=new item("nothing",head);
+	torsoEq=new item("Jacket",torso);
+	legEq=new item("Travel Pants",legs);
+	bootEq=new item("Boots",boots);
 	
 	playerID=id;
 	
@@ -88,6 +88,10 @@ player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense,int id)
 
 // player class destructor
 player::~player() {
+	delete headEq;
+	delete torsoEq;
+	delete legEq;
+	delete bootEq;
 };
 
 // overloaded operator=
@@ -101,8 +105,8 @@ player &player::operator=(const player &r_player) {
 	power=r_player.getStrength();
 	defense=r_player.getDefense();
 
-	playerHeight=r_player.getHeight(),playerAge=r_player.getAge(),playerName=r_player.getName();
-	hair=r_player.getHair(),torso=r_player.getTorso(),legs=r_player.getLegs();
+	playerName=r_player.getName();
+	hairOutfit=r_player.getHair(),torsoOutfit=r_player.getTorso(),legsOutfit=r_player.getLegs();
 	playerVocation=r_player.getVoc();
 
 	headEq=r_player.getHeadItem();
@@ -111,6 +115,24 @@ player &player::operator=(const player &r_player) {
 	bootEq=r_player.getBootsItem();
 
 	return *this;
+};
+
+// overloaded operator==
+bool player::operator==(const player &r_player) {
+	if (currentHP==r_player.getHP() && currentMP==r_player.getMP()) {
+		// now we test the other various info
+		if (luck==r_player.getLuck() && strength==r_player.getStrength() && 
+		    power==r_player.getPower() && defense==r_player.getDefense() &&
+		    hairOutfit==r_player.getHair() && torsoOutfit==r_player.getTorso() && legsOutfit==r_player.getLegs() &&
+		    
+		    headEq==r_player.getHeadItem() && torsoEq==r_player.getTorsoItem() &&
+		    legEq==r_player.getLegsItem() && bootEq==r_player.getBootsItem() &&
+		    playerName==r_player.getName() && playerVocation==r_player.getVoc())
+			return true;
+	}
+	
+	else
+		return false;
 };
 
 // let the player customize his character
@@ -160,53 +182,53 @@ void player::setLook() {
 	}
 	
 	std::cout << "\nWhat is your hair color? ";
-	std::cin >> hair;
+	std::cin >> hairOutfit;
 	
 	std::cout << "\nWhat is your shirt color? ";
-	std::cin >> torso;
+	std::cin >> torsoOutfit;
 
 	std::cout << "\nWhat is your pants color? ";
-	std::cin >> legs;
+	std::cin >> legsOutfit;
 };
 
 // display player's inventory
 void player::displayInventory() {
 	std::cout << "\nYour Inventory:\n\n";
-	std::cout << "Head: " << headEq << "\n";
-	std::cout << "Torso: " << torsoEq << "\n";
-	std::cout << "Legs: " << legEq << "\n";
-	std::cout << "Feet: " << bootEq << "\n";
+	std::cout << "Head: " << headEq->getName() << std::endl;
+	std::cout << "Torso: " << torsoEq->getName() << std::endl;
+	std::cout << "Legs: " << legEq->getName() << std::endl;
+	std::cout << "Feet: " << bootEq->getName() << std::endl;
 };
 
 // remove item from inventory
 void player::removeInventoryItem(int theType) {
 	switch(theType) {
-		case 0: headEq="nothing";break;
-		case 1: torsoEq="nothing";break;
-		case 2: legEq="nothing";break;
-		case 3: bootEq="nothing";break;
+		case 0: headEq->setName("nothing");break;
+		case 1: torsoEq->setName("nothing");break;
+		case 2: legEq->setName("nothing");break;
+		case 3: bootEq->setName("nothing");break;
 		default: std::cout << "This item is not equiped!";
 	}
 };
 
 // add item to inventory
-void player::addInventoryItem(TYPE theType,std::string name) {
+void player::addInventoryItem(TYPE theType,item *thisItem) {
 	switch(theType) {
-		case 0: headEq=name;break;
-		case 1: torsoEq=name;break;
-		case 2: legEq=name;break;
-		case 3: bootEq=name;break;
+		case 0: headEq=thisItem;break;
+		case 1: torsoEq=thisItem;break;
+		case 2: legEq=thisItem;break;
+		case 3: bootEq=thisItem;break;
 		default: std::cout << "This item cannot be equiped!";
 	}
 };
 
 // iterate through the inventory, look for item
-int player::searchInventory(player *r_player,std::string itemName) {
+int player::searchInventory(std::string itemName) {
 	std::string locator=itemName;
-	std::string headItem=r_player->getHeadItem();
-	std::string torsoItem=r_player->getTorsoItem();
-	std::string legsItem=r_player->getLegsItem();
-	std::string bootsItem=r_player->getBootsItem();
+	std::string headItem=headEq->getName();
+	std::string torsoItem=torsoEq->getName();
+	std::string legsItem=legEq->getName();
+	std::string bootsItem=bootEq->getName();
 	
 	if (locator==headItem)
 		return 0;

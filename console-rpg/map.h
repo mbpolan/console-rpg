@@ -50,7 +50,7 @@ class map {
 		
 		// misc methods for map
 		bool itemExists(map*,int,int);
-		std::string identifyItem(map*);
+		item* identifyItem(map*);
 		std::string parseGroundID(int);
 		TYPE checkItemType(map*);
 		int getGroundID() const {return groundID;}

@@ -29,6 +29,7 @@ enum TYPE {head,torso,legs,boots,npe};
 class item {
 	public:
 		item();
+		item(std::string,TYPE); // lesser constructor
 		item(std::string,int,int,TYPE); // our constructor
 		virtual ~item();
 
@@ -37,9 +38,11 @@ class item {
 		void setItemID(int);
 		void setItemName(std::string nameOfItem) {itemName=nameOfItem;}
 		
+		std::string getName() const {return itemName;}
+		void setName(std::string name) {itemName=name;}
+		
 		int getLocationX() const {return itemLocationX;}
 		int getLocationY() const {return itemLocationY;}
-		std::string getName() const {return itemName;}
 		int getItemID() const {return itemID;}
 		
 		bool isHeadItem(item*);

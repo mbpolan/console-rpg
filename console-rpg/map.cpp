@@ -38,6 +38,7 @@ map::map(int X,int Y,int NgY,int NgX) {
 		itemSquareY[i]=0;
 		itemSquareNgX[i]=0;
 		itemSquareNgY[i]=0;
+		
 		itemLineX[i]=NULL;
 		itemLineNgX[i]=NULL;
 		itemLineY[i]=NULL;
@@ -133,28 +134,28 @@ bool map::itemExists(map *karte,int currentX,int currentY) {
 };
 
 // get the item's name, similar to itemExists()
-std::string map::identifyItem(map *karte) {
+item* map::identifyItem(map *karte) {
 	int currentX=karte->getCurrentSpaceX();
 	int currentY=karte->getCurrentSpaceY();
 	
 	if (currentX<0 && currentY>0) { // if X<0 BUT Y>0
 		if ((itemLineNgX[(currentX+1)*(-1)]->getName())==(itemLineY[currentY-1]->getName()))
-			return itemLineNgX[(currentX+1)*(-1)]->getName();
+			return itemLineNgX[(currentX+1)*(-1)];
 	}
 	
 	if (currentX>0 && currentY<0) { // if X>0 BUT Y<0
 		if ((itemLineX[currentX-1]->getName())==(itemLineNgY[(currentY+1)*(-1)]->getName()))
-			return itemLineX[currentX-1]->getName();
+			return itemLineX[currentX-1];
 	}
 
 	if (currentX<0 && currentY<0) { // both <0
 		if ((itemLineNgX[(currentX+1)*(-1)]->getName())==(itemLineNgY[(currentY+1)*(-1)]->getName()))
-			return itemLineNgX[(currentX+1)*(-1)]->getName();
+			return itemLineNgX[(currentX+1)*(-1)];
 	}
 	
 	if (currentX>0 && currentY>0) { // both >0
 		if ((itemLineX[currentX-1]->getName())==(itemLineY[currentY-1]->getName()))
-			return itemLineY[currentY-1]->getName();
+			return itemLineY[currentY-1];
 	}
 
 	if (currentX==currentY) {
@@ -163,32 +164,25 @@ std::string map::identifyItem(map *karte) {
 			xName=itemLineX[currentX-1]->getName();
 			yName=itemLineY[currentY-1]->getName();
 			if (xName==yName)
-				return xName;
+				return itemLineX[currentX-1];
 			if (xName!=yName) {
-				int id=karte->getGroundID();
-				std::string ground=karte->parseGroundID(id);
-				return ground;
+				return NULL;
 			}
 		}
 		if (currentX<0 && currentY<0) {
 			xName=itemLineNgX[(currentX+1)*(-1)]->getName();
 			yName=itemLineNgY[(currentY+1)*(-1)]->getName();
 			if (xName==yName)
-				return xName;
+				return itemLineNgX[(currentX+1)*(-1)];
 			if (xName!=yName) {
-                                int id=karte->getGroundID();
-				std::string ground=karte->parseGroundID(id);
-                                return ground;
+				return NULL;
 			}
 		}
 		
 	} // end of -if (currentX==currentY)- block
 			
-	else {
-		int id=karte->getGroundID();
-		std::string ground=karte->parseGroundID(id);
-		return ground;
-	}
+	else
+		return NULL;
 };
 
 // parse the ground id and return a std::string

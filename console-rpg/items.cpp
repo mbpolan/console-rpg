@@ -29,6 +29,12 @@ item::item() {
 	itemTYPE=npe;
 };
 
+// lesser item constructor
+item::item(std::string fixedItemName,TYPE thisType) {
+	itemName=fixedItemName;
+	itemTYPE=thisType;
+};
+
 // our item class constructor
 item::item(std::string fixedItemName,int spawnX,int spawnY,TYPE thisType) {
 	itemLocationX=spawnX;

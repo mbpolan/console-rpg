@@ -30,10 +30,10 @@ std::string clientOS="Linux";
 std::string clientOS="Windows";
 #endif
 
-main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
 	std::cout << "\n==================================";
 	std::cout << "\n\tConsole-RPG 0.2.0" << std::endl;
 	std::cout << "\t" << clientOS << " Version" << std::endl;
 	std::cout << "==================================\n\n";
-	menu(); // call menu()
+	generic::menu(); // call menu()
 }

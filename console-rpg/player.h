@@ -37,6 +37,7 @@ class player: public creature {
 
 		// overloaded operators
 		player &operator=(const player&);
+		bool operator==(const player&);
 		
 		// player specific definitions
 		int getHP() const {return currentHP;}
@@ -60,12 +61,6 @@ class player: public creature {
 		void setDefense(int _defense) {defense=_defense;}
 		int getDefense() const {return defense;}
 		
-		void setHeight(int height) {playerHeight=height;}
-		int getHeight() const {return playerHeight;}
-		
-		void setAge(int age) {playerAge=age;}
-		int getAge() const {return playerAge;}
-				
 		void setVoc(vocation _vocation) {playerVocation=_vocation;}
 		vocation getVoc() const {return playerVocation;}
 		
@@ -80,12 +75,12 @@ class player: public creature {
 		
 		// visual accessors
 		void setLook();
-		void setHair(std::string hairColor) {hair=hairColor;}
-		void setTorso(std::string torsoColor) {torso=torsoColor;}
-		void setLegs(std::string legsColor) {legs=legsColor;}
-		std::string getHair() const {return hair;}
-		std::string getTorso() const {return torso;}
-		std::string getLegs() const {return legs;}
+		void setHair(std::string hairColor) {hairOutfit=hairColor;}
+		void setTorso(std::string torsoColor) {torsoOutfit=torsoColor;}
+		void setLegs(std::string legsColor) {legsOutfit=legsColor;}
+		std::string getHair() const {return hairOutfit;}
+		std::string getTorso() const {return torsoOutfit;}
+		std::string getLegs() const {return legsOutfit;}
 		
 		// for saving the data to a savefile
 		int savePlayerData(map*,int,int,bool);
@@ -99,15 +94,15 @@ class player: public creature {
 		void setTorsoItem(item*);
 		void setLegsItem(item*);
 		void setBootsItem(item*);
-		std::string getHeadItem() const {return headEq;}
-		std::string getTorsoItem() const {return torsoEq;}
-		std::string getLegsItem() const {return legEq;}
-		std::string getBootsItem() const {return bootEq;}
+		item* getHeadItem() const {return headEq;}
+		item* getTorsoItem() const {return torsoEq;}
+		item* getLegsItem() const {return legEq;}
+		item* getBootsItem() const {return bootEq;}
 		
 		// inventory actions
 		void removeInventoryItem(int);
-		void addInventoryItem(TYPE,std::string);
-		int searchInventory(player*,std::string);
+		void addInventoryItem(TYPE,item*);
+		int searchInventory(std::string);
 
 		// to display player's stats
 		void displayInventory();
@@ -122,12 +117,19 @@ class player: public creature {
 	private:
 		static int playersOn; // count of all the players on the game
 		
+		// stats and id
 		int playerID;
 		int currentHP,currentMP,luck,strength,power,defense,level,exp;
-		int playerHeight,playerAge;
 		std::string playerName;
-		std::string hair, legs, torso;
-		std::string headEq,torsoEq,legEq,bootEq;
+		std::string hairOutfit, legsOutfit, torsoOutfit;
+		
+		// equipment
+		item *headEq;
+		item* torsoEq;
+		item *legEq;
+		item *bootEq;
+		
+		// vocation
 		vocation playerVocation;
 };
 
