@@ -81,9 +81,9 @@ class player: public creature {
 		void increaseExp(int _exp) {exp+=_exp;} 
 		void increaseLevel(int);
 		
-		// for saving the data to a savefile
-		int savePlayerData(int,int,bool);
-		int loadPlayerData(int,int);
+		// save/load methods
+		xmlNodePtr savePlayerData();
+		bool loadPlayerData(xmlNodePtr);
 		
 		int saveToIndex(int);
 		static int loadFromIndex(int,int&);

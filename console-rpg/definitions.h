@@ -473,43 +473,12 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       std::cin >> slot;
       std::cin.ignore();
       
-      std::stringstream ss;
-      
-      #ifdef __LINUX__
-      ss << "data/game" << slot << "/";
-      #endif
-      
-      #ifdef __WINDOWS__
-      ss << "data\\game" << slot << "\\";
-      #endif
-      
-      bool exists=false;
-      std::ifstream fin;
-      fin.open(ss.str().c_str());
-      
-      if (fin) {
-        std::cout << "\nSlot " << slot << " is already full. Please select another.\n";
-        break;
-      }
-      
-      // only if the slot is not occupied
-      if (!fin) {
-        for (int i=0;i<playerCount;i++) {
-          // to avoid the "directory already exists" error  
-          if (i>0)
-             exists=true;
-             
-          list[i]->savePlayerData(list[i]->getPlayerID(),slot,exists);
-        }
-	
-        karte->saveMapData(slot);
-        std::cout << "\nPlayer and map saved!\n";
-      }
+      if (rhs->saveGame(slot, playerCount, karte, list))
+      	std::cout << "\nYour game was saved.\n";
       
       else
         std::cout << "\nSlot " << slot << " is already full. Please select another.\n";
       
-      fin.close();
       std::cout << "\n----------";      
     }
 
@@ -630,85 +599,29 @@ int generic::loadGame() {
    int slot;
    std::cout << "\nLoad from which slot (1-9)? ";
    std::cin >> slot; std::cin.ignore();
-
-   // our stream object
-   std::ifstream fin;
-
-   // now we declare some paths based on the client's
-   // operating system.
-   #ifdef __LINUX__
-   std::stringstream index;
-   char path[256];
-   index << "data/game" << slot << "/index.dat"; // path to index file
-   #endif
-
-   #ifdef __WINDOWS__
-   char path[256];
-   std::stringstream index;
-   index << "data\\game" << slot << "\\index.dat"; // path to index file
-   #endif
-
-   // now we attempt to open the index file
-   int players;
-   player::loadFromIndex(slot,players);
-
-   // allocate memory for the core compenents of the game.
+   
+   // allocate memory for the core components of the game.
    playerList<player*> list; // list of players
    movement *grid=new movement; // movement grid
    map *karte=new map(PMAX,PMAX,NMAX,NMAX); // world map
    
-   // load the map data from xml
-   if (karte->loadMapData(slot)==0)
-       return 0;
-
-   // start the loop to fill up array with saved player data
-   for (int i=0;i<players;i++) {
-       list[i]=new player;
-       player::setPlayersOn(players);
-
-	   #ifdef __LINUX__
-	   sprintf(path,"data/game%d/savefile%d.xml",slot,i+1);
-	   #endif
-
-	   #ifdef __WINDOWS__
-	   sprintf(path,"data\\game%d\\savefile%d.xml",slot,i+1);	
-	   #endif
-
-       fin.open(path);
-
-           #ifdef DEBUG
-	   std::cout << "\nLoading from " << path << "...\n";
-	   #endif
-
-       if (!fin) {
-          std::cout << "\nGame: " << slot;
-          std::cout << "\nSavefile " << i << " is either corrupt or not present. Aborting...\n";
-          return 0;
-       }
-
-       if (list[i]->loadPlayerData(i+1,slot)) {
-          list[i]->setPlayerID(i+1);
-          karte->players.push_back(list[i]);
-       }
-	  
-	  
-       else {
-          std::cout << "\nUnable to load player data!\n";
-	  return 0;
-       }
-       
-       fin.close();
+   // now we try to load up the saved file
+   if (grid->loadGame(slot, karte, list)) {
+	int players=karte->players.size();
+	load=true;
+	generic::preGame(grid, karte, list, players);
    }
    
-   load=true;
-   generic::preGame(grid,karte,list,players);
+   else {
+	delete grid;
+	delete karte;
+	grid=0;
+	karte=0;
+	
+	std::cout << "Unable to load file! Press enter to return to the main menu.";
+	std::cin.ignore(); std::cin.get();
+   }
    
-   // free up the memory allocated for these objects
-   delete grid; 
-   delete karte;
-   
-   grid=0;
-   karte=0;
 }
 
 /***************************************

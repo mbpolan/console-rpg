@@ -27,6 +27,7 @@
 #include "map.h"
 #include "npc.h"
 #include "player.h"
+#include "playerlist.h"
 
 enum BLOCK {
 	BLOCK_NPC,
@@ -66,6 +67,9 @@ class movement {
 		void spawnMapItems(map*);
 		int isOccupied(player*,map*);
 		int isSpecialTile(player*, map*);
+		
+		bool saveGame(int, int, map*, playerList<player*>&);
+		bool loadGame(int, map*, playerList<player*>&);
 
 		// get creatures methods
 		npc *getNPC(map*, int, int, int);

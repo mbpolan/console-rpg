@@ -356,7 +356,97 @@ int movement::isSpecialTile(player *Player, map *karte) {
 			}
 		}
 	}
-}
+};
+
+// save the game into a slot
+bool movement::saveGame(int slot, int players, map *karte, playerList<player*> &list) {
+	std::ifstream f;
+	char path[256];
+	
+	// check to see if this slot already exists
+	sprintf(path, "data/savefiles/f%d.xml", slot);
+	f.open(path);
+	if (f) {
+		f.close();
+		return false;
+	}
+	
+	f.close();
+
+	std::stringstream ss;
+	xmlDocPtr doc=xmlNewDoc((const xmlChar*) "1.0");
+	xmlNodePtr root, ptr;
+	
+	doc->children=xmlNewDocNode(doc, NULL, (const xmlChar*) "crpg-savefile", NULL);
+	root=doc->children;
+
+	// save the map
+	xmlAddChild(root, karte->saveMapData());
+	
+	// save players
+	ptr=xmlNewChild(root, NULL, (const xmlChar*) "players", NULL);
+	
+	// amount of players
+	ss << players;
+	xmlSetProp(ptr, (const xmlChar*) "count", (const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	// save each player
+	for (int i=0; i<players; i++)
+		xmlAddChild(ptr, list[i]->savePlayerData());
+		
+	xmlAddChild(root, ptr);
+	
+	sprintf(path, "data/savefiles/f%d.xml", slot);
+	
+	// dump the new xml document
+	xmlSaveFile(path, doc);
+	xmlFreeDoc(doc);
+	
+	return true;
+};
+
+// load a saved game
+bool movement::loadGame(int slot, map *karte, playerList<player*> &list) {
+	char path[256];
+	sprintf(path, "data/savefiles/f%d.xml", slot);
+	
+	xmlDocPtr doc=xmlParseFile(path);
+	if (doc) {
+		xmlNodePtr root, ptr;
+		root=xmlDocGetRootElement(doc);
+		if (strcmp("crpg-savefile", (const char*) root->name)==0) {
+			ptr=root->children;
+			
+			// first load the map
+			karte->loadMapData(ptr);
+			ptr=ptr->next;
+			
+			// load the players
+			if (strcmp("players", (const char*) ptr->name)==0) {
+				xmlNodePtr p=ptr->children;
+				int players=atoi((const char*) xmlGetProp(ptr, (const xmlChar*) "count"));
+				
+				// each player loads his own information
+				for (int i=0; i<players; i++) {
+					list[i]=new player;
+					list[i]->loadPlayerData(p);
+					list[i]->setPlayerID(i+1);
+					karte->players.push_back(list[i]);
+					
+					p=p->next;
+				}
+			}
+			
+			xmlFreeDoc(doc);
+			return true;
+		}
+		
+		xmlFreeDoc(doc);
+	}
+	
+	return false;
+};
 
 // get an NPC based on coordinates
 npc* movement::getNPC(map *karte, int x, int y, int _layer) {

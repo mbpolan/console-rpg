@@ -23,6 +23,7 @@
 
 // map.h: map class and related stuff
 #include <list>
+#include <libxml/parser.h>
 
 #include "enemy.h"
 #include "items.h"
@@ -63,8 +64,8 @@ class map {
 		TYPE checkItemType(int, int, int);
 	
 		int getGroundID() const {return groundID;}
-		int saveMapData(int);
-		int loadMapData(int);
+		xmlNodePtr saveMapData();
+		bool loadMapData(xmlNodePtr);
 	
 		void creaturesDoAction();
 	

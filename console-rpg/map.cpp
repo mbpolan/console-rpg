@@ -177,29 +177,15 @@ TYPE map::checkItemType(int currentX,int currentY, int _layer) {
 	}
 };
 
-// save the current map data to file
-int map::saveMapData(int game) {
+// save the current map data to an xmlNodePtr
+xmlNodePtr map::saveMapData() {
 	std::stringstream path,ss;
-	
-	#ifdef __LINUX__
-	path << "data/game" << game << "/crpgmap.xml";
-	#endif
-
-	#ifdef __WINDOWS__
-	path << "data\\game" << game << "\\crpgmap.xml";
-	#endif
-
-	xmlDocPtr doc; // our document
 	xmlNodePtr root,ptr;
 	
-	doc=xmlNewDoc((const xmlChar*) "1.0");
-	
-	doc->children=xmlNewDocNode(doc,NULL,(const xmlChar*) "crpg-map",NULL);
-	
-	root=doc->children;
+	root=xmlNewNode(NULL,(const xmlChar*) "crpg-map");
 	
 	// save the items
-	ptr=xmlNewChild(doc->children,NULL,(const xmlChar*) "items",NULL);
+	ptr=xmlNewChild(root,NULL,(const xmlChar*) "items",NULL);
 	
 	ss << items.size();
 	xmlSetProp(ptr,(const xmlChar*) "count",(const xmlChar*) ss.str().c_str());
@@ -212,7 +198,7 @@ int map::saveMapData(int game) {
 	}
 	
 	// save our special tiles
-	ptr=xmlNewChild(doc->children, NULL, (const xmlChar*) "spItems", NULL);
+	ptr=xmlNewChild(root, NULL, (const xmlChar*) "spItems", NULL);
 	
 	ss << spItems.size();
 	xmlSetProp(ptr, (const xmlChar*) "count", (const xmlChar*) ss.str().c_str());
@@ -224,7 +210,7 @@ int map::saveMapData(int game) {
 	}
 	
 	// save the npcs
-	ptr=xmlNewChild(doc->children,NULL,(const xmlChar*) "npcs",NULL);
+	ptr=xmlNewChild(root,NULL,(const xmlChar*) "npcs",NULL);
 	
 	ss << npcs.size();
 	xmlSetProp(ptr,(const xmlChar*) "count",(const xmlChar*) ss.str().c_str());
@@ -234,107 +220,82 @@ int map::saveMapData(int game) {
 		if ((*nit))
 			xmlAddChild(ptr,(*nit)->compressToXML());
 	}
-
-	xmlKeepBlanksDefault(1);
 	
-	// save our new map...
-	xmlSaveFile(path.str().c_str(),doc);
-	xmlFreeDoc(doc);
+	return root;
 };
 
 // load saved map data from file
-int map::loadMapData(int game) {
-	std::ifstream fin;
-	
-	char path[256];
-	
-	#ifdef __LINUX__
-	sprintf(path,"data/game%d/crpgmap.xml",game);
-	#endif
-	
-	#ifdef __WINDOWS__
-	sprintf(path,"data\\game%d\\crpgmap.xml",game);
-	#endif
-	
-	xmlDocPtr doc=xmlParseFile(path);
+bool map::loadMapData(xmlNodePtr p) {
 	std::list<item*> itemsId;
 	
-	if (doc) {
-		xmlNodePtr root,ptr,Items,Npcs;
-		root=xmlDocGetRootElement(doc);
+	xmlNodePtr ptr, Items,Npcs;
+	
+	if (p) {
+		if (xmlStrcmp(p->name,(const xmlChar*) "crpg-map")) {
+			return false;
+		}
+		ptr=p->children;
 		
-		if (xmlStrcmp(root->name,(const xmlChar*) "crpg-map")) {
-			xmlFreeDoc(doc);
-			return 0;
+		
+		// first load in the items
+		int itemCount=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "count"));
+		xmlNodePtr items=ptr->children;
+			
+		for (int i=0;i<itemCount;i++) {
+			int t=atoi((const char*) xmlGetProp(items,(xmlChar*) "id"));
+			if (t>0) {
+				const char* x=(const char*) xmlGetProp((xmlNodePtr) items,(xmlChar*) "x");
+				const char* y=(const char*) xmlGetProp((xmlNodePtr) items,(xmlChar*) "y");
+				const char* _layer=(const char*) xmlGetProp((xmlNodePtr) items, (xmlChar*) "layer");
+				const char* valid=(const char*) xmlGetProp((xmlNodePtr) items,(xmlChar*) "valid");
+			
+				this->items.push_back(new item(t , x, y, valid, _layer));
+			}
+				
+			items=items->next;
 		}
 		
-		ptr=root->children;
+		ptr=ptr->next;
 		
-		if (ptr) {
-			// first load in the items
-			int itemCount=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "count"));
-			xmlNodePtr items=ptr->children;
+		// second, load in all special tiles, etc.
+		int spItemCount=atoi((const char*) xmlGetProp(ptr, (xmlChar*) "count"));
+		xmlNodePtr spItems=ptr->children;
+		
+		for (int i=0;i<spItemCount;i++) {
+			int t=atoi((const char*) xmlGetProp((xmlNodePtr) spItems, (xmlChar*) "id"));
+			const char* x=(const char*) xmlGetProp((xmlNodePtr) spItems,(xmlChar*) "x");
+			const char* y=(const char*) xmlGetProp((xmlNodePtr) spItems,(xmlChar*) "y");
+			const char* _layer=(const char*) xmlGetProp((xmlNodePtr) spItems, (xmlChar*) "layer");
+			const char* valid=(const char*) xmlGetProp((xmlNodePtr) spItems,(xmlChar*) "valid");
 			
-			for (int i=0;i<itemCount;i++) {
-				int t=atoi((const char*) xmlGetProp(items,(xmlChar*) "id"));
-				if (t>0) {
-					const char* x=(const char*) xmlGetProp((xmlNodePtr) items,(xmlChar*) "x");
-					const char* y=(const char*) xmlGetProp((xmlNodePtr) items,(xmlChar*) "y");
-					const char* _layer=(const char*) xmlGetProp((xmlNodePtr) items, (xmlChar*) "layer");
-					const char* valid=(const char*) xmlGetProp((xmlNodePtr) items,(xmlChar*) "valid");
-				
-					this->items.push_back(new item(t , x, y, valid, _layer));
-				}
-					
-				items=items->next;
-			}
+			this->spItems.push_back(new item(t , x, y, valid, _layer));
 			
-			ptr=ptr->next;
-			
-			// second, load in all special tiles, etc.
-			int spItemCount=atoi((const char*) xmlGetProp(ptr, (xmlChar*) "count"));
-			xmlNodePtr spItems=ptr->children;
-			
-			for (int i=0;i<spItemCount;i++) {
-				int t=atoi((const char*) xmlGetProp((xmlNodePtr) spItems, (xmlChar*) "id"));
-				const char* x=(const char*) xmlGetProp((xmlNodePtr) spItems,(xmlChar*) "x");
-				const char* y=(const char*) xmlGetProp((xmlNodePtr) spItems,(xmlChar*) "y");
-				const char* _layer=(const char*) xmlGetProp((xmlNodePtr) spItems, (xmlChar*) "layer");
-				const char* valid=(const char*) xmlGetProp((xmlNodePtr) spItems,(xmlChar*) "valid");
-				
-				this->spItems.push_back(new item(t , x, y, valid, _layer));
-				
-				spItems=spItems->next;
-			}
-			
-			ptr=ptr->next;
-			
-			// now load in the npcs
-			int npcCount=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "count"));
-			xmlNodePtr npcs=ptr->children;
-			
-			for (int i=0;i<npcCount;i++) {
-				std::string npcName=atos((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "name"));
-				int X=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "x"));
-				int Y=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "y"));
-				int HP=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "hp"));
-				int MP=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "mp"));
-				int _layer=atoi((const char*) xmlGetProp((xmlNodePtr) npcs, (xmlChar*) "layer"));
-			
-				this->npcs.push_back(new npc(_layer, npcName,X,Y,HP,MP));
-				
-				npcs=npcs->next;
-			}
-
+			spItems=spItems->next;
 		}
 		
-		xmlFreeDoc(doc);
+		ptr=ptr->next;
 		
-		return 1;
+		// now load in the npcs
+		int npcCount=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "count"));
+		xmlNodePtr npcs=ptr->children;
+		
+		for (int i=0;i<npcCount;i++) {
+			std::string npcName=atos((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "name"));
+			int X=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "x"));
+			int Y=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "y"));
+			int HP=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "hp"));
+			int MP=atoi((const char*) xmlGetProp((xmlNodePtr) npcs,(xmlChar*) "mp"));
+			int _layer=atoi((const char*) xmlGetProp((xmlNodePtr) npcs, (xmlChar*) "layer"));
+		
+			this->npcs.push_back(new npc(_layer, npcName,X,Y,HP,MP));
+			
+			npcs=npcs->next;
+		}
+		
+		return true;
 	}
 	
-	std::cout << "\nUnable to load map.xml in savefile " << game << "!\n";
-	return 0;
+	return false;
 };
 
 // map method for making creatures do certain actions
