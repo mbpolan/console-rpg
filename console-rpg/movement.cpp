@@ -32,6 +32,11 @@ movement::movement() {
 	itemWarning="\nThere is an item here.";
 };
 
+// movement class destructor
+movement::~movement() {
+	delete currentBattle;
+};
+
 // move north
 void movement::moveN(player *Player,map *karte) {
 	if (Player->x==0) {

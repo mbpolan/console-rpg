@@ -44,7 +44,7 @@ class player;
 class movement { 
 	public:
 		movement(); // our constructor
-		virtual ~movement() {};
+		virtual ~movement();
 
 		// movement methods
 		void moveN(player*,map*);
