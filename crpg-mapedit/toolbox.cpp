@@ -4,6 +4,7 @@
 #include <qpainter.h>
 #include <qtabwidget.h>
 #include <qtable.h>
+#include <qdockwindow.h>
 
 #include "tiles.dat"
 
@@ -75,20 +76,13 @@ toolBox::toolBox(QWidget *parent,const char *name): QWidget(parent,name) {
 	}
     }     
     
-    /*
-    objects->setText(0,0,"Bush");
-    objects->setText(1,0,"Rock");
-    objects->setText(2,0,"Sunflowers");
-    objects->setText(3,0,"Fern");
-    objects->setText(4,0,"Herb");
-    objects->setText(5,0,"Puddle");*/
-    
     connect(objects,SIGNAL(clicked(int,int,int,const QPoint&)),this,SLOT(broadcastNewObj(int,int)));
     
     mainFrame->addTab(objects,"Objects");
     
 };
 
+// broadcast a signal when a tile was clicked
 void toolBox::broadcastNewTile(int row) {
     if (row==0)
 	emit tileChanged(0);
@@ -96,6 +90,7 @@ void toolBox::broadcastNewTile(int row) {
 	emit tileChanged(-1);
 };
 
+// broadcast a signal when an object was clicked
 void toolBox::broadcastNewObj(int row,int col) {
     QTableItem *Tile=objects->item(row,col);
  
@@ -106,6 +101,12 @@ void toolBox::broadcastNewObj(int row,int col) {
     emit objChanged(_id);
 };
 
+// slot to highlight a cell (TODO)
 void toolBox::highliteCell(int row,int col) {
     return;
+};
+
+// slot to control toolbox docking
+void toolBox::dockSidebar(bool t) {
+    ((QDockWindow*) parent())->setMovingEnabled(t);
 };

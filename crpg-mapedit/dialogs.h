@@ -1,3 +1,6 @@
+#ifndef dialogs_h
+#define dialogs_h
+
 // dialogs.h: various dialog boxes that don't fit into any particular class
 #include <qdialog.h>
 
@@ -38,7 +41,7 @@ class goToDialog: public QDialog {
 	   QLineEdit *lineRow;
 	   QLineEdit *lineCol;
 	   
-       private:
+       private:	   
 	   QGridLayout *grid;
 	   
 	   QPushButton *goButton;
@@ -56,7 +59,7 @@ class fillDialog: public QDialog {
 	   
    	   QComboBox *tileCB;
 	   
-       private:
+       private:   
 	   QGridLayout *grid;
 	   
 	   QPushButton *okButton;
@@ -65,3 +68,14 @@ class fillDialog: public QDialog {
 	   QLabel *title;
 	   QLabel *fillExp;
 };
+
+// dialog displayed when loading map editor
+class initDialog: public QDialog {
+       public:
+	   initDialog(QWidget *parent=0,const char *name=0);
+	   
+       private:
+	   QLabel *msg;
+};
+
+#endif

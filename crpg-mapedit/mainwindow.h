@@ -48,6 +48,8 @@ class mainWindow: public QMainWindow {
 	  void goToCell(int,int);
 	  void openPrefDialog();
 	  
+	  void updateMapHeader(QString text) {mapHeaderInfo=text;}  // update the map's header
+	  
       private:
 	  // our mapedit body
 	  mapTable *map;
@@ -98,6 +100,12 @@ class mainWindow: public QMainWindow {
 	  
 	  // map sizes
 	  int rows,cols;
+	  
+	  // save dialog related variables
+	  bool firstSave;
+	  QString savePath;
+	  
+	  QString mapHeaderInfo; // the text at the top of the map file
       };
 
 #endif

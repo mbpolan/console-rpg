@@ -12,8 +12,11 @@
 #include <qdockwindow.h>
 #include <qdialog.h>
 #include <qeventloop.h>
+#include <qprogressdialog.h>
+#include <qcheckbox.h>
 #include <libxml/parser.h>
 #include <sstream>
+#include <fstream>
 
 #include "icons/filenew.xpm"
 #include "icons/fileopen.xpm"
@@ -30,6 +33,7 @@
 mainWindow::mainWindow(QWidget *parent,const char *name): QMainWindow(parent,name) {
     setCaption("Console RPG Map Editor 0.1 ~ Coded by KanadaKid");
     setMinimumSize(800,600);
+    firstSave=true;
     
     // now we make the actual map editor tables...
     map=new mapTable(50,50,this,"map");
@@ -45,6 +49,9 @@ mainWindow::mainWindow(QWidget *parent,const char *name): QMainWindow(parent,nam
     
     // make some connections
     connect(map,SIGNAL(tileClicked(int,int)),position,SLOT(update(int,int)));
+    
+    // dialogs
+    pref_Dialog=new prefDialog(this);    
 };
 
 // make the actions used by menus, toolbars, etc.
@@ -231,7 +238,7 @@ void mainWindow::makeToolbox() {
 
 // slot to open a map file
 void mainWindow::makeOpen() {
-    mapFilePath=QFileDialog::getOpenFileName("/home","XML files (*.xml)",this,"fileDialog","Open a map file");
+    mapFilePath=QFileDialog::getOpenFileName(0,"XML files (*.xml)",this,"fileDialog","Open a map file");
     
     if (mapFilePath.isNull())
 	return;
@@ -239,7 +246,7 @@ void mainWindow::makeOpen() {
     xmlDocPtr doc=xmlParseFile((const char*)mapFilePath.ascii());
     
     if (doc) {
-	xmlNodePtr root;
+	xmlNodePtr root,ptr,items;
 	root=xmlDocGetRootElement(doc);
 	
 	// check to see if this is a console rpg map file
@@ -248,17 +255,70 @@ void mainWindow::makeOpen() {
 				 "<p>Invalid map file! Please select another.</p>");
 	}
 	
-	// loadMapData(doc);
+	ptr=root->children;
+	if (ptr) {
+	    map->clear();
+	    
+	    int itemCount=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "count"));	
+	    items=ptr->children;
+	    
+	    QProgressDialog progress("Loading map...",0,itemCount,this,"saveMapDialog",true);
+	    progress.setMinimumDuration(0);	
+	    for (int i=0;i<itemCount;i++) {
+		progress.setProgress(i);
+		int _id=atoi((const char*) xmlGetProp(items,(xmlChar*) "id"));
+		
+		int x=atoi((const char*) xmlGetProp(items,(xmlChar*) "x"));
+		int y=atoi((const char*) xmlGetProp(items,(xmlChar*) "y"));
+		    
+		map->setItem(y,x,(new tile(_id,map)));
+		
+		items=items->next;
+		
+		qApp->eventLoop()->processEvents(QEventLoop::ExcludeUserInput);
+	    }
+	    
+	    ptr=ptr->next;
+	}
+	
 	xmlFreeDoc(doc);
+	return;
     }
+    
+    QMessageBox::critical(this,"Error","Unable to load map file from XML!");
 };
 
 // slot to save a map
-void mainWindow::makeSave() {
-    QString savePath=QFileDialog::getSaveFileName("/home/mike","XML files (*.xml)",this,"saveFileDialog","Save current map");
-    std::stringstream ss;
+void mainWindow::makeSave() {   
+    if (firstSave) {
+	savePath=QFileDialog::getSaveFileName(0,"XML files (*.xml)",this,"saveFileDialog","Save current map");
+	savePath+=".xml";
+    }
     
+    std::ifstream fin;
+    std::ofstream fout;
+    fin.open(savePath.ascii());
+    
+    if (fin && firstSave) {
+	int confirm=QMessageBox::warning(this,"File exists!",
+			     "This file already exists! Are you sure you want to overwrite it?",QMessageBox::Yes,QMessageBox::No);
+	
+	if (confirm==QMessageBox::No)
+	    return;
+    }
+    fin.close();
+    
+    std::stringstream ss;
     if (!savePath.isNull()) {
+	firstSave=false;
+	
+	// add the header first
+/*	fout.open(savePath.ascii());
+	fout << "<? " << mapHeaderInfo.ascii() << " ?>" << std::endl;
+	
+	fout.close();*/
+	
+	// save info in xml format
 	xmlDocPtr doc;
 	xmlNodePtr root,nodePtr,ptr;
 	
@@ -272,25 +332,30 @@ void mainWindow::makeSave() {
 	QTableItem *Item;	
 	int itemCount=0;
 	
+	// get a count of items on the map
 	for(int i=0;i<map->numRows();i++) {
 	    for (int j=0;j<map->numCols();j++) {
 		Item=map->item(i,j);
 		
-		if (Item && ((tile*) Item)->getID()>0)
+		if (Item)
 		    itemCount+=1;
 	    }
 	}
 		
 	ss << itemCount;
-	xmlSetProp(nodePtr,(const xmlChar*) "count",(const xmlChar*) ss.str().c_str());
+	xmlSetProp(nodePtr,(const xmlChar*) "count",(const xmlChar*) ss.str().c_str()); // item count
 	ss.str("");
 	
-//	QProgressDialog progr
+	QProgressDialog progress("Saving map...",0,map->numRows(),this,"saveMapDialog",true);
+	progress.setMinimumDuration(0);
+//	progress->show();
+	// save our item to an xmlNodePtr and add it
 	for(int i=0;i<map->numRows();i++) {
 	    for (int j=0;j<map->numCols();j++) {
+		progress.setProgress(i);
 		Item=map->item(i,j);
 		
-		if (Item && ((tile*) Item)->getID()>0) {
+		if (Item) {
 		        ptr=xmlNewNode(0,(const xmlChar*) "item");
 		    
 		        ss << ((tile*) Item)->getID();
@@ -314,7 +379,7 @@ void mainWindow::makeSave() {
 	    qApp->eventLoop()->processEvents(QEventLoop::ExcludeUserInput);
 	}
 	
-	
+	// TODO: save npcs
 	nodePtr=xmlNewChild(doc->children,0,(const xmlChar*) "npcs",0);
 	xmlSetProp(nodePtr,(const xmlChar*) "count",(const xmlChar*) "0");
 	
@@ -327,7 +392,8 @@ void mainWindow::makeSave() {
 
 // slot to save a map as...
 void mainWindow::makeSaveAs() {
-    return;
+    firstSave=true;
+    makeSave();
 };
 
 // display dialog for gotocell
@@ -407,15 +473,12 @@ void mainWindow::goToCell(int row,int col) {
     map->setCurrentCell(row,col);
 };
 
+// open the preferences dialog
 void mainWindow::openPrefDialog() {
-    pref_Dialog=new prefDialog(this);
-    
     pref_Dialog->show();
     pref_Dialog->raise();
     pref_Dialog->setActiveWindow();
     
-    if (pref_Dialog->exec()) {
-    }
-    
-    delete pref_Dialog;
+    connect(pref_Dialog,SIGNAL(dockSidebarChecked(bool)),itemBox,SLOT(dockSidebar(bool)));
+    connect(pref_Dialog,SIGNAL(mapHeader(QString)),this,SLOT(updateMapHeader(QString)));
 };

@@ -5,11 +5,12 @@
 
 #include "prefdialog.h"
 
+// prefDialog constructor
 prefDialog::prefDialog(QWidget *parent,const char *name): QTabDialog(parent,name) {
     globalGB=new QGroupBox(1,Qt::Vertical,"General",this,"globalGB");
     
-    dockSidebarCB=new QCheckBox("Keep the sidebar docked",globalGB,"dockSidebar");
-    dockSidebarCB->setChecked(true);
+    dockSidebarCB=new QCheckBox("Keep the sidebar undocked",globalGB,"dockSidebar");
+    dockSidebarCB->setChecked(false);
     
     this->addTab(globalGB,"Global");
     
@@ -27,6 +28,12 @@ prefDialog::prefDialog(QWidget *parent,const char *name): QTabDialog(parent,name
     setApplyButton("Apply");
     setCancelButton("Cancel");
     
-    connect(this,SIGNAL(applyButtonPressed()),this,SLOT(accept())); // todo
+    connect(this,SIGNAL(applyButtonPressed()),this,SLOT(broadcastPrefs()));
     connect(this,SIGNAL(cancelButtonPressed()),this,SLOT(reject()));
+};
+
+// emit a signal to global app when prefs change
+void prefDialog::broadcastPrefs() {
+    emit dockSidebarChecked(dockSidebarCB->isChecked());
+    emit mapHeader(mapHeaderText->text());
 };

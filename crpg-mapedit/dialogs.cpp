@@ -16,7 +16,7 @@
 newDialog::newDialog(QWidget *parent,const char *name): QDialog(parent,name) {
     setSizeGripEnabled(false);
     setModal(true);
-    setCaption("New map");
+    setCaption("New map");    
     
     grid=new QGridLayout(this,4,3);
     
@@ -107,4 +107,13 @@ fillDialog::fillDialog(QWidget *parent,const char *name): QDialog(parent,name) {
     
     grid->addWidget(okButton,2,0);
     grid->addWidget(cancelButton,2,1);
+};
+
+initDialog::initDialog(QWidget *parent,const char *name): QDialog(parent,name) {
+    setCaption("Loading...");
+    setMinimumSize(230,20);
+    
+    msg=new QLabel("Loading map editor... Please wait.",this);
+    msg->setFont(QFont("Times",16,QFont::Bold));
+    msg->setMinimumSize(230,20);
 };

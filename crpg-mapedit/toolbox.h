@@ -21,6 +21,7 @@ class toolBox: public QWidget {
 	   void broadcastNewObj(int,int);
 	   void highliteCell(int,int);	   
 	   
+	   void dockSidebar(bool);
 	   
        private:
 	   QTabWidget *mainFrame;
