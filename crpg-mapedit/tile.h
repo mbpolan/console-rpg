@@ -7,16 +7,18 @@ class QTable;
 
 class tile: public QTableItem {
        public:
-	   tile(const char *tileName,QTable *table, EditType ed=QTableItem::Never);
-	   
-	   QPixmap getGroundTile() const {return groundTile;}
+	   tile(int,QTable *table, EditType ed=QTableItem::Never);
+
+	   int getID() const {return id;}
 	   void setID(int _id) {id=_id;}
 	   void setItem(bool t) {isItem=t;}
 	   
+	   static QPixmap parseID(int);
+	   void setPic(int); // set the pixmap	   
+	   
        private:
-	   QPixmap groundTile;
-	   bool isItem;
-	   int id;
+	   bool isItem; // is an item here?
+	   int id; // item id
 	   
 };
 

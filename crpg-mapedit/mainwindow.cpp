@@ -200,8 +200,8 @@ void mainWindow::makeToolbox() {
     itemBox=new toolBox(toolbox,"itemToolBox");
     toolbox->setWidget(itemBox);
     
-    connect(itemBox,SIGNAL(tileChanged(int,int)),map,SLOT(registerTile(int,int)));
-    connect(itemBox,SIGNAL(objChanged(int,int)),map,SLOT(registerObj(int,int)));
+    connect(itemBox,SIGNAL(tileChanged(int)),map,SLOT(registerTile(int)));
+    connect(itemBox,SIGNAL(objChanged(int)),map,SLOT(registerObj(int)));
 };
 
 // slot to open a map file
@@ -265,21 +265,21 @@ void mainWindow::helpDialog() {
 
 // slot to handle map resizing
 void mainWindow::handleSizes(int x,int y) {
-    if (x>1000 || y>1000) {
+    if (x>50 || y>50) {
 	QMessageBox::warning(this,"Error",
-			     "Map is too big! The maximum size is 1000/1000.");
+			     "Map is too big! The maximum size is 50/50.");
 	return;
     }
     
-    rows=x;
-    cols=y;
+    rows=y;
+    cols=x;
     
     map->clear();
         
-    map->setNumRows(x);
-    map->setNumCols(y);
+    map->setNumRows(y);
+    map->setNumCols(x);
         
-    map->resync(x,y);
+    map->resync(y,x);
     map->redraw();
 };
 

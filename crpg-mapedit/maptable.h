@@ -22,8 +22,8 @@ class mapTable: public QTable {
 	   
        public slots:
 	   void enableGrid(bool);
-	   void registerTile(int,int);
-	   void registerObj(int,int);
+	   void registerTile(int);
+	   void registerObj(int);
 	   void updateTile(int,int);  
 	   
 	   void setPenTo1();
@@ -47,6 +47,7 @@ class mapTable: public QTable {
 	   QAction *removeItemAct;
 	   
 	   // tiles
+	   int regTileID;
 	   QPixmap regTile;
 };
 

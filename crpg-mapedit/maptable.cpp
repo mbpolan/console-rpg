@@ -17,15 +17,8 @@ mapTable::mapTable(int row,int col,QWidget *parent,const char *name): QTable(row
     pen3=false;
     pen5=false;
     
-   QPixmap grassTile=QPixmap(grass);
-   QPixmap waterTile=QPixmap(water);    
-   
-   QPixmap bushObj=QPixmap(bush);
-   QPixmap rockObj=QPixmap(rock);
-   QPixmap fernObj=QPixmap(fern);
-   QPixmap herbObj=QPixmap(herb);   
-    
-    regTile=grassTile;   
+    regTileID=0;   
+    regTile=tile::parseID(0);
     rows=row;
     cols=col;
     
@@ -41,10 +34,8 @@ mapTable::mapTable(int row,int col,QWidget *parent,const char *name): QTable(row
     }
     
     for (int i=0;i<row;i++) {
-	for (int j=0;j<col;j++) {
-	    setItem(i,j,(new tile("grass",this)));
-	    setPixmap(i,j,grassTile);
-	}
+	for (int j=0;j<col;j++)
+	    setItem(i,j,(new tile(0,this)));
     }
 	    
     setColumnMovingEnabled(false);
@@ -80,8 +71,7 @@ void mapTable::redraw() {
     for (int i=0;i<rows;i++) {
 	for (int j=0;j<cols;j++) {
 	    progress.setProgress(rows);
-	    setItem(i,j,(new tile("grass",this)));
-	    setPixmap(i,j,grassTile);
+	    setItem(i,j,(new tile(0,this)));
 	}
 	qApp->eventLoop()->processEvents(QEventLoop::ExcludeUserInput);
     }
@@ -106,39 +96,16 @@ void mapTable::enableGrid(bool t) {
 };
 
 // set which tile the pen should use
-void mapTable::registerTile(int row,int col) {
-   QPixmap grassTile=QPixmap(grass);
-   QPixmap waterTile=QPixmap(water);        
-    
-    if (row==0 && col==0)
-	regTile=grassTile;
-    
-    if (row==1 && col==0)
-	regTile=waterTile;
-    
-    else 
-	regTile=grassTile;
+void mapTable::registerTile(int _id) {
+    regTileID=_id;
+    regTile=tile::parseID(_id);
 };
 
 // set which items the pen should use
 // TODO: rewrite this to load data from the .dat file
-void mapTable::registerObj(int row,int col) {
-   QPixmap bushObj=QPixmap(bush);
-   QPixmap rockObj=QPixmap(rock);
-   QPixmap fernObj=QPixmap(fern);
-   QPixmap herbObj=QPixmap(herb);       
-    
-    if (row==0 && col==0)
-	regTile=bushObj;
-    
-    if (row==1 && col==0)
-	regTile=rockObj;
-    
-    if (row==2 && col==0)
-	regTile=fernObj;
-    
-    if (row==3 && col==0)
-	regTile=herbObj;
+void mapTable::registerObj(int _id) {
+    regTileID=_id;
+    regTile=tile::parseID(_id);
 };
 
 // update a tile on the map
@@ -252,7 +219,6 @@ void mapTable::contextMenuEvent(QContextMenuEvent *p) {
 
 // method to remove an item on the map and reset that tile
 void mapTable::removeItem(int row,int col) {
-    QPixmap grassTile=QPixmap(grass);
-    setPixmap(row,col,grassTile);
+//    setPixmap(row,col,grassTile);
     updateCell(row,col);
 };
