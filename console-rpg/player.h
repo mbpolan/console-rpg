@@ -31,8 +31,8 @@ enum vocation {warrior,mage,archer};
 class player: public creature {
 	public:
 		player();
-		player(int,int,int,int,int); // new player constructor
-		player(int,int,int,int,int,int); // enhanced constructor
+		player(int hp,int mp,int id); // new player constructor
+		player(int hp,int mp,int Luck,int Strength,int Power,int Defense,int id); // enhanced constructor
 		virtual ~player();
 
 		// overloaded operators
@@ -88,8 +88,10 @@ class player: public creature {
 		std::string getLegs() const {return legs;}
 		
 		// for saving the data to a savefile
-		int savePlayerData(map*,int,int);
+		int savePlayerData(map*,int,int,bool);
 		int loadPlayerData(map*,int,int);
+		int saveToIndex(int);
+		int loadFromIndex(int);
 		int removeTemp();
 		
 		// item actions
@@ -114,8 +116,12 @@ class player: public creature {
 		// misc methods
 		void setPlayerID(int id) {playerID=id;}
 		int getPlayerID() const {return playerID;}
+		void setPlayersOn(int players) {playersOn=players;}
+		int getPlayersOn() {return playersOn;}
 		
 	private:
+		static int playersOn; // count of all the players on the game
+		
 		int playerID;
 		int currentHP,currentMP,luck,strength,power,defense,level,exp;
 		int playerHeight,playerAge;

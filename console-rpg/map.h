@@ -54,9 +54,8 @@ class map {
 		std::string parseGroundID(int);
 		TYPE checkItemType(map*);
 		int getGroundID() const {return groundID;}
-		int saveMapData();
-		int loadMapData();
-		
+		int saveMapData(int);
+		int loadMapData(int);
 		
 	private:
 		int MapMaxSizeX,MapMaxSizeY,MapMaxSizeNgY,MapMaxSizeNgX;

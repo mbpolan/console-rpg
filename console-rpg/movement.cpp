@@ -164,16 +164,47 @@ void movement::look(map *karte) {
 void movement::placeItem(item *thisItem,map *karte) {
 	int itemX=(thisItem->getLocationX());
 	int itemY=(thisItem->getLocationY());
+	
 	karte->addItemX(thisItem,itemX);
 	karte->addItemY(thisItem,itemY);
+	
+	// shows what this function is doing when called
+	#ifdef DEBUG
+		int x=karte->getCurrentSpaceX();
+		int y=karte->getCurrentSpaceY();
+		
+		if (karte->itemExists(karte,x,y)) {
+			if (x!=0 && y!=0)
+				std::cout << "\nItem added at " << x << "," << y << std::endl;
+		}
+		
+		else if (!karte->itemExists(karte,x,y)) {
+			if (x!=0 && y!=0)
+				std::cout << "\nFailed to add item at " << x << "," << y << std::endl;
+		}
+	#endif
 };
 
 // remove the item from the map
-void movement::removeItem(item *thisItem,map *karte) {
-	int itemX=(thisItem->getLocationX());
-	int itemY=(thisItem->getLocationY());
-	karte->removeItemX(itemX);
-	karte->removeItemY(itemY);
+void movement::removeItem(map *karte) {
+	int x=karte->getCurrentSpaceX();
+	int y=karte->getCurrentSpaceY();
+	
+	karte->removeItemX(x);
+	karte->removeItemY(y);
+	
+	// shows what this function is doing when called
+	#ifdef DEBUG		
+		if (karte->itemExists(karte,x,y)) {
+			if (x!=0 && y!=0)
+				std::cout << "\nFailed to remove item at " << x << "," << y << std::endl;
+		}
+		
+		else if (!karte->itemExists(karte,x,y)) {
+			if (x!=0 && y!=0)
+				std::cout << "\nItem removed at " << x << "," << y << std::endl;
+		}
+	#endif
 };
 
 // fetch the player's current position on X/Y
@@ -185,7 +216,9 @@ int movement::getCurrentPosition(map *karte) const {
 
 // spawn some initial map items
 void movement::spawnMapItems(movement *rhs,map *karte) {
-	
+
+	// syntax for new item is name,x,y,type.
+	// then call placeItem to put these on the map.
 	item *plant0=new item("fern",1,2,npe);
 	rhs->placeItem(plant0,karte);
 

@@ -4,14 +4,35 @@
 # 8/13/04 - KanadaKid
 
 # variables and other info
+###########################
+# GCC/G++ Compilers (Linux)
+###########################
 CPP = g++
-OFLAG = -c
+OFLAG = -o
+CFLAG = -c
+EXT = 
 OSUFFIX = .o
-CPPFLAGS = -DDEBUG
+CPPFLAGS = -D__LINUX__ -DDEBUG
 DEL = rm -f
-.SUFFIXES : .o .cpp
-.cpp.o :
-	$(CPP) $(CPPFLAGS) -c $<
+
+#########################
+# Dev-Cpp (G++) (Windows)
+#########################
+#CPP = g++.exe
+#OFLAG = -o
+#CFLAG = -c
+#EXT = .exe
+#OSUFFIX = .obj
+#CPPFLAGS = -D__WINDOWS__
+#DEL = rm
+#
+############################
+# end compiler specific part
+############################
+
+.SUFFIXES : $(OSUFFIX) .cpp
+.cpp$(OSUFFIX) :
+	$(CPP) $(CPPFLAGS) $(OFLAG) $<
 
 # compile this
 all: \
@@ -22,25 +43,25 @@ test: all
 	crpg
 
 # object files
-crpg: crpg.o items.o map.o player.o movement.o
-	$(CPP) crpg.o items.o map.o player.o movement.o -o crpg
+crpg: crpg$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX)
+	$(CPP) crpg$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX) $(OFLAG) crpg$(EXT)
 
-crpg.o: crpg.cpp definitions.h
-	$(CPP) $(OFLAG) $(CPPFLAGS) crpg.cpp -o crpg.o
+crpg$(OSUFFIX): crpg.cpp definitions.h
+	$(CPP) $(CPPFLAGS) $(CFLAG) crpg.cpp $(OFLAG) crpg$(OSUFFIX)
 
-items.o: items.cpp items.h
-	$(CPP) $(OFLAG) items.cpp -o items.o
+items$(OSUFFIX): items.cpp items.h
+	$(CPP) $(CPPFLAGS) $(CFLAG) items.cpp $(OFLAG) items$(OSUFFIX)
 
-map.o: map.cpp map.h items.h
-	$(CPP) $(OFLAG) map.cpp -o map.o
+map$(OSUFFIX): map.cpp map.h items.h
+	$(CPP) $(CPPFLAGS) $(CFLAG) map.cpp $(OFLAG) map$(OSUFFIX)
 
-player.o: player.cpp player.h items.h creature.h
-	$(CPP) $(OFLAG) player.cpp -o player.o
+player$(OSUFFIX): player.cpp player.h items.h creature.h
+	$(CPP) $(CPPFLAGS) $(CFLAG) player.cpp $(OFLAG) player$(OSUFFIX)
 
-movement.o: movement.cpp movement.h map.h
-	$(CPP) $(OFLAG) movement.cpp -o movement.o
+movement$(OSUFFIX): movement.cpp movement.h map.h
+	$(CPP) $(CPPFLAGS) $(CFLAG) movement.cpp $(OFLAG) movement$(OSUFFIX)
 
 # clean the directory
 clean: 
 	$(DEL) *$(OSUFFIX)
-	$(DEL) crpg
+	$(DEL) crpg$(EXT)

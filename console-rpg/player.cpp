@@ -28,26 +28,24 @@
 player::player() {
 	currentHP=100;
 	currentMP=10;
-	playerHeight=6;
-	playerAge=18;
 	playerName="Arbba";
 	hair="brown", legs="blue", torso="brown";
 	luck=0,power=0,strength=0,defense=0;
 	playerVocation=warrior;
 
 	headEq="nothing";
-	torsoEq="nothing";
-	legEq="nothing";
-	bootEq="nothing";
+	torsoEq="Jacket";
+	legEq="Travel Pants";
+	bootEq="Boots";
+	
+	playerID=0;
 
 };
 
 // player class overloaded constructor
-player::player(int fixedHP, int fixedMP, int fixedHeight, int fixedAge, int id) {
+player::player(int fixedHP, int fixedMP, int id) {
 	currentHP=fixedHP;
 	currentMP=fixedMP;
-	playerHeight=fixedHeight;
-	playerAge=fixedAge;
 	playerName="Arbba";
 
 	luck=0;
@@ -62,12 +60,12 @@ player::player(int fixedHP, int fixedMP, int fixedHeight, int fixedAge, int id) 
 	legEq="Travel Pants";
 	bootEq="Boots";
 	
-	playerID=id;
+	playerID=id;;
 	
 };
 
 // player class enhanced constructor
-player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense) {
+player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense,int id) {
 	currentHP=hp;
 	currentMP=mp;
 	luck=Luck;
@@ -75,14 +73,17 @@ player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense) {
 	power=Power;
 	defense=Defense;
 
-	playerHeight=6,playerAge=18,playerName="Arbba";
+	playerName="Arbba";
 	hair="brown",legs="blue",torso="brown";
 	playerVocation=warrior;
 
 	headEq="nothing";
-	torsoEq="nothing";
+	torsoEq="Jacket";
         legEq="Travel Pants";
         bootEq="Boots";
+	
+	playerID=id;
+	
 };
 
 // player class destructor
@@ -238,7 +239,7 @@ int player::displayStats() {
 };
 
 // saves the current player status to file
-int player::savePlayerData(map *karte,int player,int game) {
+int player::savePlayerData(map *karte,int player,int game,bool ignoreTemp) {
 
 	// get the player's coordinates
 	int x=karte->getCurrentSpaceX();
@@ -246,17 +247,38 @@ int player::savePlayerData(map *karte,int player,int game) {
 	
 	char savefile[256];
 	char targetDir[256];
+	char index[256];
+	char namefile[256];
 	
 	std::ofstream fout;
 	std::ifstream fin;
 	
-	sprintf(savefile,"data/game%d/savefile%d.dat",game,player);
+	// check which system the client is using. this is nessesary
+	// because the file separators in linux and windows are different,
+	// which will cause problems if they are not defined specifically ;)
+	#ifdef __LINUX__
+	sprintf(savefile,"data/game%d/savefile%d.dat",game,player); // the savefile
+	sprintf(targetDir,"mkdir data/game%d",game); // command to make a new slot
+	sprintf(index,"data/game%d/index.dat",game); // index file
+	sprintf(namefile,"data/game%d/name%d.dat",game,player);
+	#endif
 	
+	#ifdef __WINDOWS__
+	sprintf(savefile,"data\\game%d\\savefile%d.dat",game,player); // the savefile
+	sprintf(targetDir,"mkdir data\\game%d",game); // command to make a new slot
+	sprintf(index,"data\\game%d\\index.dat",game); // index file
+	sprintf(namefile,"data\\game%d\\name%d.dat",game,player);
+	#endif
+	
+	// if this slot doesn't exist, then make a directory for the savefiles.
 	fin.open(savefile);
 	
-	if (!fin) {
-		sprintf(targetDir,"mkdir data/game%d/",game);
-		system(targetDir);
+	// if we flag ignoreTemp to be false, then we need to make a temporary
+	// directory for savefiles. otherwise we assume to temporary directory exists.
+	if (!ignoreTemp) {
+		if (!fin) {
+			system(targetDir);
+		}
 	}
 	fin.close();
 	
@@ -269,7 +291,7 @@ int player::savePlayerData(map *karte,int player,int game) {
 		return 0;
 	}
 	
-	fout.write((char*) &playerName,sizeof(playerName));
+	//fout.write((char*) &playerName,sizeof(playerName));
 	fout.write((char*) &x,sizeof(x));
 	fout.write((char*) &y,sizeof(y));
 	fout.write((char*) &currentHP,sizeof(currentHP));
@@ -281,15 +303,38 @@ int player::savePlayerData(map *karte,int player,int game) {
 	fout.write((char*) &defense,sizeof(defense));
 	
 	fout.close();
+	
+	fout.open(namefile);
+	if (!fout) {
+		std::cout << "\nUnable to save file!";
+		return 0;
+	}
+	
+	fout << playerName;
+	fout.close();
+	
+	saveToIndex(game);
 };
 
-// load the savefstreamfile and continue the game
+// load the savefile and continue the game
 int player::loadPlayerData(map *karte,int player,int game) {
+	
 	std::fstream fin;
 	int x,y;
 	char savefile[256];
+	char namefile[256];
 	
+	// once again, check what the client's system is and use
+	// the appropriate file separator.
+	#ifdef __LINUX__
 	sprintf(savefile,"data/game%d/savefile%d.dat",game,player);
+	sprintf(namefile,"data/game%d/name%d.dat",game,player);
+	#endif
+	
+	#ifdef __WINDOWS__
+	sprintf(savefile,"data\\game%d\\savefile%d.dat",game,player);
+	sprintf(namefile,"data\\game%d\\name%d.dat",game,player);
+	#endif
 	
 	fin.open(savefile);
 
@@ -298,9 +343,10 @@ int player::loadPlayerData(map *karte,int player,int game) {
 		return 0;
 	}
 	
+	/*
 	fin.read((char*) &playerName,sizeof(playerName));
-	fin.clear();
-
+	fin.clear();*/
+	
 	fin.read((char*) &x,sizeof(x));
 	karte->setCurrentSpaceX(x);
 	fin.clear();
@@ -325,21 +371,100 @@ int player::loadPlayerData(map *karte,int player,int game) {
 	fin.clear();
 
 	fin.read((char*) &defense,sizeof(defense));
-	fin.clear(); fin.close();
+	fin.clear();
+	 
+	fin.close();
+	
+	fin.open(namefile);
+	if (!fin) {
+		std::cout << "\nFailed to load namefile!";
+		return 0;
+	}
+	
+	fin >> playerName;
+	fin.close();
 
 };
 
+// save to index file
+int player::saveToIndex(int game) {
+
+	// currently we only save the amount of players
+	// that were playing the game.
+	#ifdef __LINUX__
+	char index[256];
+	sprintf(index,"data/game%d/index.dat",game); // index file
+	#endif
+	
+	#ifdef __WINDOWS__
+	char index[256];
+	sprintf(index,"data\\game%d\\index.dat",game); // index file
+	#endif
+	
+	std::ofstream fout;
+	
+	fout.open(index);
+	if (!fout) {
+		std::cout << "\nUnable to save index file!";
+		return 0;
+	}
+	
+	fout << playersOn << std::endl;
+	fout.close();
+};
+
+// load data from the index file
+int player::loadFromIndex(int game) {
+
+	#ifdef __LINUX__
+	char index[256];
+	sprintf(index,"data/game%d/index.dat",game); // index file
+	#endif
+	
+	#ifdef __WINDOWS__
+	char index[256];
+	sprintf(index,"data\\game%d\\index.dat",game); // index file
+	#endif
+
+	std::ifstream fin;
+	
+	fin.open(index);
+	if (!fin) {
+		std::cout << "\nUnable to load from index file!";
+		return 0;
+	}
+	
+	int playersOnGame;
+	fin >> playersOnGame; fin.clear();
+	fin.close();
+	
+	return playersOnGame;
+};
+	
 // delete the temporary directory (99)
 int player::removeTemp() {
+
+	// last time we need to check the client's system and
+	// use the appropriate file separator.
+	#ifdef __LINUX__
+	char path[]="data/game99/savefile1.dat";
+	char delCommand[]="rm -rf data/game99";
+	#endif
+	
+	#ifdef __WINDOWS__
+	char path[]="data\\game99\\savefile1.dat";
+	char delCommand[]="rmdir /S /Q data\\game99";
+	#endif
+
 	std::ifstream fin;
 	
 	// first we attempt to load a savefile from the temporary
 	// directory. if it fails, then there is no need to remove
 	// the directory since it doesn't exist. otherwise, remove it!
-	fin.open("data/game99/savefile1.dat");
+	fin.open(path);
 	
-	if (fin)
-		system("rm -rf data/game99/");
-		
-	fin.close();
+	if (fin) {
+		fin.close();
+		system(delCommand);
+	}
 };

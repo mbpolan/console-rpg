@@ -23,20 +23,28 @@
  
 // definitions.h: holds function declarations and definitions
 #include <iostream>
+#include <fstream>
 #include <ctype.h> // for toupper()
+#include <stdlib.h> // for atoi()
 
 #include "player.h"
+#include "playerlist.h"
 #include "movement.h"
+
+int player::playersOn=0;
 
 // our prototypes
 // move these into classes later
-int mainMenu(player**,int);
-void startGame(movement*,map*,player*,int);
+int configurePlayers(playerList<player*>&,int);
+void preGame(movement*,map*,playerList<player*>&,int);
+void startGame(movement*,map*,playerList<player*>&,int,int,int&);
 void optionMenu();
 
 // menu function: display menu and options
 int menu() { // takes a reference to player
-	std::string menuChoice;
+	char a_menuChoice[5];
+	int menuChoice;
+	
 	for(;;) {
 		std::cout << "\nMain Menu\n"
 		     << "---------" << std::endl;
@@ -45,11 +53,12 @@ int menu() { // takes a reference to player
 		     << "(3) Options\n"
 		     << "(4) Quit\n"
 		     << "---------\n> ";
-		std::cin >> menuChoice;
+		std::cin >> a_menuChoice;
+		menuChoice=atoi(a_menuChoice);
 		std::cin.ignore(); // remove the newline
 		
 		// the user wants to start a new game
-		if (menuChoice=="1") {
+		if (menuChoice==1) {
 		
 			int players; // the amount of players
 			std::cout << "\nHow many players in this game? ";
@@ -57,30 +66,82 @@ int menu() { // takes a reference to player
 			std::cin.ignore(); // remove the newline
 			
 			// make an array of current players
-			player *playerList[players];
+			//player *list[players];
+			playerList<player*> list;
+			list[0]->setPlayersOn(players);
 			
 			// fill up this array
 			for (int i=0;i<players;i++) {
-				playerList[i]=new player(5,0,0,0,i); // player HP/MP/Height(ft)/age/id
+				list[i]=new player(5,0,i); // player HP/MP/id
 			}
 			
-			mainMenu(playerList,players); // pass in the character list
-			delete [] playerList; // delete all players
+			configurePlayers(list,players); // pass in the character list
+			//delete [] list; // delete all players
 			
 			return 0;
 		}
 		
-		if (menuChoice=="2") {
+		if (menuChoice==2) {
+		
+			// ask the user which slot to load from
+			int slot;
+			std::cout << "\nLoad from which slot (1-9)? ";
+			std::cin >> slot; std::cin.ignore();
 			
-			std::cout << "\nLoading from data/ directory...";
+			// our stream object
+			std::ifstream fin;
 			
+			// now we declare some paths based on the client's
+			// operating system.
+			#ifdef __LINUX__
+			char index[256];
+			sprintf(index,"data/game%d/index.dat",slot); // path to index file
+			#endif
+			
+			#ifdef __WINDOWS__
+			char index[256];
+			sprintf(index,"data\\game%d\\index.dat",slot); // path to index file
+			#endif
+			
+			// now we attempt to open the index file
+			player *pPlayer=new player;
 			int players;
-			//player *playerList[players];
-			//std::cout << 
+			players=(pPlayer->loadFromIndex(slot));
+			delete pPlayer;
+			
+			// allocate memory for the core compenents of the game.
+			playerList<player*> list; // list of players
+			movement *grid=new movement; // movement grid
+			map *karte=new map(30,30,-30,-30); // world map
+			
+			// start the loop to fill up array with saved player data
+			char path[256];
+			for (int i=0;i<players;i++) {
+				list[i]=new player;
+				player *pPlayer=new player;
+				
+				sprintf(path,"data/game%d/savefile%d.dat",slot,i+1);
+				
+				fin.open(path);
+				
+				if (!fin) {
+					std::cout << "\nGame: " << slot;
+					std::cout << "\nSavefile " << i << " is either corrupt or not present. Aborting...\n";
+					return 0;
+				}
+				
+				pPlayer->loadPlayerData(karte,i+1,slot);
+				pPlayer->loadFromIndex(slot);
+				list[i]=pPlayer;
+				
+				fin.close();
+			}
+			
+			preGame(grid,karte,list,players);
 		}
 			
 		
-		if( menuChoice=="3")
+		if( menuChoice==3)
 			optionMenu(); // display options (todo)
 		
 		else
@@ -88,11 +149,14 @@ int menu() { // takes a reference to player
 	}
 }
 
-// mainMenu: function for displaying the main menu
-int mainMenu(player **r_list,int playerCount) { // takes an array of players and count
+// configurePlayers: (formerly mainMenu) configure all players
+int configurePlayers(playerList<player*> &r_list,int playerCount) { // takes an array of players and count
 
 	movement *grid=new movement; // make a new movement grid
 	map *karte=new map(30,30,-30,-30); // make a new map
+	
+	grid->spawnMapItems(grid,karte); // spawn items on map NOW
+	
 	char cVar; // confirmation variable
 	
 	// loop for as long as there are players
@@ -124,20 +188,7 @@ int mainMenu(player **r_list,int playerCount) { // takes an array of players and
 	cVar=toupper(cVar);
 	
 	if (cVar=='Y') {
-		int j=0; // counter variable
-		 
-		for (;;) {
-			// reset the counter
-			if (j==playerCount)
-				j=0;
-			
-			std::cout << "\n*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*";
-			std::cout << "\nWelcome to Console RPG, " << r_list[j]->getName() << std::endl
-			<< "Type 'help' to display a help menu.";
-			std::cout << "\n*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*";
-			startGame(grid,karte,r_list[j],playerCount); // this is where we actually start
-			j++;
-		}
+		preGame(grid,karte,r_list,playerCount);
 	}
 	else {
 		std::cout << "\nQuitting...\n";
@@ -150,23 +201,45 @@ int mainMenu(player **r_list,int playerCount) { // takes an array of players and
 	karte=0;
 }
 
+// function to preform certain actions before start of
+// new turn or game.
+void preGame(movement *rhs,map *karte,playerList<player*> &r_list,int playerCount) {
+	int j=0; // counter variable
+	int turns=1; // amount of turns
+	 
+	for (;;) {
+		// reset the counter
+		if (j==playerCount)
+			j=0;
+		
+		std::cout << "\n*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*";
+		std::cout << "\nWelcome to Console RPG, " << r_list[j]->getName() << std::endl
+		<< "Type 'help' to display a help menu.";
+		std::cout << "\n*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*";
+		
+		startGame(rhs,karte,r_list,j,playerCount,turns); // this is where we actually start
+		j++;
+		turns++;
+	}
+}
+
 // optionMenu: function for displaying option menu (finish this later)
 void optionMenu() {
 	std::cout << "\nNo options avaliable at this time.\n";
 }
 
-int turns=0; // amount of turns
 // startGame function: this will start the actual game
-void startGame(movement *rhs,map *karte,player* r_player,int playerCount) {
-	
+void startGame(movement *rhs,map *karte,playerList<player*> &list,int playerNow,int playerCount,int &turns) {
+
 	bool firstTurn=true; // first turn flag
+	int moves=10; // moves remaining
 	
 	std::cout << "\nTURN: " << turns << std::endl;
 	
 	// if amount of turns is greater than the amount of players,
 	// then flag firstTurn to false so we can load the player's
 	// stats before he starts.
-	if (turns>=playerCount)
+	if (turns>playerCount)
 		firstTurn=false;
 	
 	// reset the coordinates for the next player as long as it's
@@ -179,11 +252,10 @@ void startGame(movement *rhs,map *karte,player* r_player,int playerCount) {
 	// if it is NOT the first turn
 	// 99 is the temporary directory number for saved files
 	if (!firstTurn)
-		r_player->loadPlayerData(karte,r_player->getPlayerID(),99);
+		list[playerNow]->loadPlayerData(karte,list[playerNow]->getPlayerID(),99);
 
-	while(1) {
+	while(moves>0) {
 		int count=rhs->getStepCount(); // count the amount of spaces moved
-		rhs->spawnMapItems(rhs,karte); // spawn items on map NOW
 	
 		std::cout << "\nMove: ";
 		
@@ -193,52 +265,66 @@ void startGame(movement *rhs,map *karte,player* r_player,int playerCount) {
 		// for debugging purposes only!
 		#ifdef DEBUG
 		if (moverVar=="mod") {
-			r_player->setHP(0);
+			list[playerNow]->setHP(0);
 		}
 		#endif
+		
+		// if this is the final move, then make sure to save the player's
+		// stats before passing in the next player
+		if (moves==1) {
+			moverVar="end";
+		}
 		
 		if (moverVar=="n") {
 			rhs->moveN(karte);
 			rhs->controlTime(count);
+			moves--;
 		}
 		
 		if (moverVar=="s") {
 			rhs->moveS(karte);
 			rhs->controlTime(count);
+			moves--;
 		}
 		
 		if (moverVar=="w") {
 			rhs->moveW(karte);
 			rhs->controlTime(count);
+			moves--;
 		}
 		
 		if (moverVar=="e") {
 			rhs->moveE(karte);
 			rhs->controlTime(count);
+			moves--;
 		}
 		
 		if (moverVar=="nw") {
 			rhs->moveNW(karte);
 			rhs->controlTime(count);
+			moves--;
 		}
 		
 		if (moverVar=="ne") {
 			rhs->moveNE(karte);
 			rhs->controlTime(count);
+			moves--;
 		}
 		
 		if (moverVar=="sw") {
 			rhs->moveSW(karte);
 			rhs->controlTime(count);
+			moves--;
 		}
 		
 		if (moverVar=="se") {
 			rhs->moveSE(karte);
 			rhs->controlTime(count);
+			moves--;
 		}
 
 		if (moverVar=="stats") {
-			r_player->displayStats();
+			list[playerNow]->displayStats();
 		}
 		
 		if (moverVar=="pos") {
@@ -257,28 +343,30 @@ void startGame(movement *rhs,map *karte,player* r_player,int playerCount) {
 				<< "In the documentation that came with this game.\n";
 		}
 		
-		if (moverVar=="load")
-			r_player->loadPlayerData(karte,r_player->getPlayerID(),1);
-		
-		
 		if (moverVar=="save") {
 			int slot;
-			std::cout << "\nWhich slot to save to (1-9)? ";
+			std::cout << "\nSave to which slot (1-9)? ";
 			std::cin >> slot;
 			std::cin.ignore();
 			
-			r_player->savePlayerData(karte,r_player->getPlayerID(),slot);
-			karte->saveMapData();
+			// since the slot doesn't yet exist, we pass in 'false' as the
+			// parameter to make the slot directory. loop until every players'
+			// stats are saved in the slot.
+			for (int i=0;i<playerCount;i++) {
+				list[i]->savePlayerData(karte,list[i]->getPlayerID(),slot,false);
+			}
+			karte->saveMapData(slot);
 			std::cout << "\nPlayer and map saved!\n";
 		}
 		
 		if (moverVar=="inv") {
-			r_player->displayInventory();
+			list[playerNow]->displayInventory();
 		}
 		
 		if (moverVar=="equip") {
 			int x=karte->getCurrentSpaceX();
 			int y=karte->getCurrentSpaceY();
+			
 			if (karte->itemExists(karte,x,y)) {
 				TYPE type=karte->checkItemType(karte);
 				char confirm;
@@ -287,9 +375,8 @@ void startGame(movement *rhs,map *karte,player* r_player,int playerCount) {
 				std::cin >> confirm;
 				confirm=toupper(confirm);
 				if (confirm=='Y') {
-					r_player->addInventoryItem(type,targetItem);
-					karte->removeItemX(x); // now remove the item from X
-					karte->removeItemY(y); // now remove the item from Y
+					list[playerNow]->addInventoryItem(type,targetItem);
+					rhs->removeItem(karte);
 					std::cout << targetItem << " was equipped.\n";
 				}
 				if (confirm=='N')
@@ -306,9 +393,9 @@ void startGame(movement *rhs,map *karte,player* r_player,int playerCount) {
 			std::getline(std::cin,targetItem,'\n');
 			
 			bool equiped=false;
-			int itemString=r_player->searchInventory(r_player,targetItem);
+			int itemString=list[playerNow]->searchInventory(list[playerNow],targetItem);
 			if (itemString>=0 && itemString<=3) {
-				r_player->removeInventoryItem(itemString);
+				list[playerNow]->removeInventoryItem(itemString);
 				std::cout << std::endl << targetItem << " was unequipped.\n";
 			}
 			if (itemString>3) {
@@ -320,8 +407,15 @@ void startGame(movement *rhs,map *karte,player* r_player,int playerCount) {
 		}
 		
 		if (moverVar=="end") {
-			turns++; // increment the turns
-			r_player->savePlayerData(karte,r_player->getPlayerID(),99); // save the player's data
+			bool ignore=false; // should we ignore making a temp directory?
+		
+			// after the first player ends his turn, then the temp directory is made.
+			// since it's already there, we ignore remaking it based upon the player's
+			// id. any id's above 1 are NOT the first players.
+			if (list[playerNow]->getPlayerID()>1)
+			ignore=true;
+	
+			list[playerNow]->savePlayerData(karte,list[playerNow]->getPlayerID(),99,ignore); // save the player's data
 			break;
 		}
 
@@ -332,11 +426,12 @@ void startGame(movement *rhs,map *karte,player* r_player,int playerCount) {
 			if (quitVer=="n")
 				continue;
 			else {
-				r_player->removeTemp(); // remove the temporary directory
+				list[playerNow]->removeTemp(); // remove the temporary directory
 				exit(0);
 			}
 		} // if (moverVar=="quit")
-	} // while(1)
+		
+	} // for (int i=0;i<MAXTURNS;i++)
 		
 } // void startGame(movement *rhs,map *karte,player* r_player,int playerCount)
 

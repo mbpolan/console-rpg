@@ -42,7 +42,7 @@ class movement {
 		// other methods
 		void look(map*);
 		void placeItem(item*,map*);
-		void removeItem(item*,map*);
+		void removeItem(map*);
 		void spawnMapItems(movement*,map*);
 
 		// public accessors

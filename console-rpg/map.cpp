@@ -257,9 +257,20 @@ TYPE map::checkItemType(map *karte) {
 
 // save the current map data to file
 // todo: merge the map.dat file into savefile.dat
-int map::saveMapData() {
+int map::saveMapData(int game) {
 	std::ofstream fout;
-	fout.open("data/map.dat"); // open a new map file
+	
+	char path[256];
+	
+	#ifdef __LINUX__
+	sprintf(path,"data/game%d/map.dat",game);
+	#endif
+	
+	#ifdef __WINDOWS__
+	sprintf(path,"data\\game%d\\map.dat",game);
+	#endif
+	
+	fout.open(path); // open a new map file
 	
 	if (!fout) {
 		std::cout << "\nFailed to save map data!\n";
@@ -313,9 +324,19 @@ int map::saveMapData() {
 };
 
 // load saved map data from file
-int map::loadMapData() {
+int map::loadMapData(int game) {
 	std::ifstream fin;
-	fin.open("data/map.dat"); // try to load a map file
+	char path[256];
+	
+	#ifdef __LINUX__
+	sprintf(path,"data/game%d/map.dat",game);
+	#endif
+	
+	#ifdef __WINDOWS__
+	sprintf(path,"data\\game%d\\map.dat",game);
+	#endif
+	
+	fin.open(path); // try to load a map file
 
 	if (!fin) {
 		std::cout << "\nFailed to load map data!\n";
