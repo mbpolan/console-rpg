@@ -2,12 +2,14 @@
 #include "player.h"
 
 player::player() {
-	currentHP=new int(100);
-	currentMP=new int(10);
-	playerHeight=new int(6);
-	playerAge=new int(18);
-	playerName=new std::string("Arbba");
+	currentHP=100;
+	currentMP=10;
+	playerHeight=6;
+	playerAge=18;
+	playerName="Arbba";
 	hair="brown", legs="blue", torso="brown";
+	luck=0,power=0,strength=0,defense=0;
+	playerVocation=warrior;
 
 	headEq="nothing";
 	torsoEq="nothing";
@@ -17,35 +19,91 @@ player::player() {
 };
 
 player::player(int fixedHP, int fixedMP, int fixedHeight, int fixedAge) {
-	currentHP=new int(fixedHP);
-	currentMP=new int(fixedMP);
-	playerHeight=new int(fixedHeight);
-	playerAge=new int(fixedAge);
-	playerName=new std::string("Arbba");
-	hair="brown", legs="blue", torso="brown";
+	currentHP=fixedHP;
+	currentMP=fixedMP;
+	playerHeight=fixedHeight;
+	playerAge=fixedAge;
+	playerName="Arbba";
+
+	luck=0;
+	power=0;
+	strength=0;
+	defense=0;
+	hair="brown",legs="blue",torso="brown";
+	playerVocation=warrior;
 	
-	headEq="helmet";
+	headEq="nothing";
+	torsoEq="Jacket";
+	legEq="Travel_Pants";
+	bootEq="Boots";
+	
+};
+
+player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense) {
+	currentHP=hp;
+	currentMP=mp;
+	luck=Luck;
+	strength=Strength;
+	power=Power;
+	defense=Defense;
+
+	playerHeight=6,playerAge=18,playerName="Arbba";
+	hair="brown",legs="blue",torso="brown";
+	playerVocation=warrior;
+
+	headEq="nothing";
 	torsoEq="nothing";
-	legEq="nothing";
-	bootEq="nothing";
-	
+        legEq="Travel_Pants";
+        bootEq="Boots";
 };
 
 player::~player() {
-	delete currentHP;
-	delete currentMP;
-	delete playerName;
-	delete playerHeight;
-	delete playerAge;
-	currentHP=0;
-	currentMP=0;
-	playerName=0;
-	playerHeight=0;
-	playerAge=0;
 };
 
 void player::setLook(player *r_player) {
+	std::string userVocation;
 	std::string userHair, userBody, userLegs;
+
+	std::cout << "\nPlease choose a vocation (warrior,mage,archer): ";
+	std::cin >> userVocation;
+
+	if (userVocation=="warrior") {
+		r_player->setLuck(5);
+		r_player->setStrength(10);
+		r_player->setPower(15);
+		r_player->setDefense(15);
+		r_player->setExp(0);
+		r_player->setLevel(1);
+		std::cout << "\nYou are now a warrior.\n";
+		r_player->setVoc(warrior);
+	}
+
+	if (userVocation=="mage") {
+		r_player->setLuck(10);
+		r_player->setStrength(5);
+		r_player->setPower(10);
+		r_player->setDefense(5);
+		r_player->setExp(0);
+		r_player->setLevel(1);
+		std::cout << "\nYou are now a mage.\n";
+		r_player->setVoc(mage);
+	}
+
+	if (userVocation=="archer") {
+		r_player->setLuck(5);
+		r_player->setStrength(10);
+		r_player->setPower(15);
+		r_player->setDefense(10);
+		r_player->setExp(0);
+		r_player->setLevel(1);
+		std::cout << "\nYou are now an archer.\n";
+		r_player->setVoc(archer);
+	}
+
+	if (userVocation!="warrior" && userVocation!="mage" && userVocation!="archer") {
+		std::cout << "\nThis vocation doesn't exist.\nDefault is warrior.\n";
+	}
+
 	std::cout << "\nWhat is your hair color? ";
 	std::cin >> userHair;
 	r_player->setHair(userHair);
@@ -105,3 +163,17 @@ int player::searchInventory(player *r_player,std::string itemName) {
 	}
 };
 
+void player::increaseLevel() {
+		level++;
+		std::cout << "\nYou advanced to level " << level << "!\n";
+};
+
+int player::displayStats(player *r_player) {
+	std::cout << "\n\nStats\n";
+	std::cout << "HP: " << r_player->getHP() << std::endl;
+	std::cout << "MP: " << r_player->getMP() << std::endl;
+	std::cout << "Luck: " << r_player->getLuck() << std::endl;
+	std::cout << "Strength: " << r_player->getStrength() << std::endl;
+	std::cout << "Power: " << r_player->getPower() << std::endl;
+	std::cout << "Defense: " << r_player->getDefense() << "\n\n";
+};

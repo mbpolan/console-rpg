@@ -3,7 +3,7 @@
 
 class movement { 
 	public:
-		movement(int defaultX, int defaultY); // our constructor
+		movement(); // our constructor
 		virtual ~movement() {};
 
 		// movement methods
@@ -24,7 +24,15 @@ class movement {
 
 		// public accessors
 		signed int getCurrentPosition(map*) const;
+
+		// time related methods
+		void checkTime();
+		int controlTime(int);
+		int getStepCount() const {return stepCount;}
+		
 	private:
 		std::string itemWarning;
+		bool fDay;
+		int stepCount;
 };
 

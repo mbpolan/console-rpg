@@ -1,7 +1,9 @@
 // movement.h: definitions for movement class
 #include "movement.h"
 
-movement::movement(int defaultX=0, int defaultY=0) {
+movement::movement() {
+	fDay=true; // make it day by default
+	stepCount=0;
 	itemWarning="\nThere is an item here.";
 };
 
@@ -167,7 +169,34 @@ void movement::spawnMapItems(movement *rhs,map *karte) {
 	item *plant3=new item("sunflowers",20,5,npe);
 	rhs->placeItem(plant3,karte);
 
-	item *equip=new item("Adamant_Armor1",4,6,torso);
+	item *equip=new item("Leather_Armor",4,6,torso);
 	rhs->placeItem(equip,karte);
+};
+
+int movement::controlTime(int steps) {
+	if (steps==500) { // toggle day/night now
+		if (!fDay) { // if it is night
+			std::cout << "\nIt is now day time.\n";
+			stepCount=0;
+			fDay=true;
+			return 0;
+		}
+		if (fDay) { // if it is day
+			std::cout << "\nIt is now night.\n";
+			stepCount=0;
+			fDay=false;
+			return 0;
+		}
+	}
+
+	if (steps!=500) // leave it at the current time
+		stepCount++; // increment player steps
+};
+
+void movement::checkTime() {
+	if (fDay)
+		std::cout << "\nIt is day time.\n";
+	if (!fDay)
+		std::cout << "\nIt is night time.\n";
 };
 

@@ -1,6 +1,7 @@
 // definitions.h: holds function declarations and definitions
 #include <iostream>
 #include <fstream>
+#include <ctype.h>
 
 int mainMenu(player*);
 int savePlayerData(player*);
@@ -77,6 +78,7 @@ void optionMenu() {
 void startGame(movement *rhs,map *karte,player *r_player) {
 	for(;;) {
 		
+		int count=rhs->getStepCount();
 		rhs->spawnMapItems(rhs,karte); // spawn items on map NOW
 	
 		std::cout << "\nMove: ";
@@ -86,34 +88,46 @@ void startGame(movement *rhs,map *karte,player *r_player) {
 		
 		if (moverVar=="n") {
 			rhs->moveN(karte);
+			rhs->controlTime(count);
 		}
 		
 		if (moverVar=="s") {
 			rhs->moveS(karte);
+			rhs->controlTime(count);
 		}
 		
 		if (moverVar=="w") {
 			rhs->moveW(karte);
+			rhs->controlTime(count);
 		}
 		
 		if (moverVar=="e") {
 			rhs->moveE(karte);
+			rhs->controlTime(count);
 		}
 		
 		if (moverVar=="nw") {
 			rhs->moveNW(karte);
+			rhs->controlTime(count);
 		}
 		
 		if (moverVar=="ne") {
 			rhs->moveNE(karte);
+			rhs->controlTime(count);
 		}
 		
 		if (moverVar=="sw") {
 			rhs->moveSW(karte);
+			rhs->controlTime(count);
 		}
 		
 		if (moverVar=="se") {
 			rhs->moveSE(karte);
+			rhs->controlTime(count);
+		}
+
+		if (moverVar=="stats") {
+			r_player->displayStats(r_player);
 		}
 		
 		if (moverVar=="pos") {
@@ -121,6 +135,7 @@ void startGame(movement *rhs,map *karte,player *r_player) {
 		}
 		
 		if (moverVar=="look") {
+			rhs->checkTime();
 			rhs->look(karte);
 		}
 		
@@ -141,7 +156,9 @@ void startGame(movement *rhs,map *karte,player *r_player) {
 		if (moverVar=="inv") {
 			r_player->displayInventory(r_player);
 		}
-		* End bug segment code */
+		* ******************** *
+		* End bug segment code *
+		* ******************** */
 		
 		if (moverVar=="equip") {
 			if (karte->itemExists(karte,karte->getCurrentSpaceX(),karte->getCurrentSpaceY())) {
