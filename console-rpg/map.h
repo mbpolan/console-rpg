@@ -36,6 +36,7 @@ class npc;
 
 class map {
 	public:
+		map() {};
 		map(int,int,int,int);
 		virtual ~map();
 		
@@ -46,15 +47,13 @@ class map {
 		int getMapMaxSizeNgY() const {return MapMaxSizeNgY;}
 		
 		// map methods
-		void addItemX(item*,int);
-		void addItemY(item*,int);
-		void removeItemX(int);
-		void removeItemY(int);
+		void addItem(item*);
+		void removeItem(int,int);
 
 		// misc methods for map
 		bool itemExists(int,int);
 
-		item* identifyItem(int,int);
+		item* getItem(int,int);
 		std::string parseGroundID(int);
 		TYPE checkItemType(int,int);
 
@@ -64,26 +63,21 @@ class map {
 
 		void removeFromList(player*);
 		void removeFromList(npc*);
-		
+
+		void creaturesDoAction();
+
 		// list of players on the map
 		std::list<player*> players;
 
 		// list of npcs on the map
 		std::list<npc*> npcs;
+
+		// list of all items on the map
+		std::list<item*> items;
 		
 	private:
 		int MapMaxSizeX,MapMaxSizeY,MapMaxSizeNgY,MapMaxSizeNgX;
 		int currentSquareX,currentSquareY,groundID;
-
-		// the item coordinate arrays
-		int itemSquareX[max],itemSquareY[max];
-		int itemSquareNgX[max],itemSquareNgY[max];
-
-		// the item object arrays
-		item *itemLineX[max];
-		item *itemLineY[max];
-		item *itemLineNgX[max];
-		item *itemLineNgY[max];
 };
 
 #endif

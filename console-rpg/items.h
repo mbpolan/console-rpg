@@ -30,31 +30,34 @@ enum TYPE {head,torso,legs,boots,npe};
 class item {
 	public:
 		item();
+		item(item*); // copy constructor
 		item(std::string,TYPE); // lesser constructor
 		item(std::string,int,int,TYPE); // our constructor
 		virtual ~item();
 
-		void setLocationX(int);
-		void setLocationY(int);
-		void setItemID(int);
+		void setItemID(int id) {itemID=id;};
 		void setItemName(std::string nameOfItem) {itemName=nameOfItem;}
 		
 		std::string getName() const {return itemName;}
 		void setName(std::string name) {itemName=name;}
-		
-		int getLocationX() const {return itemLocationX;}
-		int getLocationY() const {return itemLocationY;}
+
 		int getItemID() const {return itemID;}
-		
+
 		bool isHeadItem(item*);
 		bool isTorsoItem(item*);
 		bool isLegsItem(item*);
 		bool isBootsItem(item*);
-		
+
 		TYPE checkType();
+		void invalidateItem(item*);
+
+		int x,y;
+		static int itemCount;
 
 	private:
-		int itemLocationX, itemLocationY, itemID;
+		int itemID;
+		bool isValid;
+
 		std::string itemName;
 		TYPE itemTYPE;
 };

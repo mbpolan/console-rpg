@@ -160,13 +160,13 @@ void movement::look(player *Player,map *karte) {
 	groundType=karte->parseGroundID(gID); // parse the id
 
 	if (karte->itemExists(Player->x,Player->y)) {
-		item* theName=karte->identifyItem(Player->x,Player->y);
+		item* theName=karte->getItem(Player->x,Player->y);
 
 		if (theName)
-			std::cout << "You see " << theName->getName() << ".\n";
+			std::cout << "\nYou see " << theName->getName() << ".\n";
 
 		else
-			std::cout << "You see " << groundType << ".\n";
+			std::cout << "\nYou see " << groundType << ".\n";
 	}
 
 	else
@@ -175,20 +175,19 @@ void movement::look(player *Player,map *karte) {
 
 // place item on the map
 void movement::placeItem(item *thisItem,map *karte) {
-	int itemX=(thisItem->getLocationX());
-	int itemY=(thisItem->getLocationY());
-	
-	karte->addItemX(thisItem,itemX);
-	karte->addItemY(thisItem,itemY);
-	
+	item::itemCount+=1;
+	thisItem->setItemID(item::itemCount);
+
+	karte->addItem(thisItem);
+
 	// shows what this function is doing when called
 	#ifdef DEBUG
-		if (karte->itemExists(karte,itemX,itemY)) {
+		if (karte->itemExists(thisItem->x,thisItem->y)) {
 			if (x!=0 && y!=0)
 				std::cout << "\nItem added at " << itemX << "," << itemY << std::endl;
 		}
 		
-		else if (!karte->itemExists(karte,itemX,itemY)) {
+		else if (!karte->itemExists(thisItem->x,thisItem->y)) {
 			if (x!=0 && y!=0)
 				std::cout << "\nFailed to add item at " << itemX << "," << itemY << std::endl;
 		}
@@ -197,20 +196,23 @@ void movement::placeItem(item *thisItem,map *karte) {
 
 // remove the item from the map
 void movement::removeItem(map *karte,int x,int y) {
-	karte->removeItemX(x);
-	karte->removeItemY(y);
+	karte->removeItem(x,y);
+	item::itemCount-=1;
 
 	// shows what this function is doing when called
-	#ifdef DEBUG		
-		if (karte->itemExists(karte,x,y)) {
+	#ifdef DEBUG
+//		item *thisItem=karte->getItem(x,y);
+		if (karte->itemExists(x,y)) {
 			if (x!=0 && y!=0)
 				std::cout << "\nFailed to remove item at " << x << "," << y << std::endl;
 		}
 		
-		else if (!karte->itemExists(karte,x,y)) {
+		else if (!karte->itemExists(x,y)) {
 			if (x!=0 && y!=0)
 				std::cout << "\nItem removed at " << x << "," << y << std::endl;
 		}
+
+//		delete thisItem;
 	#endif
 };
 
@@ -233,6 +235,7 @@ void movement::spawnMapItems(movement *rhs,map *karte) {
 
 	// syntax for new npcs is x,y,name
 	karte->npcs.push_back(new npc(2,3,"Mike"));
+	npc::setNpcsOn(1);
 };
 
 // toggle between night and day, or increase step count if none

@@ -68,7 +68,8 @@ ACTIONS npc::preformThink(map *karte) {
 	srand(time(NULL));
 
 	// first we check if there are any players nearby and
-	// execute actions accordingly.
+	// execute actions accordingly. our npc's goal is to
+	// avoid walking into players (if possible)
 	std::list<player*>::iterator it;
 	for (it=karte->players.begin();it!=karte->players.end();++it) {
 		if ((*it)) {

@@ -79,7 +79,7 @@ class player: public creature {
 		int savePlayerData(player*,int,int,bool);
 		int loadPlayerData(player*,int,int);
 		int saveToIndex(int);
-		int loadFromIndex(int);
+		static int loadFromIndex(int);
 		int removeTemp();
 		
 		// item actions

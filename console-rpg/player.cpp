@@ -220,10 +220,10 @@ void player::removeInventoryItem(int theType) {
 // add item to inventory
 void player::addInventoryItem(TYPE theType,item *thisItem) {
 	switch(theType) {
-		case head: headEq=thisItem;break;
-		case torso: torsoEq=thisItem;break;
-		case legs: legEq=thisItem;break;
-		case boots: bootEq=thisItem;break;
+		case head: headEq=(new item(thisItem));break;
+		case torso: torsoEq=(new item(thisItem));break;
+		case legs: legEq=(new item(thisItem));break;
+		case boots: bootEq=(new item(thisItem));break;
 		default: std::cout << "This item cannot be equiped!";
 	}
 };
@@ -318,8 +318,7 @@ int player::savePlayerData(player *Player,int player,int game,bool ignoreTemp) {
 		std::cout << "\nUnable to save file!";
 		return 0;
 	}
-	
-	//fout.write((char*) &playerName,sizeof(playerName));
+
 	fout.write((char*) &x,sizeof(x));
 	fout.write((char*) &y,sizeof(y));
 	fout.write((char*) &currentHP,sizeof(currentHP));
@@ -329,7 +328,9 @@ int player::savePlayerData(player *Player,int player,int game,bool ignoreTemp) {
 	fout.write((char*) &strength,sizeof(strength));
 	fout.write((char*) &power,sizeof(power));
 	fout.write((char*) &defense,sizeof(defense));
-	
+
+	// todo: save eq
+
 	fout.close();
 	
 	fout.open(namefile);
@@ -372,11 +373,7 @@ int player::loadPlayerData(player *Player,int player,int game) {
 		std::cout << "\nFailed to load savefile!";
 		return 0;
 	}
-	
-	/*
-	fin.read((char*) &playerName,sizeof(playerName));
-	fin.clear();*/
-	
+
 	fin.read((char*) &x,sizeof(x));
 	Player->x=x;
 	fin.clear();
@@ -384,7 +381,7 @@ int player::loadPlayerData(player *Player,int player,int game) {
 	fin.read((char*) &y,sizeof(y));
 	Player->y=y;
 	fin.clear();
-	
+
 	fin.read((char*) &currentHP,sizeof(currentHP));
 	fin.clear();
 	

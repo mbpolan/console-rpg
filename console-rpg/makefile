@@ -25,7 +25,7 @@ DEL = rm -f
 #EXT = .exe
 #OSUFFIX = .obj
 #CPPFLAGS = -D__WINDOWS__ -DDEBUG #for debugging
-#CPPFLAGS = -D__WINDOWS__ 
+#CPPFLAGS = -D__WINDOWS__
 #DEL = rm
 #
 ############################

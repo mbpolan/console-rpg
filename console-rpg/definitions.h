@@ -190,10 +190,10 @@ void generic::preGame(movement *rhs,map *karte,playerList<player*> &r_list,int p
       j=0;
       
     #ifdef DEBUG
-    std::cout << "j: " << j << std::endl;
+    std::cout << "current player: " << j << std::endl;
     #endif
 
-    CRPG_CLEAR_SCREEN;
+//    CRPG_CLEAR_SCREEN;
     std::cout << "\n*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*";
     std::cout << "\nWelcome to Console RPG, " << r_list[j]->getName() << std::endl
     << "Type 'help' to display a help menu.";
@@ -250,12 +250,6 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
   if (!load)
   std::cout << "\nLoad NOT defined. Reset.\n";
   #endif
-
-  /*
-  if (firstTurn && !load) {
-    karte->setCurrentSpaceX(0);
-    karte->setCurrentSpaceY(0);
-  }*/
 
   // if it is NOT the first turn
   // 99 is the temporary directory number for saved files
@@ -407,7 +401,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       if (karte->itemExists(x,y)) {
         TYPE type=karte->checkItemType(x,y);
         char confirm;
-        item *targetItem=karte->identifyItem(x,y);
+        item *targetItem=karte->getItem(x,y);
 
 	// if the target item is NULL, then disable equipping since
 	// it will mostly likely cause a segfault
@@ -418,8 +412,9 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
 	  
           if (confirm=='Y') {
             list[playerNow]->addInventoryItem(type,targetItem);
-            rhs->removeItem(karte,x,y);
-            //std::cout << targetItem->getName(); << " was equipped.\n";
+            std::cout << std::endl << targetItem->getName() << " was equipped.\n";
+
+	    karte->removeItem(x,y);
           }
           if (confirm=='N')
             std::cout << std::endl << targetItem->getName() << " was not equipped.\n";
@@ -442,14 +437,17 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
 
       bool equiped=false;
       int itemString=list[playerNow]->searchInventory(targetItem);
+
       if (itemString>=0 && itemString<=3) {
         list[playerNow]->removeInventoryItem(itemString);
         std::cout << std::endl << targetItem << " was unequipped.\n";
       }
+
       if (itemString>3) {
         std::cout << "\nThis item is not equipped!\n";
         equiped=false;
       }
+
       if (equiped)
         std::cout << "\nYou unequipped the " << targetItem << ".\n";
     }
@@ -464,6 +462,8 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
         ignore=true;
 
       list[playerNow]->savePlayerData(list[playerNow],list[playerNow]->getPlayerID(),99,ignore); // save the player's data
+      karte->creaturesDoAction(); // move any npcs/monsters
+
       break;
     }
 
@@ -476,6 +476,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
 
       else {
         list[playerNow]->removeTemp(); // remove the temporary directory
+	CRPG_CLEAR_SCREEN;
         exit(0);
       }
     } // if (moverVar=="quit")
@@ -509,19 +510,19 @@ int generic::loadGame() {
    #endif
 
    // now we attempt to open the index file
-   player *pPlayer=new player;
    int players;
-   players=(pPlayer->loadFromIndex(slot));
-   delete pPlayer;
+   players=player::loadFromIndex(slot);
 
    // allocate memory for the core compenents of the game.
    playerList<player*> list; // list of players
    movement *grid=new movement; // movement grid
-   map *karte=new map(30,30,-30,-30); // world map
+   map *karte=new map; // world map
+
+//   karte->loadMapData(slot);
 
    // start the loop to fill up array with saved player data
    for (int i=0;i<players;i++) {
-       list[i]=new player;
+//       list[i]=new player;
        player *pPlayer=new player;
 
 	   #ifdef __LINUX__
@@ -538,14 +539,13 @@ int generic::loadGame() {
 	   std::cout << "\nLoading from " << path << "...\n";
 	   #endif
 
-       if (!fin) {           
+       if (!fin) {
           std::cout << "\nGame: " << slot;
           std::cout << "\nSavefile " << i << " is either corrupt or not present. Aborting...\n";
           return 0;
         }
 
-       pPlayer->loadPlayerData(list[i+1],i+1,slot);
-       pPlayer->loadFromIndex(slot);
+       pPlayer->loadPlayerData(pPlayer,i+1,slot);
        list[i]=pPlayer;
 
        fin.close();

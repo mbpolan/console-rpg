@@ -21,12 +21,23 @@
 // items.cpp: declarations for item functions
 #include "items.h"
 
+int item::itemCount=0;
+
 // item class default constructor
 item::item() {
-	itemLocationX=0;
-	itemLocationY=0;
+	x=0;
+	y=0;
 	itemName="NULL";
 	itemTYPE=npe;
+};
+
+// copy constructor
+item::item(item *rhs) {
+	x=rhs->x;
+	y=rhs->y;
+
+	itemName=rhs->getName();
+	itemTYPE=rhs->checkType();
 };
 
 // lesser item constructor
@@ -37,24 +48,14 @@ item::item(std::string fixedItemName,TYPE thisType) {
 
 // our item class constructor
 item::item(std::string fixedItemName,int spawnX,int spawnY,TYPE thisType) {
-	itemLocationX=spawnX;
-	itemLocationY=spawnY;
+	x=spawnX;
+	y=spawnY;
 	itemName=fixedItemName;
 	itemTYPE=thisType;
 };
 
 // item class destructor
 item::~item() {
-};
-
-// set item location on X
-void item::setLocationX(int XLOCATION) {
-	itemLocationX=XLOCATION;
-};
-
-// set item location on Y
-void item::setLocationY(int YLOCATION) {
-	itemLocationY=YLOCATION;
 };
 
 // check the item's enumerated type
@@ -98,3 +99,7 @@ bool item::isBootsItem(item *thisItem) {
 		return 0;
 };
 
+// method for making items unusable
+void item::invalidateItem(item *thisItem) {
+	isValid=false;
+};
