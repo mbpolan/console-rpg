@@ -199,13 +199,11 @@ void movement::placeItem(item *thisItem,map *karte) {
 	// shows what this function is doing when called
 	#ifdef DEBUG
 		if (karte->itemExists(thisItem->x,thisItem->y)) {
-			if (x!=0 && y!=0)
-				std::cout << "\nItem added at " << itemX << "," << itemY << std::endl;
+			std::cout << "\nItem added at " << thisItem->x << "," << thisItem->y << std::endl;
 		}
 		
 		else if (!karte->itemExists(thisItem->x,thisItem->y)) {
-			if (x!=0 && y!=0)
-				std::cout << "\nFailed to add item at " << itemX << "," << itemY << std::endl;
+			std::cout << "\nFailed to add item at " << thisItem->x << "," << thisItem->y << std::endl;
 		}
 	#endif
 };
@@ -219,13 +217,11 @@ void movement::removeItem(map *karte,int x,int y) {
 	#ifdef DEBUG
 //		item *thisItem=karte->getItem(x,y);
 		if (karte->itemExists(x,y)) {
-			if (x!=0 && y!=0)
-				std::cout << "\nFailed to remove item at " << x << "," << y << std::endl;
+			std::cout << "\nFailed to remove item at " << x << "," << y << std::endl;
 		}
 		
 		else if (!karte->itemExists(x,y)) {
-			if (x!=0 && y!=0)
-				std::cout << "\nItem removed at " << x << "," << y << std::endl;
+			std::cout << "\nItem removed at " << x << "," << y << std::endl;
 		}
 
 //		delete thisItem;

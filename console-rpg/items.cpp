@@ -236,7 +236,6 @@ void bag::operator<<(item *Item) {
 bool bag::addItem(item *Item) {
 	if (contentCount<=maxSize) {
 		contentCount+=1;
-	//	Item->setPos(contentCount);
 		
 		contents.push_back(Item);
 		
@@ -251,15 +250,17 @@ bool bag::addItem(item *Item) {
 item* bag::removeItem(int pos, bool get) {
 	std::list<item*>::iterator it=contents.begin();
 	
+	int i=0; // determine position with this
 	while(it!=contents.end()) {
-		if ((*it) && (*it)->getPos()==pos) {
+		i+=1; // next pos
+	
+		if ((*it) && i==pos) {
 			item ret=(*it);
 		
 			contents.erase(it);
 			delete (*it);
 			
 			contentCount-=1;
-	//		resync(); // resync the list
 			
 			// if we want to get this item, return it
 			if (get)
@@ -283,7 +284,7 @@ void bag::displayContents() {
 	for (it=contents.begin();it!=contents.end();++it) {
 		if ((*it)) {
 			i++;
-			std::cout << (*it)->getPos() << ": " << (*it)->getName() << std::endl;
+			std::cout << i << ": " << (*it)->getName() << std::endl;
 		}
 	}
 };

@@ -12,8 +12,8 @@ OFLAG = -o
 CFLAG = -c
 EXT = 
 OSUFFIX = .o
-#CPPFLAGS = -D__LINUX__ -DDEBUG #for debugging
-CPPFLAGS = -D__LINUX__
+CPPFLAGS = -D__LINUX__ -DDEBUG #for debugging
+#CPPFLAGS = -D__LINUX__
 LINKFLAGS = -lxml2
 DEL = rm -f
 

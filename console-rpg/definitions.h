@@ -197,12 +197,13 @@ void generic::preGame(movement *rhs,map *karte,playerList<player*> &r_list,int p
     // reset the counter
     if (j==playerCount)
       j=0;
+    
+    CRPG_CLEAR_SCREEN;      
       
     #ifdef DEBUG
     std::cout << "Current player: " << j << std::endl;
     #endif
     
-    CRPG_CLEAR_SCREEN;
     std::cout << "\n*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*";
     std::cout << "\nWelcome to Console RPG, " << r_list[j]->getName() << std::endl
     << "Type 'help' to display a help menu.";
@@ -388,7 +389,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
     }
     
     // remove an item from player's backpack
-/*    if (moverVar=="remove") {
+    if (moverVar=="remove") {
       std::cout << "\n----------";
       std::cout << "\nBackpack contents:\n";
       list[playerNow]->bp->displayContents();
@@ -400,19 +401,21 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       
       item *Item=list[playerNow]->bp->removeItem(pos, true);
       
+      // check if this item was dropped correctly
       if (Item) {
         Item->x=list[playerNow]->x;
-	Item->y=list[playerNow]->y;
-	
+        Item->y=list[playerNow]->y;
+
         rhs->placeItem(Item, karte);
       	std::cout << "\nItem dropped.";
       }
       
+      // not dropped, so its still in the player's backpack
       else
-      	std::cout << "\nItem cannot be removed!";
+         std::cout << "\nItem cannot be removed!";
 
       std::cout << "\n----------\n";
-    }*/
+    }
 
     // display stats
     if (moverVar=="stats") {
