@@ -2,6 +2,7 @@
 #include <iostream>
 #include "map.h"
 
+// map class constructor
 map::map(int X,int Y,int NgY,int NgX) {
 	MapMaxSizeX=X;
 	MapMaxSizeY=Y;
@@ -22,9 +23,11 @@ map::map(int X,int Y,int NgY,int NgX) {
 	}
 };
 
+// map class destructor
 map::~map() {};
 
-void map::addItemX(item *thisItem,int spawnX) {
+// add item to map on X
+void map::addItemX(item	*thisItem,int spawnX) {
 	if (spawnX<0) {
 		itemSquareNgX[spawnX-1]=spawnX;
 		itemLineNgX[spawnX-1]=thisItem;
@@ -35,6 +38,7 @@ void map::addItemX(item *thisItem,int spawnX) {
 	}
 };
 
+// add item to map on Y
 void map::addItemY(item *thisItem,int spawnY) {
 	if (spawnY<0) {
 		itemSquareNgY[spawnY-1]=spawnY;
@@ -46,6 +50,7 @@ void map::addItemY(item *thisItem,int spawnY) {
 	}
 };
 
+// remove item from map on X
 void map::removeItemX(int spawnX) {
 	if (spawnX<0) {
 		itemSquareNgX[spawnX-1]=0;
@@ -57,6 +62,7 @@ void map::removeItemX(int spawnX) {
 	}
 };
 
+// remove item from map on Y
 void map::removeItemY(int spawnY) {
 	if (spawnY<0) {
 		itemSquareNgY[spawnY-1]=0;
@@ -68,6 +74,7 @@ void map::removeItemY(int spawnY) {
 	}
 };
 
+// check to see if the item exists on this space
 bool map::itemExists(map *karte,int currentX,int currentY) {
 	currentX=karte->getCurrentSpaceX();
 	currentY=karte->getCurrentSpaceY();
@@ -103,6 +110,7 @@ bool map::itemExists(map *karte,int currentX,int currentY) {
 	}
 };
 
+// get the item's name, similar to itemExists()
 std::string map::identifyItem(map *karte) {
 	int currentX=karte->getCurrentSpaceX();
 	int currentY=karte->getCurrentSpaceY();
@@ -145,6 +153,7 @@ std::string map::identifyItem(map *karte) {
 		return "nothing";
 };
 
+// check the type of item (head,torso,leg,boot,npe)
 TYPE map::checkItemType(map *karte) {
 	int currentX=karte->getCurrentSpaceX();
 	int currentY=karte->getCurrentSpaceY();

@@ -1,10 +1,16 @@
 // definitions.h: holds function declarations and definitions
 #include <iostream>
 #include <fstream>
-#include <ctype.h>
+#include <ctype.h> // for toupper()
 
+#include "player.h"
+#include "movement.h"
+
+// our prototypes
+// move these into classes later
 int mainMenu(player*);
-int savePlayerData(player*);
+int savePlayerData(player*,map*);
+int loadPlayerData(player*,map*);
 void startGame(movement*,map*,player*);
 void optionMenu();
 void spawnMapItems(movement*,map*);
@@ -78,7 +84,7 @@ void optionMenu() {
 void startGame(movement *rhs,map *karte,player *r_player) {
 	for(;;) {
 		
-		int count=rhs->getStepCount();
+		int count=rhs->getStepCount(); // count the amount of spaces moved
 		rhs->spawnMapItems(rhs,karte); // spawn items on map NOW
 	
 		std::cout << "\nMove: ";
@@ -147,8 +153,14 @@ void startGame(movement *rhs,map *karte,player *r_player) {
 		}
 		
 		if (moverVar=="save") {
-			savePlayerData(r_player);
+			savePlayerData(r_player,karte);
 		}
+
+		if (moverVar=="load") {
+			loadPlayerData(r_player,karte);
+			std::cout << "\nLoading NOW!\n";
+		}
+		
 		/* ********************************************** *
 		 * Displaying the inventory results in a loop bug *
 		 * Fix it before making equipment spawnable!      *
@@ -185,6 +197,7 @@ void startGame(movement *rhs,map *karte,player *r_player) {
 			std::cout << "\nRemove which item? ";
 			std::string targetItem;
 			std::cin >> targetItem;
+			
 			bool equiped=false;
 			int itemString=r_player->searchInventory(r_player,targetItem);
 			if (itemString>=0 && itemString<=3) {
@@ -214,33 +227,98 @@ void startGame(movement *rhs,map *karte,player *r_player) {
 
 // savePlayerData: saves the current player status to file
 // (Todo: encrypt the save file so the user can't edit it)
-int savePlayerData(player *r_player) {
+int savePlayerData(player *r_player, map *karte) {
 
 	std::string playerName(r_player->getName());
-	std::string playerHair(r_player->getHair());
-	std::string playerTorso(r_player->getTorso());
-	std::string playerLegs(r_player->getLegs());
-	int playerAge=r_player->getAge();
-	int playerHeight=r_player->getHeight();
+	
+	// do these later //
+//	std::string playerHair(r_player->getHair());
+//	std::string playerTorso(r_player->getTorso());
+//	std::string playerLegs(r_player->getLegs());
+//	int playerAge=r_player->getAge();
+//	int playerHeight=r_player->getHeight();
 	
 	// End of customization part. Start physical part //
 	
 	int playerCurrentHP=r_player->getHP();
 	int playerCurrentMP=r_player->getMP();
+	int luck=r_player->getLuck();
+	int strength=r_player->getStrength();
+	int power=r_player->getPower();
+	int defense=r_player->getDefense();
+
+	// get the player's coordinates
+	int x=karte->getCurrentSpaceX();
+	int y=karte->getCurrentSpaceY();
 	
 	std::ofstream fout;
-	fout.open("savefile.dat");
-	fout << "[Player]\n";
-	// add to stream fout...
-	fout << "name = " << playerName << std::endl;
-	fout << "hair = " << playerHair << std::endl
-	     << "torso = " << playerTorso << std::endl
-	     << "legs = " << playerLegs << std::endl
-	     << "age = " << playerAge << std::endl
-	     << "height = " << playerHeight << std::endl << std::endl;
-	     
-	fout << "hp = " << playerCurrentHP << std::endl
-	     << "mp = " << playerCurrentMP << std::endl
-	     << "[/Player]" << std::endl;
+	
+	// open our savefile and load the stats in
+	// follow each stat by a new line for loading
+	fout.open("data/savefile.dat");
+	
+	if (!fout) {
+		std::cout << "\nUnable to save file!";
+		return 0;
+	}
+	
+	fout << playerName << std::endl;
+	fout << x << std::endl;
+	fout << y << std::endl;
+	fout << playerCurrentHP << std::endl;
+	fout << playerCurrentMP << std::endl;
+	fout << luck << std::endl;
+	fout << strength << std::endl;
+	fout << power << std::endl;
+	fout << defense << std::endl;
 	fout.close();
 }
+
+// loadPlayerData: load the savefile and continue the game
+int loadPlayerData(player *r_player, map *karte) {
+	std::fstream fin;
+	std::string name;
+	int hp,mp,luck,strength,power,defense;
+	int x,y;
+	
+	fin.open("data/savefile.dat");
+
+	if (!fin) {
+		std::cout << "\nFailed to load savefile!";
+		return 0;
+	}
+	
+	
+	fin >> name;
+	r_player->setName(name);
+	fin.clear();
+
+	fin >> x;
+	karte->setCurrentSpaceX(x);
+	fin.clear();
+
+	fin >> y;
+	karte->setCurrentSpaceY(y);
+	fin.clear();
+	
+	fin >> hp;
+	r_player->setHP(hp);
+	fin.clear();
+	
+	fin >> mp;
+	r_player->setMP(mp);
+	fin.clear();
+
+	fin >> luck; r_player->setLuck(luck);
+	fin.clear();
+
+	fin >> strength; r_player->setStrength(strength);
+	fin.clear();
+
+	fin >> power; r_player->setPower(power);
+	fin.clear();
+
+	fin >> defense; r_player->setDefense(defense);
+	fin.clear(); fin.close();
+}
+

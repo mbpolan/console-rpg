@@ -1,4 +1,4 @@
-// creature.h: holds the creature class
+// creature.h: holds the ADT creature class
 
 class creature {
 	public:

@@ -1,9 +1,5 @@
 // crpg.cpp: main file
 #include <iostream>
-#include "items.cpp"
-#include "map.cpp"
-#include "player.cpp"
-#include "movement.cpp"
 #include "definitions.h"
 
 main(int argc, char *argv[]) {

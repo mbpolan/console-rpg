@@ -2,14 +2,24 @@
 #include <iostream>
 #include "creature.h"
 
+//#ifndef __nItems
+#include "items.h"
+//#endif
+
+#ifndef __nPlayer
+#define __nPlayer
+
 enum vocation {warrior,mage,archer};
 
-class player: public creature {
+class player: private creature {
 	public:
 		player();
 		player(int,int,int,int); // new player constructor
 		player(int,int,int,int,int,int); // enhanced constructor
 		virtual ~player();
+
+		// overloaded operators
+		player &operator=(const player&);
 		
 		// player specific definitions
 		int getHP() const {return currentHP;}
@@ -90,4 +100,6 @@ class player: public creature {
 		std::string headEq,torsoEq,legEq,bootEq;
 		vocation playerVocation;
 };
+
+#endif
 

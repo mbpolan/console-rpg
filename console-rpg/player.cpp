@@ -1,6 +1,7 @@
 // player.cpp: declarations for player functions
 #include "player.h"
 
+// player class default constructor
 player::player() {
 	currentHP=100;
 	currentMP=10;
@@ -18,6 +19,7 @@ player::player() {
 
 };
 
+// player class overloaded constructor
 player::player(int fixedHP, int fixedMP, int fixedHeight, int fixedAge) {
 	currentHP=fixedHP;
 	currentMP=fixedMP;
@@ -39,6 +41,7 @@ player::player(int fixedHP, int fixedMP, int fixedHeight, int fixedAge) {
 	
 };
 
+// player class enhanced constructor
 player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense) {
 	currentHP=hp;
 	currentMP=mp;
@@ -57,9 +60,34 @@ player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense) {
         bootEq="Boots";
 };
 
+// player class destructor
 player::~player() {
 };
 
+// overloaded operator=
+player &player::operator=(const player &r_player) {
+	if (this==&r_player)
+		return *this;
+	currentHP=r_player.getHP();
+	currentMP=r_player.getMP();
+	luck=r_player.getLuck();
+	strength=r_player.getStrength();
+	power=r_player.getStrength();
+	defense=r_player.getDefense();
+
+	playerHeight=r_player.getHeight(),playerAge=r_player.getAge(),playerName=r_player.getName();
+	hair=r_player.getHair(),torso=r_player.getTorso(),legs=r_player.getLegs();
+	playerVocation=r_player.getVoc();
+
+	headEq=r_player.getHeadItem();
+	torsoEq=r_player.getTorsoItem();
+	legEq=r_player.getLegsItem();
+	bootEq=r_player.getBootsItem();
+
+	return *this;
+};
+
+// let the player customize his character
 void player::setLook(player *r_player) {
 	std::string userVocation;
 	std::string userHair, userBody, userLegs;
@@ -67,7 +95,7 @@ void player::setLook(player *r_player) {
 	std::cout << "\nPlease choose a vocation (warrior,mage,archer): ";
 	std::cin >> userVocation;
 
-	if (userVocation=="warrior") {
+	if (userVocation=="warrior") { // set warrior class stats
 		r_player->setLuck(5);
 		r_player->setStrength(10);
 		r_player->setPower(15);
@@ -78,7 +106,7 @@ void player::setLook(player *r_player) {
 		r_player->setVoc(warrior);
 	}
 
-	if (userVocation=="mage") {
+	if (userVocation=="mage") { // set mage class stats
 		r_player->setLuck(10);
 		r_player->setStrength(5);
 		r_player->setPower(10);
@@ -89,7 +117,7 @@ void player::setLook(player *r_player) {
 		r_player->setVoc(mage);
 	}
 
-	if (userVocation=="archer") {
+	if (userVocation=="archer") { // set archer class stats
 		r_player->setLuck(5);
 		r_player->setStrength(10);
 		r_player->setPower(15);
@@ -110,11 +138,13 @@ void player::setLook(player *r_player) {
 	std::cout << "\nWhat is your shirt color? ";
 	std::cin >> userBody;
 	r_player->setTorso(userBody);
-	std::cout << "\nFinally, what is your pants color? ";
+	std::cout << "\nWhat is your pants color? ";
 	std::cin >> userLegs;
 	r_player->setLegs(userLegs);
 };
 
+// display player's inventory
+// BUG: there is a bug here, fix it!
 std::string player::displayInventory(player *r_player) {
 	std::cout << "\nYour Inventory:\n\n";
 	std::cout << "Head: " << r_player->getHeadItem() << ".\n";
@@ -123,6 +153,7 @@ std::string player::displayInventory(player *r_player) {
 	std::cout << "Feet: " << r_player->getBootsItem() << ".\n";
 };
 
+// remove item from inventory
 void player::removeInventoryItem(int theType) {
 	switch(theType) {
 		case 0: headEq="nothing";break;
@@ -133,6 +164,7 @@ void player::removeInventoryItem(int theType) {
 	}
 };
 
+// add item to inventory
 void player::addInventoryItem(TYPE theType,std::string name) {
 	switch(theType) {
 		case 0: headEq=name;break;
@@ -143,6 +175,7 @@ void player::addInventoryItem(TYPE theType,std::string name) {
 	}
 };
 
+// iterate through the inventory, look for item
 int player::searchInventory(player *r_player,std::string itemName) {
 	std::string locator=itemName;
 	std::string headItem=r_player->getHeadItem();
@@ -163,11 +196,13 @@ int player::searchInventory(player *r_player,std::string itemName) {
 	}
 };
 
+// increase the player's current level
 void player::increaseLevel() {
 		level++;
 		std::cout << "\nYou advanced to level " << level << "!\n";
 };
 
+// display player statistics
 int player::displayStats(player *r_player) {
 	std::cout << "\n\nStats\n";
 	std::cout << "HP: " << r_player->getHP() << std::endl;

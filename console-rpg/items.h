@@ -1,6 +1,9 @@
 // items.h: holds item class and declarations
 #include <iostream>
 
+#ifndef _nItems
+#define _nItems
+
 enum TYPE {head,torso,legs,boots,npe};
 
 class item {
@@ -33,4 +36,6 @@ class item {
 		std::string *itemName;
 		TYPE itemTYPE;
 };
+
+#endif
 

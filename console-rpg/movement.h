@@ -1,5 +1,9 @@
 // movement.h: holds movement system and map stuff
 #include <iostream>
+#include "map.h"
+
+#ifndef __nMovement
+#define __nMovement
 
 class movement { 
 	public:
@@ -35,4 +39,6 @@ class movement {
 		bool fDay;
 		int stepCount;
 };
+
+#endif
 

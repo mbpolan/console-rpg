@@ -1,12 +1,14 @@
 // movement.h: definitions for movement class
 #include "movement.h"
 
+// movement class default constructor
 movement::movement() {
 	fDay=true; // make it day by default
 	stepCount=0;
 	itemWarning="\nThere is an item here.";
 };
 
+// move north
 void movement::moveN(map *karte) {
 	if (karte->getCurrentSpaceX()==karte->getMapMaxSizeX()) {
 		std::cout << "\nYou can't move any further north!";
@@ -15,10 +17,11 @@ void movement::moveN(map *karte) {
 		int x=karte->getCurrentSpaceX();
 		int y=karte->getCurrentSpaceY();
 		karte->setCurrentSpaceX(++x);
-		std::cout << "\nMoved North.";
+		std::cout << "\nMoved north.";
 	}
 };
 
+// move south
 void movement::moveS(map *karte) {
 	if (karte->getCurrentSpaceX()==karte->getMapMaxSizeNgX()) {
 		std::cout << "\nYou can't move any further south!";
@@ -31,6 +34,7 @@ void movement::moveS(map *karte) {
 	}
 };
 
+// move west
 void movement::moveW(map *karte) {
 	if (karte->getCurrentSpaceY()==karte->getMapMaxSizeNgY()) {
 		std::cout << "\nYou can't move any further west!";
@@ -43,6 +47,7 @@ void movement::moveW(map *karte) {
 	}
 };
 
+// move east
 void movement::moveE(map *karte) {
 	if (karte->getCurrentSpaceY()==karte->getMapMaxSizeY())  {
 		std::cout << "\nYou can't move any further east!";
@@ -55,6 +60,7 @@ void movement::moveE(map *karte) {
 	}
 };
 
+// move northeast
 void movement::moveNE(map *karte) {
 	if (karte->getCurrentSpaceY()==karte->getMapMaxSizeY() || karte->getCurrentSpaceX()==karte->getMapMaxSizeX() 
        || karte->getCurrentSpaceY()==karte->getMapMaxSizeNgY() || karte->getCurrentSpaceX()==karte->getMapMaxSizeNgX()) {
@@ -69,6 +75,7 @@ void movement::moveNE(map *karte) {
 	}
 };
 
+// move northwest
 void movement::moveNW(map *karte) {
 	if (karte->getCurrentSpaceY()==karte->getMapMaxSizeY() || karte->getCurrentSpaceX()==karte->getMapMaxSizeX()
        || karte->getCurrentSpaceY()==karte->getMapMaxSizeNgY() || karte->getCurrentSpaceX()==karte->getMapMaxSizeNgX()) {
@@ -83,6 +90,7 @@ void movement::moveNW(map *karte) {
 	}
 };
 
+// move southeast
 void movement::moveSE(map *karte) {
         if (karte->getCurrentSpaceY()==karte->getMapMaxSizeY() || karte->getCurrentSpaceX()==karte->getMapMaxSizeX()
        || karte->getCurrentSpaceY()==karte->getMapMaxSizeNgY() || karte->getCurrentSpaceX()==karte->getMapMaxSizeNgX()) {
@@ -97,6 +105,7 @@ void movement::moveSE(map *karte) {
 	}
 };
 
+// move southwest
 void movement::moveSW(map *karte) {
         if (karte->getCurrentSpaceY()==karte->getMapMaxSizeY() || karte->getCurrentSpaceX()==karte->getMapMaxSizeX()
        || karte->getCurrentSpaceY()==karte->getMapMaxSizeNgY() || karte->getCurrentSpaceX()==karte->getMapMaxSizeNgX()) {
@@ -133,6 +142,7 @@ void movement::look(map *karte) {
 	// of ground type. (Do this later)
 };
 
+// place item on the map
 void movement::placeItem(item *thisItem,map *karte) {
 	int itemX=(thisItem->getLocationX());
 	int itemY=(thisItem->getLocationY());
@@ -140,6 +150,7 @@ void movement::placeItem(item *thisItem,map *karte) {
 	karte->addItemY(thisItem,itemY);
 };
 
+// remove the item from the map
 void movement::removeItem(item *thisItem,map *karte) {
 	int itemX=(thisItem->getLocationX());
 	int itemY=(thisItem->getLocationY());
@@ -147,12 +158,14 @@ void movement::removeItem(item *thisItem,map *karte) {
 	karte->removeItemY(itemY);
 };
 
+// fetch the player's current position on X/Y
 int movement::getCurrentPosition(map *karte) const {
 	int x=karte->getCurrentSpaceX();
 	int y=karte->getCurrentSpaceY();
 	std::cout << "X: " << x << " Y: " << y << std::endl;
 };
 
+// spawn some initial map items
 void movement::spawnMapItems(movement *rhs,map *karte) {
 	item *plant0=new item("fern",1,2,npe);
 	rhs->placeItem(plant0,karte);
@@ -173,6 +186,7 @@ void movement::spawnMapItems(movement *rhs,map *karte) {
 	rhs->placeItem(equip,karte);
 };
 
+// toggle between night and day, or increase step count if none
 int movement::controlTime(int steps) {
 	if (steps==500) { // toggle day/night now
 		if (!fDay) { // if it is night
@@ -193,6 +207,7 @@ int movement::controlTime(int steps) {
 		stepCount++; // increment player steps
 };
 
+// fetch the current time
 void movement::checkTime() {
 	if (fDay)
 		std::cout << "\nIt is day time.\n";

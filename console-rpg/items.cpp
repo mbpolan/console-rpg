@@ -1,6 +1,7 @@
 // items.cpp: declarations for item functions
 #include "items.h"
 
+// item class default constructor
 item::item() {
 	itemLocationX=new int(0);
 	itemLocationY=new int(0);
@@ -8,6 +9,7 @@ item::item() {
 	itemTYPE=npe;
 };
 
+// our item class constructor
 item::item(std::string fixedItemName,int spawnX,int spawnY,TYPE thisType) {
 	itemLocationX=new int(spawnX);
 	itemLocationY=new int(spawnY);
@@ -15,6 +17,7 @@ item::item(std::string fixedItemName,int spawnX,int spawnY,TYPE thisType) {
 	itemTYPE=thisType;
 };
 
+// item class destructor
 item::~item() {
 	delete itemLocationX;
 	delete itemLocationY;
@@ -24,6 +27,7 @@ item::~item() {
 	itemLocationY=0;
 };
 
+// set item location on X
 void item::setLocationX(int XLOCATION) {
 	if (*itemLocationX==XLOCATION)
 		*itemLocationX=*itemLocationX;
@@ -31,6 +35,7 @@ void item::setLocationX(int XLOCATION) {
 		*itemLocationX=XLOCATION;
 };
 
+// set item location on Y
 void item::setLocationY(int YLOCATION) {
 	if (*itemLocationY==YLOCATION)
 		*itemLocationY=*itemLocationY;
@@ -38,10 +43,12 @@ void item::setLocationY(int YLOCATION) {
 		*itemLocationY=YLOCATION;
 };
 
+// check the item's enumerated type
 TYPE item::checkType() {
 	return itemTYPE;
 };
 
+// check if this item can be equipped on head slot
 bool item::isHeadItem(item *thisItem) {
 	TYPE result=thisItem->checkType();
 	if (result==head)
@@ -50,6 +57,7 @@ bool item::isHeadItem(item *thisItem) {
 		return 0;
 };
 
+// check if this item can be equipped on armor slot
 bool item::isTorsoItem(item *thisItem) {
 	TYPE result=thisItem->checkType();
 	if (result==torso)
@@ -58,6 +66,7 @@ bool item::isTorsoItem(item *thisItem) {
 		return 0;
 };
 
+// check if this item can be equipped on legs slot
 bool item::isLegsItem(item *thisItem) {
 	TYPE result=thisItem->checkType();
 	if (result==legs)
@@ -66,6 +75,7 @@ bool item::isLegsItem(item *thisItem) {
 		return 0;
 };
 
+// check if this item can be equipped on boots slot
 bool item::isBootsItem(item *thisItem) {
 	TYPE result=thisItem->checkType();
 	if (result==boots)
