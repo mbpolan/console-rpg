@@ -21,11 +21,12 @@
  #ifndef item_h
  #define item_h
  
-// items.h: holds item class and declarations
+// items.h: holds item classes and declarations
 #include <iostream>
 #include <sstream>
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
+#include <list>
 
 // enumerate the types of items
 enum TYPE {head,torso,legs,boots,npe};
@@ -48,6 +49,9 @@ class item {
 		void setName(std::string name) {itemName=name;}
 
 		int getItemID() const {return itemID;}
+		
+		void setPos(int p) {pos=p;}
+		int getPos() const {return pos;}
 
 		bool isHeadItem();
 		bool isTorsoItem();
@@ -65,10 +69,35 @@ class item {
 
 	private:
 		int itemID;
+		int pos; // used only in bag-type items
 		bool isValid;
 
 		std::string itemName;
 		TYPE itemTYPE;
+};
+
+// a bag type item that holds other items
+class bag: public item {
+	public:
+		bag(int);
+		virtual ~bag() {};
+		
+		item *operator>>(int);
+		void operator<<(item*);
+		
+		bool addItem(item*);
+		item* removeItem(int, bool);	
+		
+		void displayContents();
+		
+		// list of this bag's items
+		std::list<item*> contents;
+		
+	private:
+		void resync(); // for resyncing the list
+	
+		int contentCount; // amount of items now
+		int maxSize; // max items
 };
 
 #endif

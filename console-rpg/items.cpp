@@ -38,10 +38,16 @@ item::item(item *rhs) {
 
 	itemName=rhs->getName();
 	itemTYPE=rhs->checkType();
+	
+	itemID=rhs->getItemID();
+	pos=rhs->getPos();
 };
 
 // lesser item constructor
 item::item(int id) {
+	x=0;
+	y=0;
+
 	parseItem(id);
 	itemID=id;
 };
@@ -68,7 +74,7 @@ item::item(int id,const char* cx,const char* cy,const char* valid) {
 	x=atoi(cx);
 	y=atoi(cy);
 	
-	if (strcmp(valid,"1"))
+	if (strcmp(valid,"1")==0)
 		isValid=true;
 	else
 		isValid=false;
@@ -151,6 +157,7 @@ xmlNodePtr item::compressToXML() {
 	return ptr;
 };
 
+// parse the id and set some variables
 void item::parseItem(int id) {
 	switch(id) {
 		// item ids are compared in hex values to avoid the user editing
@@ -159,7 +166,7 @@ void item::parseItem(int id) {
 		// generic
 		case 0x00: itemName="nothing"; itemTYPE=npe; break;
 		
-		// inanimate objectsvocation
+		// inanimate objects
 		case 0x01: itemName="a bush"; itemTYPE=npe; break;
 		case 0x02: itemName="a rock"; itemTYPE=npe; break;
 		case 0x03: itemName="sunflowers"; itemTYPE=npe; break;
@@ -200,5 +207,96 @@ void item::parseItem(int id) {
 		case 0x92: itemName="Warrior Helmet"; itemTYPE=head; break;
 		
 		default: itemName=""; itemTYPE=npe; break;
+	}
+};
+
+/********************************************************************
+ * Start bag item definitions...
+ *******************************************************************/
+
+// bag constructor taking an int
+bag::bag(int items) {
+	contentCount=0;
+	maxSize=items;
+	
+	contents.clear();
+};
+
+// overloaded operator>> for extraction of items (get item)
+item* bag::operator>>(int pos) {
+	removeItem(pos, true);
+};
+
+// overloaded operator<< for insertion of new item
+void bag::operator<<(item *Item) {
+	addItem(Item);
+};
+
+// method for adding items to the bag
+bool bag::addItem(item *Item) {
+	if (contentCount<=maxSize) {
+		contentCount+=1;
+	//	Item->setPos(contentCount);
+		
+		contents.push_back(Item);
+		
+		return true;
+	}
+	
+	// out of space?
+	return false;
+};
+
+// method for removing/getting items
+item* bag::removeItem(int pos, bool get) {
+	std::list<item*>::iterator it=contents.begin();
+	
+	while(it!=contents.end()) {
+		if ((*it) && (*it)->getPos()==pos) {
+			item ret=(*it);
+		
+			contents.erase(it);
+			delete (*it);
+			
+			contentCount-=1;
+	//		resync(); // resync the list
+			
+			// if we want to get this item, return it
+			if (get)
+				return (new item(ret));
+			
+			// return NULL;
+			else
+				return NULL;
+		}
+		
+		else
+			++it;
+	}
+};
+
+// method for displaying this bag's contents
+void bag::displayContents() {
+	std::list<item*>::iterator it;
+	
+	int i=0;
+	for (it=contents.begin();it!=contents.end();++it) {
+		if ((*it)) {
+			i++;
+			std::cout << (*it)->getPos() << ": " << (*it)->getName() << std::endl;
+		}
+	}
+};
+
+// resync the content list if it was modified
+void bag::resync() {
+	std::list<item*>::iterator it;
+	
+	int i=0;
+	for (it=contents.begin();it!=contents.end();++it) {
+		if ((*it)) {
+			i++;
+			(*it)->setPos(i);
+		}
 	}
 };

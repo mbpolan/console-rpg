@@ -124,6 +124,9 @@ class player: public creature {
 		void sendNpcMsg(map*,movement*);
 
 		int x,y;
+		
+		// player's backpack
+		bag *bp;
 
 	private:
 		std::string name;

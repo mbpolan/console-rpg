@@ -40,6 +40,7 @@ player::player() {
 	torsoEq=new item(100,torso);
 	legEq=new item(114,legs);
 	bootEq=new item(130,boots);
+	bp=new bag(8);
 
 	playerID=0;
 	x=25;
@@ -64,6 +65,7 @@ player::player(int fixedHP, int fixedMP, int id) {
 	torsoEq=new item(100,torso);
 	legEq=new item(114,legs);
 	bootEq=new item(130,boots);
+	bp=new bag(8);
 	
 	playerID=id;
 	x=25;
@@ -73,8 +75,6 @@ player::player(int fixedHP, int fixedMP, int id) {
 
 // player class enhanced constructor
 player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense,int id) {
-	currentHP=hp;
-	currentMP=mp;
 	luck=Luck;
 	strength=Strength;
 	power=Power;
@@ -88,8 +88,8 @@ player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense,int id)
 	torsoEq=new item(100,torso);
 	legEq=new item(114,legs);
 	bootEq=new item(130,boots);
+	bp=new bag(8);
 	
-	playerID=id;
 	x=25;
 	y=25;
 
@@ -101,6 +101,7 @@ player::~player() {
 	delete torsoEq;
 	delete legEq;
 	delete bootEq;
+	delete bp;
 };
 
 // overloaded operator=
@@ -207,6 +208,7 @@ void player::displayInventory() {
 	std::cout << "Torso: " << torsoEq->getName() << std::endl;
 	std::cout << "Legs: " << legEq->getName() << std::endl;
 	std::cout << "Feet: " << bootEq->getName() << std::endl;
+	std::cout << "Other: Backpack" << std::endl;
 };
 
 // remove item from inventory
@@ -304,7 +306,7 @@ int player::savePlayerData(int player,int game,bool ignoreTemp) {
 	
 	xmlDocPtr doc;
 	xmlNodePtr root,ptr;
-	std::stringstream ss;
+	std::stringstream ss, ss2;
 	
 	doc=xmlNewDoc((const xmlChar*) "1.0");
 	doc->children=xmlNewDocNode(doc,NULL,(const xmlChar*) "player",NULL);
@@ -405,6 +407,32 @@ int player::savePlayerData(int player,int game,bool ignoreTemp) {
 	
 	xmlAddChild(doc->children,eq);
 	
+	xmlNodePtr bpNode=xmlNewNode(0, (const xmlChar*) "backpack");
+	xmlNodePtr bpItem;
+	
+	std::list<item*>::iterator it;
+	int i=0;
+	
+	// save the contents of the player's backpack
+	for (it=((bag*) bp)->contents.begin();it!=((bag*) bp)->contents.end();it++) {
+		if ((*it)) {
+			i++;
+			
+			bpItem=xmlNewNode(0, (const xmlChar*) "slot");
+			
+			ss << (*it)->getItemID();
+			xmlSetProp(bpItem, (const xmlChar*) "item", (const xmlChar*) ss.str().c_str());
+			ss.str("");
+			
+			xmlAddChild(bpNode, bpItem);
+		}
+	}
+	
+	ss << i;
+	xmlSetProp(bpNode, (const xmlChar*) "contents", (const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	xmlAddChild(eq, bpNode);	
 
 	xmlKeepBlanksDefault(1);
 	
@@ -419,6 +447,7 @@ int player::savePlayerData(int player,int game,bool ignoreTemp) {
 // load the savefile and continue the game
 int player::loadPlayerData(int player,int game) {
 	std::fstream fin;
+	std::stringstream ss;
 	
 	char savefile[256];
 	char namefile[256];
@@ -477,6 +506,20 @@ int player::loadPlayerData(int player,int game) {
 		torsoEq=new item(atoi((const char*) xmlGetProp(ptr,(xmlChar*) "torso")));
 		legEq=new item(atoi((const char*) xmlGetProp(ptr,(xmlChar*) "legs")));
 		bootEq=new item(atoi((const char*) xmlGetProp(ptr,(xmlChar*) "boots")));
+		
+		temp=ptr->children;
+		
+		// load in the player's backpack contents
+		int bpCount=atoi((const char*) xmlGetProp(temp, (xmlChar*) "contents"));
+		xmlNodePtr bpItemNode=temp->children;;
+		
+		while(bpItemNode) {
+			int bpItemId=atoi((const char*) xmlGetProp(bpItemNode, (xmlChar*) "item"));
+			
+			bp->addItem(new item(bpItemId));
+			
+			bpItemNode=bpItemNode->next;
+		}
 		
 		xmlFreeDoc(doc);
 		return 1;

@@ -253,6 +253,9 @@ void movement::spawnMapItems(map *karte) {
 		// syntax for new item is id,x,y
 		placeItem(new item(id,x,y),karte);
 	}
+	
+	placeItem(new item(100, 26, 26), karte);
+	placeItem(new item(101, 26, 27), karte);
 
 	// syntax for new npcs is x,y,name
 	placeNPC(new npc(26,26,"Mike"),karte);

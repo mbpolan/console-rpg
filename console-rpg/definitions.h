@@ -29,6 +29,7 @@
 #include <sstream> // for stringstream
 
 // nessesary headers
+#include "items.h"
 #include "player.h"
 #include "playerlist.h"
 #include "movement.h"
@@ -57,6 +58,10 @@ int npc::npcsOn=0;
 
 // movement strings
 std::string N="n",S="s",W="w",E="e",NW="nw",NE="ne",SW="sw",SE="se";
+
+// forward declarations
+class item;
+class bag;
 
 // first we place all the function prototypes
 // into a generic namespace. this hopefully makes
@@ -246,6 +251,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
     std::string moverVar;
     std::cin >> moverVar;
     
+    // if the player's turn has expired
     if (moves==0) {
       std::cout << "\n----------";
       std::cout << "\nYour turn is now over. Press enter to continue...";
@@ -256,7 +262,18 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       karte->creaturesDoAction();
       break;
     }
+    
+    // for quick movement when debugging ;)
+    #ifdef DEBUG
+    if (moverVar=="t") {
+      int x,y;
+      std::cin >> x >> y;
+      list[playerNow]->x=x;
+      list[playerNow]->y=y;
+    }
+    #endif
 
+    // move north
     if (moverVar==N) {
       std::cout << "\n----------";    
       rhs->moveN(list[playerNow],karte);
@@ -266,6 +283,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       moves--;
     }
 
+    // move south
     if (moverVar==S) {
       std::cout << "\n----------";    
       rhs->moveS(list[playerNow],karte);
@@ -275,6 +293,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       moves--;
     }
 
+    // move west
     if (moverVar==W) {
       std::cout << "\n----------";    
       rhs->moveW(list[playerNow],karte);
@@ -284,6 +303,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       moves--;
     }
 
+    // move east
     if (moverVar==E) {
       std::cout << "\n----------";    
       rhs->moveE(list[playerNow],karte);
@@ -293,6 +313,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       moves--;
     }
 
+    // move northwest
     if (moverVar==NW) {
       std::cout << "\n----------";    
       rhs->moveNW(list[playerNow],karte);
@@ -302,6 +323,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       moves--;
     }
 
+    // move northeast
     if (moverVar==NE) {
       std::cout << "\n----------";    
       rhs->moveNE(list[playerNow],karte);
@@ -311,6 +333,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       moves--;
     }
 
+    // move southwest
     if (moverVar==SW) {
       std::cout << "\n----------";    
       rhs->moveSW(list[playerNow],karte);
@@ -320,6 +343,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       moves--;
     }
 
+    // move southeast
     if (moverVar==SE) {
       std::cout << "\n----------";    
       rhs->moveSE(list[playerNow],karte);
@@ -328,19 +352,83 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       
       moves--;
     }
+    
+    // display backpack contents
+    if (moverVar=="bp") {
+      std::cout << "\n----------";
+      std::cout << "\nYour backpack contains:\n";
+      list[playerNow]->bp->displayContents();
+      std::cout << "----------\n";
+    }
+    
+    // add an item to player's backpack
+    if (moverVar=="add") {
+      std::cout << "\n----------";
+      if (karte->itemExists(list[playerNow]->x, list[playerNow]->y)) {
+      	item *Item=karte->getItem(list[playerNow]->x, list[playerNow]->y);
+	
+	std::string s;
+	if (Item) {
+		std::cout << "\nPut " << Item->getName() << " into your backpack? ";
+		std::cin >> s;
+		
+		if (s[0]=='y' || s[0]=='Y') {
+			if (list[playerNow]->bp->addItem(new item(Item->getItemID()))) {
+				std::cout << "\nItem added.";
+				rhs->removeItem(karte, list[playerNow]->x, list[playerNow]->y);
+			}
+			
+			else
+				std::cout << "\nYour backpack is full!";
+		}
+	} // if (Item)
+      } // if (itemExists(...))
+      
+      std::cout << "\n----------\n";
+    }
+    
+    // remove an item from player's backpack
+/*    if (moverVar=="remove") {
+      std::cout << "\n----------";
+      std::cout << "\nBackpack contents:\n";
+      list[playerNow]->bp->displayContents();
+      std::cout << "\nRemove which item (position)? ";
+      
+      std::string s;
+      std::cin >> s;
+      int pos=atoi(s.c_str());
+      
+      item *Item=list[playerNow]->bp->removeItem(pos, true);
+      
+      if (Item) {
+        Item->x=list[playerNow]->x;
+	Item->y=list[playerNow]->y;
+	
+        rhs->placeItem(Item, karte);
+      	std::cout << "\nItem dropped.";
+      }
+      
+      else
+      	std::cout << "\nItem cannot be removed!";
 
+      std::cout << "\n----------\n";
+    }*/
+
+    // display stats
     if (moverVar=="stats") {
-      std::cout << "\n----------";    
+      std::cout << "\n----------";
       list[playerNow]->displayStats();
-      std::cout << "\n----------\n";     
+      std::cout << "\n----------\n";
     }
 
+    // display position
     if (moverVar=="pos") {
       std::cout << "\n----------\n";    
       std::cout << "Position: X: " << list[playerNow]->x << " / Y: " << list[playerNow]->y;
       std::cout << "\n----------\n";     
     }
 
+    // look on the ground
     if (moverVar=="look") {
       std::cout << "\n----------";
       rhs->checkTime();
@@ -348,12 +436,14 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       std::cout << "----------\n";
     }
     
+    // talk to an npc or creature on this space
     if (moverVar=="talk") {
       std::cout << "\n----------\n";
       list[playerNow]->sendNpcMsg(karte,rhs);
       std::cout << "\n----------\n";
     }
 
+    // show quick help screen
     if (moverVar=="help") {
       std::cout << "\n----------";    
       std::cout << "\nYou may move around the map using the following directions:\n"
@@ -364,6 +454,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       std::cout << "\n----------";      
     }
 
+    // save the game
     if (moverVar=="save") {
       int slot;
       std::cout << "\n----------";
@@ -412,12 +503,14 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       std::cout << "\n----------";      
     }
 
+    // display the player's inventory
     if (moverVar=="inv") {
       std::cout << "\n----------";    
       list[playerNow]->displayInventory();
       std::cout << "----------\n";      
     }
 
+    // equip an item on this space
     if (moverVar=="equip") {
       int x=list[playerNow]->x;
       int y=list[playerNow]->y;
@@ -457,6 +550,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       std::cout << "----------\n";
     }
 
+    // unequip an item
     if (moverVar=="unequip") {
       std::cout << "\n----------";
           
@@ -484,6 +578,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       std::cout << "----------\n";
     }
 
+    // manually end a turn
     if (moverVar=="end") {
       karte->creaturesDoAction(); // move any npcs/monsters
       
@@ -497,6 +592,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       break;
     }
 
+    // quit the game
     std::string quitVer;
     if (moverVar=="quit") {
       std::cout << "\n----------";    
