@@ -514,11 +514,11 @@ int generic::loadGame() {
        list[i]=new player;
 
 	   #ifdef __LINUX__
-	   sprintf(path,"data/game%d/savefile%d.dat",slot,i+1);
+	   sprintf(path,"data/game%d/savefile%d.xml",slot,i+1);
 	   #endif
 
 	   #ifdef __WINDOWS__
-	   sprintf(path,"data\\game%d\\savefile%d.dat",slot,i+1);	
+	   sprintf(path,"data\\game%d\\savefile%d.xml",slot,i+1);	
 	   #endif
 
        fin.open(path);
@@ -531,11 +531,16 @@ int generic::loadGame() {
           std::cout << "\nGame: " << slot;
           std::cout << "\nSavefile " << i << " is either corrupt or not present. Aborting...\n";
           return 0;
-        }
+       }
 
-       list[i]->loadPlayerData(i+1,slot);
-       karte->players.push_back(list[i]);
-
+       if (list[i]->loadPlayerData(i+1,slot))
+          karte->players.push_back(list[i]);
+	  
+       else {
+          std::cout << "\nUnable to load player data!\n";
+	  return 0;
+       }
+       
        fin.close();
    }
    

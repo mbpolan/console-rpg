@@ -20,6 +20,8 @@
 
  #include <iostream>
  #include <fstream>
+ #include <libxml/xmlmemory.h>
+ #include <libxml/parser.h>
 
 // player.cpp: declarations for player functions
 #include "player.h"
@@ -276,17 +278,15 @@ int player::savePlayerData(int player,int game,bool ignoreTemp) {
 	char targetDir[256];
 	char index[256];
 	
-	// check which system the client is using. this is nessesary
-	// because the file separators in linux and windows are different,
-	// which will cause problems if they are not defined specifically ;)
+	// check which system the client is using
 	#ifdef __LINUX__
-	sprintf(savefile,"data/game%d/savefile%d.dat",game,player);// the savefile
+	sprintf(savefile,"data/game%d/savefile%d.xml",game,player);// the savefile
 	sprintf(targetDir,"mkdir data/game%d",game); // command to make a new slot
 	sprintf(index,"data/game%d/index.dat",game); // index file
 	#endif
 	
 	#ifdef __WINDOWS__
-	sprintf(savefile,"data\\game%d\\savefile%d.dat",game,player);// the savefile
+	sprintf(savefile,"data\\game%d\\savefile%d.xml",game,player);// the savefile
 	sprintf(targetDir,"mkdir data\\game%d",game); // command to make a new slot
 	sprintf(index,"data\\game%d\\index.dat",game); // index file
 	#endif
@@ -303,29 +303,113 @@ int player::savePlayerData(int player,int game,bool ignoreTemp) {
 	}
 	fin.close();
 	
-	// open our savefile and load the stats in
-	// follow each stat by a new line for loading
-	fout.open(savefile);
+	xmlDocPtr doc;
+	xmlNodePtr root,ptr;
+	std::stringstream ss;
 	
-	if (!fout) {
-		std::cout << "\nUnable to save file!";
-		return 0;
-	}
+	doc=xmlNewDoc((const xmlChar*) "1.0");
+	doc->children=xmlNewDocNode(doc,NULL,(const xmlChar*) "player",NULL);
+	root=doc->children;
 	
-	fout << name << std::endl;
-	fout << x << std::endl;
-	fout << y << std::endl;
-	fout << currentHP << std::endl;
-	fout << currentMP << std::endl;
-	fout << luck << std::endl;
-	fout << strength << std::endl;
-	fout << power << std::endl;
-	fout << defense << std::endl;
+	// save some info such as location, etc.
+	xmlNodePtr info=xmlNewNode(NULL,(const xmlChar*) "info");
+	
+	ss << name;
+	xmlSetProp(info,(const xmlChar*) "name",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << x;
+	xmlSetProp(info,(const xmlChar*) "x",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << y;
+	xmlSetProp(info,(const xmlChar*) "y",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	xmlAddChild(doc->children,info);
+	
+	////////////////////////
+	// save character entity
+	////////////////////////
+	xmlNodePtr ent=xmlNewNode(NULL,(const xmlChar*) "entity");
+	
+	ss << hairOutfit;
+	xmlSetProp(ent,(const xmlChar*) "hair",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << torsoOutfit;
+	xmlSetProp(ent,(const xmlChar*) "torso",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << legsOutfit;
+	xmlSetProp(ent,(const xmlChar*) "legs",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << currentHP;
+	xmlSetProp(ent,(const xmlChar*) "hp",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << currentMP;
+	xmlSetProp(ent,(const xmlChar*) "mp",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << luck;
+	xmlSetProp(ent,(const xmlChar*) "luck",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << strength;
+	xmlSetProp(ent,(const xmlChar*) "strength",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << power;
+	xmlSetProp(ent,(const xmlChar*) "power",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << defense;
+	xmlSetProp(ent,(const xmlChar*) "defense",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << level;
+	xmlSetProp(ent,(const xmlChar*) "level",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << exp;
+	xmlSetProp(ent,(const xmlChar*) "exp",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	xmlAddChild(doc->children,ent);
+	
+	///////////////////
+	// Save player's EQ
+	///////////////////
+	xmlNodePtr eq=xmlNewNode(NULL,(const xmlChar*) "eq");
+	
+	ss << headEq->getItemID();
+	xmlSetProp(eq,(const xmlChar*) "head",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << torsoEq->getItemID();
+	xmlSetProp(eq,(const xmlChar*) "torso",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << legEq->getItemID();
+	xmlSetProp(eq,(const xmlChar*) "legs",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	ss << bootEq->getItemID();
+	xmlSetProp(eq,(const xmlChar*) "boots",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	xmlAddChild(doc->children,eq);
+	
 
-	// todo: save eq
-
-	fout.close();
+	xmlKeepBlanksDefault(1);
 	
+	// save the player file
+	xmlSaveFile(savefile,doc);
+	xmlFreeDoc(doc);
+	
+	// make an index file
 	saveToIndex(game);
 };
 
@@ -339,33 +423,63 @@ int player::loadPlayerData(int player,int game) {
 	// once again, check what the client's system is and use
 	// the appropriate file separator.
 	#ifdef __LINUX__
-	sprintf(savefile,"data/game%d/savefile%d.dat",game,player);
+	sprintf(savefile,"data/game%d/savefile%d.xml",game,player);
 	#endif
 	
 	#ifdef __WINDOWS__
-	sprintf(savefile,"data\\game%d\\savefile%d.dat",game,player);
+	sprintf(savefile,"data\\game%d\\savefile%d.xml",game,player);
 	#endif
 	
-	fin.open(savefile);
-
-	if (!fin) {
-		std::cout << "\nFailed to load savefile!";
-		return 0;
+	xmlDocPtr doc=xmlParseFile(savefile);
+	
+	if (doc) {
+		xmlNodePtr root,ptr,temp;
+		root=xmlDocGetRootElement(doc);
+	
+		if (xmlStrcmp(root->name,(const xmlChar*) "player")) {
+			xmlFreeDoc(doc);
+			return 0;
+		}
+		
+		ptr=root->children;
+		char _name[256];
+		
+		// load the basic info
+		this->name=item::atos((const char*) xmlGetProp(ptr,(xmlChar*) "name"));
+		this->x=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "x"));
+		this->y=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "y"));
+		
+		ptr=ptr->next;
+		
+		// get the entity of the player
+		this->hairOutfit=item::atos((const char*) xmlGetProp(ptr,(xmlChar*) "hair"));
+		this->torsoOutfit=item::atos((const char*) xmlGetProp(ptr,(xmlChar*) "torso"));
+		this->legsOutfit=item::atos((const char*) xmlGetProp(ptr,(xmlChar*) "legs"));
+		
+		this->currentHP=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "hp"));
+		this->currentMP=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "mp"));
+		this->luck=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "luck"));
+		this->strength=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "strength"));
+		
+		this->power=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "power"));
+		this->defense=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "defense"));
+		this->level=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "level"));
+		this->exp=atoi((const char*) xmlGetProp(ptr,(xmlChar*) "exp"));
+		
+		ptr=ptr->next;
+		
+		// load the player's equipment
+		//int hid=atoi((const char*)xmlGetProp(ptr,(xmlChar*) "head"));
+		headEq=new item(atoi((const char*) xmlGetProp(ptr,(xmlChar*) "head")));
+		torsoEq=new item(atoi((const char*) xmlGetProp(ptr,(xmlChar*) "torso")));
+		legEq=new item(atoi((const char*) xmlGetProp(ptr,(xmlChar*) "legs")));
+		bootEq=new item(atoi((const char*) xmlGetProp(ptr,(xmlChar*) "boots")));
+		
+		xmlFreeDoc(doc);
+		return 1;
 	}
 	
-	fin >> name; fin.clear();
-	fin >> x; fin.clear();
-	fin >> y; fin.clear();
-	fin >> currentHP; fin.clear();
-	fin >> currentMP; fin.clear();
-	fin >> luck; fin.clear();
-	fin >> strength; fin.clear();
-	fin >> power; fin.clear();
-	fin >> defense; fin.clear();
-	
-	// todo: load eq
-	
-	fin.close();
+	return 0;
 };
 
 // save to index file

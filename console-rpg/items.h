@@ -59,6 +59,8 @@ class item {
 		
 		xmlNodePtr compressToXML();
 		void parseItem(int);
+		
+		static std::string atos(const char*);
 
 		int x,y;
 		static int itemCount;

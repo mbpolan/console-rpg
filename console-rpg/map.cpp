@@ -137,14 +137,14 @@ int map::saveMapData(int game) {
 	xmlDocPtr doc;
 	xmlNodePtr p,root;
 	
-	doc = xmlNewDoc((const xmlChar*)"1.0");
-	doc->children = xmlNewDocNode(doc, NULL, (const xmlChar*)"map", NULL);
+	doc=xmlNewDoc((const xmlChar*) "1.0");
+	doc->children=xmlNewDocNode(doc,NULL,(const xmlChar*) "map",NULL);
 	root=doc->children;
 	
 	std::list<item*>::iterator iit;
 	for (iit=items.begin();iit!=items.end();++iit) {
 		if ((*iit)) {
-			p=xmlNewChild(doc->children, NULL, (const xmlChar*)"object", NULL);
+			p=xmlNewChild(doc->children,NULL,(const xmlChar*) "object",NULL);
 			xmlAddChild(p,(*iit)->compressToXML());
 		}
 	}
@@ -152,7 +152,7 @@ int map::saveMapData(int game) {
 	xmlKeepBlanksDefault(1);
 	
 	// save our new map...
-	xmlSaveFile(path.str().c_str(), doc);
+	xmlSaveFile(path.str().c_str(),doc);
 	xmlFreeDoc(doc);
 };
 
@@ -190,7 +190,7 @@ int map::loadMapData(int game) {
 			temp=ptr->children;
 			
 			while (temp) {
-				int t=atoi((const char*)xmlGetProp(temp,(xmlChar*) "id"));
+				int t=atoi((const char*) xmlGetProp(temp,(xmlChar*) "id"));
 				if (t>0) {
 					const char* x=(const char*) xmlGetProp(temp,(xmlChar*) "x");
 					const char* y=(const char*) xmlGetProp(temp,(xmlChar*) "y");

@@ -202,3 +202,13 @@ void item::parseItem(int id) {
 		default: itemName=""; itemTYPE=npe; break;
 	}
 };
+
+std::string item::atos(const char* cstring) {
+	std::stringstream ss;
+	
+	for (int i=0;i<strlen(cstring);i++) {
+		ss << cstring[i];
+	}
+	
+	return ss.str();
+};
