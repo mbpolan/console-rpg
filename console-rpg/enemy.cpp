@@ -100,3 +100,28 @@ int enemy::addExtraDamageEffect(int orig_damage) {
 	if (isStrong)
 		orig_damage+=500;
 };
+
+void enemy::receiveAttack(battleAction *battle_act) {
+	if (battle_act->getBuffer()[1] != 0x01 || !battle_act->isBuilt())
+		return;
+	
+	attackAction *act=dynamic_cast<attackAction*> (battle_act);
+	
+	int damage=act->getDamage();
+	
+	// start parsing attack
+	damage=blockAttack(damage); // block initial attack
+	
+	// apply any effects
+	if (act->isBurning())
+		isBurned=true;
+	
+	if (act->isElectrifying())
+		isElectrified=true;
+	
+	if (act->isPoisonous())
+		isPoisoned=true;
+	
+	this->hp-=damage;
+	this->mp-=act->getManaReduction();
+};

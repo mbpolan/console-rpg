@@ -46,6 +46,10 @@ player::player() {
 	x=25;
 	y=25;
 	layer=0;
+	
+	isPoisoned=false;
+	isBurned=false;
+	isElectrified=false;
 
 };
 
@@ -72,6 +76,10 @@ player::player(int fixedHP, int fixedMP, int id) {
 	x=25;
 	y=25;
 	layer=0;
+	
+	isPoisoned=false;
+	isBurned=false;
+	isElectrified=false;
 
 };
 
@@ -95,6 +103,10 @@ player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense,int id)
 	x=25;
 	y=25;
 	layer=0;
+	
+	isPoisoned=false;
+	isBurned=false;
+	isElectrified=false;
 
 };
 

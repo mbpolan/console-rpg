@@ -20,15 +20,46 @@
  
  #include <iostream>
  
+ // adt class
+ class battleAction {
+ 	public:
+		battleAction();
+		
+		// reset the entire action
+		virtual void clear();
+		
+		// methods to work on internal buffer
+		virtual void addByte(char);
+		virtual void addBuffer(std::string buf, bool clear=false);
+		
+		// build the complete action
+		virtual void build();
+		bool isBuilt() const {return built;}
+		
+		// return the internal buffer of bytes
+		std::string getBuffer() const {return buffer;}
+		
+	protected:
+		// internal buffer
+		std::string buffer;
+		
+		// is this action ready to be used?
+		bool built;
+};
+ 
  // a class to manage data about an attack
- class attackAction {
+ class attackAction: public battleAction {
  	public:
 		// constructors
 		attackAction();
 		attackAction(int damage, int mana_reduc);
 		
 		// clear the entire action
-		void clear();
+		virtual void clear();
+		
+		// methods to work on internal buffer
+		virtual void addByte(char);
+		virtual void addBuffer(std::string buf, bool clear=false);
 		
 		// simple action access functions
 		void setDamage(int _damage) {attack_damage=_damage;}
@@ -49,16 +80,8 @@
 		void setStrong(bool s) {strong=s;}
 		bool isStrong() const {return strong;}
 		
-		// methods to work on internal buffer
-		void addByte(char);
-		void addBuffer(std::string buf, bool clear=false);
-		
-		// build the complete action
-		void build();
-		bool isBuilt() const {return built;}
-		
-		// return the internal buffer of bytes
-		std::string getBuffer() const {return buffer;}
+		// (virtual) build the complete action
+		virtual void build();
 		
 	private:
 		int attack_damage; // damage to be taken
@@ -66,10 +89,4 @@
 		
 		// effects
 		bool poisonous, electrifying, burning, strong;
-		
-		// internal buffer
-		std::string buffer;
-		
-		// is this action ready to be used?
-		bool built;
 };

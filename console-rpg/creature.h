@@ -64,6 +64,9 @@ class creature {
 		
 		virtual void setDefense(int) =0;
 		virtual int getDefense() const =0;
+	
+	protected:
+		bool isBurned, isPoisoned, isElectrified;
 };
 
 #endif

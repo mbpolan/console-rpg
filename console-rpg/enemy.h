@@ -19,6 +19,7 @@
  ***************************************************************************/
  
  #include "creature.h"
+ #include "battlesystem.h"
  
  // ways to attack
  enum ATTACKS { ATTACK_MELEE=0x00, ATTACK_MAGIC=0x01, ATTACK_STRONG=0x02 };
@@ -74,6 +75,7 @@
 		int enhanceAttack(int);
 		int blockAttack(int);
 		int addExtraDamageEffect(int);
+		void receiveAttack(battleAction*);
 		
 		// map coordinates
 		int x, y;

@@ -21,6 +21,47 @@
  #include <sstream>
  #include "battlesystem.h"
 
+// battleAction class constructor 
+battleAction::battleAction() {
+	buffer="";
+	built=false;
+};
+
+// virtual battleAction method to reset data
+void battleAction::clear() {
+	buffer="";
+	built=false;
+};
+
+// method to add bytes to the buffer
+void battleAction::addByte(char byte) {
+	if (buffer[0] != 0x00)
+		buffer.insert(0, "0");
+	
+	buffer+=(char) byte;
+};
+
+// method to add another buffer into this
+void battleAction::addBuffer(std::string buf, bool clear) {
+	if (clear)
+		buffer.clear();
+	
+	buffer+=buf;
+};
+
+// build the complete action
+void battleAction::build() {
+	if (buffer[0]!=(char) 0x00)
+		buffer.insert(0, "0");
+	
+	// length
+	buffer+=(char) 0x00;
+};
+
+ /***************************************************************************
+  * Start attackAction class implementation
+  **************************************************************************/
+
 // attackAction class constructor  
 attackAction::attackAction() {
  	attack_damage=0;
@@ -46,12 +87,20 @@ attackAction::attackAction(int damage, int mana_reduc) {
 // clear the internal buffer
 void attackAction::clear() {
 	buffer="";
+	
+ 	attack_damage=0;
+	mana_reduction=0;
+	
+	poisonous=false;
+	electrifying=false;
+	burning=false;
+	strong=false;
 };
 
 // add a byte to the internal buffer
 void attackAction::addByte(char byte) {
 	if (buffer.empty())
-		buffer+=(char) 0x00;
+		buffer+=(char) 0x01;
 	
 	buffer+=(char) byte;
 };
@@ -69,8 +118,8 @@ void attackAction::build() {
 	std::stringstream ss;
 	
 	// first check if we have an identifier
-	if (buffer[0]!=(char) 0x00)
-		buffer.insert(0, "0");
+	if (buffer[0]!=(char) 0x01)
+		buffer.insert(0, "1");
 	
 	// count of all bytes that are added
 	int byte_count=0;
