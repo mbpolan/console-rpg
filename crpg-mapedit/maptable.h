@@ -2,9 +2,13 @@
 #define maptable_h
 
 #include <qtable.h>
+#include <iostream>
+#include <list>
+#include <libxml/parser.h>
 
 class QAction;
 class fillDialog;
+class mapItem;
 
 class mapTable: public QTable {
        Q_OBJECT
@@ -16,7 +20,14 @@ class mapTable: public QTable {
 	   void redraw();
 	   void clear();
 	   
+	   int size() const {return items.size();}
+	   
+	   void addItem(int,int,int);
 	   void removeItem(int,int);
+	   void fillSelection(int,int,int,int,int);
+	   
+	   // list of items
+	   std::list<mapItem*> items;
 	   
        signals:
 	   void tileClicked(int,int);
@@ -55,6 +66,20 @@ class mapTable: public QTable {
 	   // tiles
 	   int regTileID;
 	   QPixmap regTile;
+};
+
+// items used in maplist
+class mapItem {
+       public:
+	   mapItem(int,int,int);
+	   
+	   xmlNodePtr compressToXML();
+	   int getID() const {return id;}
+	   
+	   int x,y;
+	   
+       private:
+	   int id;
 };
 
 #endif

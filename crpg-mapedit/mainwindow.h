@@ -4,9 +4,8 @@
 #include <qmainwindow.h>
 
 // nessesary includes
-#include "gotodialog.h"
+#include "dialogs.h"
 #include "maptable.h"
-#include "newdialog.h"
 #include "prefdialog.h"
 #include "tileindicator.h"
 #include "toolbox.h"

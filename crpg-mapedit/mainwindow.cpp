@@ -12,6 +12,7 @@
 #include <qdockwindow.h>
 #include <qdialog.h>
 #include <libxml/parser.h>
+#include <sstream>
 
 #include "icons/filenew.xpm"
 #include "icons/fileopen.xpm"
@@ -254,7 +255,34 @@ void mainWindow::makeOpen() {
 // slot to save a map
 void mainWindow::makeSave() {
     QString savePath=QFileDialog::getSaveFileName("/home/mike","XML files (*.xml)",this,"saveFileDialog","Save current map");
-    // saveMapData(savePath);
+    std::stringstream ss;
+    
+    if (!savePath.isNull()) {
+	xmlDocPtr doc;
+	xmlNodePtr root,ptr;
+	
+	doc=xmlNewDoc((const xmlChar*) "1.0");
+	
+	doc->children=xmlNewDocNode(doc,0,(const xmlChar*) "crpg-map",0);
+	root=doc->children;
+	
+	ptr=xmlNewChild(doc->children,0,(const xmlChar*) "items",0);
+	
+	ss << map->size();
+	xmlSetProp(ptr,(const xmlChar*) "count",(const xmlChar*) ss.str().c_str());
+	ss.str("");
+	
+	std::list<mapItem*>::iterator it;
+	for (it=map->items.begin();it!=map->items.end();++it) {
+	    if ((*it))
+		xmlAddChild(ptr,(*it)->compressToXML());
+	}
+	
+	xmlKeepBlanksDefault(1);
+	xmlSaveFile(savePath.ascii(),doc);
+	
+	xmlFreeDoc(doc);
+    }
 };
 
 // slot to save a map as...

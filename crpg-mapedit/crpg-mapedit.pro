@@ -1,18 +1,14 @@
 SOURCES	+= crpgmapedit.cpp \
 	mainwindow.cpp \
 	maptable.cpp \
-	newdialog.cpp \
 	tile.cpp \
-	gotodialog.cpp \
 	toolbox.cpp \
 	tileindicator.cpp \
 	prefdialog.cpp \
 	dialogs.cpp
 HEADERS	+= mainwindow.h \
 	maptable.h \
-	newdialog.h \
 	tile.h \
-	gotodialog.h \
 	toolbox.h \
 	tileindicator.h \
 	prefdialog.h \
