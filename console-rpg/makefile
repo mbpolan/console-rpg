@@ -39,10 +39,6 @@ DEL = rm -f
 # compile this
 all: \
 	crpg
-	
-# test the program
-test: all
-	crpg
 
 # object files
 crpg: crpg$(OSUFFIX) items$(OSUFFIX) map$(OSUFFIX) npc$(OSUFFIX) player$(OSUFFIX) movement$(OSUFFIX)
