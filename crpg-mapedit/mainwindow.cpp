@@ -328,7 +328,7 @@ void mainWindow::makeOpen() {
 		int _hp=atoi((const char*) xmlGetProp(npcs,(xmlChar*) "hp"));
 		int _mp=atoi((const char*) xmlGetProp(npcs,(xmlChar*) "mp"));
 		
-		map->setItem(_y,_x,new tile(0,true,_name,_hp,map));
+		map->setItem(_y,_x,new tile(0,true,_name,_hp,_mp,map));
 		
 		npcs=npcs->next;
 	    }
@@ -477,7 +477,9 @@ void mainWindow::makeSave() {
 		    xmlSetProp(ptr,(const xmlChar*) "hp",(const xmlChar*) ss.str().c_str());
 		    ss.str("");
 		    
-		    xmlSetProp(ptr,(const xmlChar*) "mp",(const xmlChar*) "0");
+		    ss << ((tile*) Item)->Npc.mp;
+		    xmlSetProp(ptr,(const xmlChar*) "mp",(const xmlChar*) ss.str().c_str());
+		    ss.str("");
 		    
 		    xmlAddChild(nodePtr,ptr);
 		}
@@ -608,8 +610,9 @@ void mainWindow::makeNpc() {
     if (mNpc_Dialog->exec()) {
 	QString Name=mNpc_Dialog->nameEdit->text();
 	int Health=atoi(mNpc_Dialog->healthEdit->text().ascii());
+	int Mp=atoi(mNpc_Dialog->mpEdit->text().ascii());
 	
-	map->registerNpc(Name,Health);
+	map->registerNpc(Name,Health,Mp);
 	map->setNpcPen();
     }
     

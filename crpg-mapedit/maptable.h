@@ -35,6 +35,7 @@ class mapItem;
 struct regNPC {
     QString name;
     int health;
+    int mp;
 };
 
 class mapTable: public QTable {
@@ -48,7 +49,7 @@ class mapTable: public QTable {
 	   void clear();
 	   
 	   void addItem(int,int,int);
-	   void removeItem(int,int);
+	   void removeItem(int,int,int);
 	   void fillSelection(int,int,int,int,int);
 	   
 	   void placeNpc(int,int);
@@ -60,7 +61,7 @@ class mapTable: public QTable {
 	   void enableGrid(bool);
 	   void registerTile(int);
 	   void registerObj(int);
-	   void registerNpc(QString,int);
+	   void registerNpc(QString,int,int);
 	   void updateTile(int,int);  
 	   
 	   void setPenTo1();
@@ -101,6 +102,7 @@ class mapTable: public QTable {
 	   // our registered npc to place
 	   QString npcName;
 	   int npcHealth;
+	   int npcMp;
 	   
 	   // location of last context menu request
 	   int cxMenuRow;

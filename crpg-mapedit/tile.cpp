@@ -34,7 +34,7 @@ tile::tile(int _id,QTable *table,EditType ed): QTableItem(table,ed) {
 };
 
 // npc constructor
-tile::tile(int _id, bool NPC, QString _name, int _health, QTable *table, EditType ed): QTableItem(table,ed) {
+tile::tile(int _id, bool NPC, QString _name, int _health, int _mp, QTable *table, EditType ed): QTableItem(table,ed) {
     isItem=false;
     isNpc=NPC;
     id=_id;
@@ -43,6 +43,7 @@ tile::tile(int _id, bool NPC, QString _name, int _health, QTable *table, EditTyp
 	setPixmap(parseID(-100));
 	this->Npc.name=_name;
 	this->Npc.health=_health;
+	this->Npc.mp=_mp;
 	
     }
     

@@ -31,7 +31,7 @@ class QTable;
 class tile: public QTableItem {
        public:
 	   tile(int,QTable *table, EditType ed=QTableItem::Never);
-	   tile(int, bool, QString, int, QTable *table, EditType ed=QTableItem::Never);
+	   tile(int, bool, QString, int, int, QTable *table, EditType ed=QTableItem::Never);
 
 	   int getID() const {return id;}
 	   void setID(int _id) {id=_id;}

@@ -163,7 +163,7 @@ genDialog::genDialog(QWidget *parent,const char *name): QDialog(parent,name) {
 // dialog displayed when making a new npc
 makeNpcDialog::makeNpcDialog(QWidget *parent,const char *name): QDialog(parent,name) {
     setCaption("Make NPC");
-    grid=new QGridLayout(this,5,2);
+    grid=new QGridLayout(this,6,2);
     grid->setMargin(5);
     grid->setResizeMode(QLayout::Fixed);    
     
@@ -173,9 +173,11 @@ makeNpcDialog::makeNpcDialog(QWidget *parent,const char *name): QDialog(parent,n
     
     nameLab=new QLabel("NPC Name",this);
     healthLab=new QLabel("NPC Health",this);
+    mpLab=new QLabel("NPC Magic Points",this);
     
     nameEdit=new QLineEdit(this);
     healthEdit=new QLineEdit(this);
+    mpEdit=new QLineEdit(this);
     
     okButton=new QPushButton("OK",this);
     cancelButton=new QPushButton("Cancel",this);
@@ -190,20 +192,22 @@ makeNpcDialog::makeNpcDialog(QWidget *parent,const char *name): QDialog(parent,n
     
     // add name labels
     grid->addWidget(nameLab,2,0);
-    grid->addWidget(healthLab,3,0);    
+    grid->addWidget(healthLab,3,0);   
+    grid->addWidget(mpLab,4,0);
     
     // add line edits
     grid->addWidget(nameEdit,2,1);
     grid->addWidget(healthEdit,3,1);
+    grid->addWidget(mpEdit,4,1);
     
     // finally, add our buttons
-    grid->addWidget(okButton,4,0);
-    grid->addWidget(cancelButton,4,1);
+    grid->addWidget(okButton,5,0);
+    grid->addWidget(cancelButton,5,1);
 };
 
 editNpcDialog::editNpcDialog(QWidget *parent,const char *name): QDialog(parent,name) {
     setCaption("Edit NPC");
-    grid=new QGridLayout(this,4,2);
+    grid=new QGridLayout(this,5,2);
     grid->setMargin(5);
     grid->setResizeMode(QLayout::Fixed);
     
@@ -213,9 +217,11 @@ editNpcDialog::editNpcDialog(QWidget *parent,const char *name): QDialog(parent,n
     intro=new QLabel("Edit this NPC.",this);
     nameLab=new QLabel("NPC Name",this);
     healthLab=new QLabel("NPC Health",this);
+    mpLab=new QLabel("NPC Magic Points",this);
     
     nameEdit=new QLineEdit(this);
     healthEdit=new QLineEdit(this);
+    mpEdit=new QLineEdit(this);
     
     okButton=new QPushButton("OK",this);
     cancelButton=new QPushButton("Cancel",this);
@@ -228,11 +234,13 @@ editNpcDialog::editNpcDialog(QWidget *parent,const char *name): QDialog(parent,n
     grid->setRowSpacing(0,10);
     grid->addWidget(nameLab,1,0);
     grid->addWidget(healthLab,2,0);
+    grid->addWidget(mpLab,3,0);
     
     grid->addWidget(nameEdit,1,1);
     grid->addWidget(healthEdit,2,1);
+    grid->addWidget(mpEdit,3,1);
     
-    grid->setRowSpacing(3,40);
-    grid->addWidget(okButton,3,0);
-    grid->addWidget(cancelButton,3,1);    
+    grid->setRowSpacing(4,40);
+    grid->addWidget(okButton,4,0);
+    grid->addWidget(cancelButton,4,1);    
 };

@@ -117,7 +117,8 @@ class makeNpcDialog: public QDialog {
 	   makeNpcDialog(QWidget *parent=0,const char *name=0);
 	   
 	   QLineEdit *nameEdit;
-	   QLineEdit *healthEdit;	   
+	   QLineEdit *healthEdit;
+	   QLineEdit *mpEdit;	   
 	   
        private:
 	   QGridLayout *grid;
@@ -126,6 +127,7 @@ class makeNpcDialog: public QDialog {
 	   QLabel *intro;
 	   QLabel *nameLab;
 	   QLabel *healthLab;
+	   QLabel *mpLab;	   
 	   
 	   QPushButton *okButton;
 	   QPushButton *cancelButton;
@@ -136,7 +138,8 @@ class editNpcDialog: public QDialog {
 	   editNpcDialog(QWidget *parent=0,const char *name=0);
 	   
 	   QLineEdit *nameEdit;
-	   QLineEdit *healthEdit;	   
+	   QLineEdit *healthEdit;
+	   QLineEdit *mpEdit;
 	   
        private:
 	   QGridLayout *grid;
@@ -144,6 +147,7 @@ class editNpcDialog: public QDialog {
 	   QLabel *intro;
 	   QLabel *nameLab;
 	   QLabel *healthLab;
+	   QLabel *mpLab;
 	   
 	   QPushButton *okButton;
 	   QPushButton *cancelButton;

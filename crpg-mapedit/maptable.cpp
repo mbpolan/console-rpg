@@ -131,9 +131,10 @@ void mapTable::registerObj(int _id) {
     regTile=tile::parseID(_id);
 };
 
-void mapTable::registerNpc(QString _name,int _health) {
+void mapTable::registerNpc(QString _name,int _health,int _mp) {
     npcName=_name;
     npcHealth=_health;
+    npcMp=_mp;
 };
 
 // update a tile on the map
@@ -242,7 +243,7 @@ void mapTable::fillSelection(int id,int start_row,int end_row,int start_col,int 
 
 // method for placing npcs
 void mapTable::placeNpc(int row,int col) {
-    setItem(row,col,(new tile(0,true,npcName,npcHealth,this)));
+    setItem(row,col,(new tile(0,true,npcName,npcHealth,npcMp,this)));
 };
 
 // the fill command dialog and actions
@@ -283,13 +284,20 @@ void mapTable::openEditNpc() {
 	// current npc data
 	QString tileNpcName=((tile*) Tile)->Npc.name;
 	int tileNpcHealthInt=((tile*) Tile)->Npc.health;
+	int tileNpcMpInt=((tile*) Tile)->Npc.mp;
 	
 	ss << tileNpcHealthInt;
 	QString tileNpcHealth=ss.str();
+	ss.str("");
+	
+	ss << tileNpcMpInt;
+	QString tileNpcMp=ss.str().c_str();
+	ss.str("");	
     
 	// send npc data to the dialog and update the fields
 	eNpc_Dialog->nameEdit->setText(tileNpcName);
 	eNpc_Dialog->healthEdit->setText(tileNpcHealth);
+	eNpc_Dialog->mpEdit->setText(tileNpcMp);
     
 	// show our dialog
 	eNpc_Dialog->show();
@@ -300,10 +308,12 @@ void mapTable::openEditNpc() {
 	    // get the user's modifications
 	    tileNpcName=eNpc_Dialog->nameEdit->text();
 	    tileNpcHealthInt=atoi(eNpc_Dialog->healthEdit->text().ascii());
+	    tileNpcMpInt=atoi(eNpc_Dialog->mpEdit->text().ascii());
 	    
 	    // and update the npc
 	    ((tile*) Tile)->Npc.name=tileNpcName;
 	    ((tile*) Tile)->Npc.health=tileNpcHealthInt;
+	    ((tile*) Tile)->Npc.mp=tileNpcMpInt;
 	}
     }
 };
