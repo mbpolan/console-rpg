@@ -92,6 +92,7 @@ void startGame(movement *rhs,map *karte,player *r_player) {
 		std::string moverVar;
 		std::cin >> moverVar;
 		
+		// for debugging purposes only!
 		#ifdef DEBUG
 		if (moverVar=="mod") {
 			r_player->setHP(0);
@@ -160,26 +161,24 @@ void startGame(movement *rhs,map *karte,player *r_player) {
 		
 		if (moverVar=="save") {
 			savePlayerData(r_player,karte);
+			karte->saveMapData();
+			printf("%s","\nPlayer and map saved!\n");
 		}
 
 		if (moverVar=="load") {
 			loadPlayerData(r_player,karte);
+			karte->loadMapData();
 			std::cout << "\nLoading NOW!\n";
 		}
 		
-		/* ********************************************** *
-		 * Displaying the inventory results in a loop bug *
-		 * Fix it before making equipment spawnable!      *
-		 * ********************************************** */
 		if (moverVar=="inv") {
 			r_player->displayInventory();
 		}
-		/* ******************** *
-		* End bug segment code *
-		* ******************** */
 		
 		if (moverVar=="equip") {
-			if (karte->itemExists(karte,karte->getCurrentSpaceX(),karte->getCurrentSpaceY())) {
+			int x=karte->getCurrentSpaceX();
+			int y=karte->getCurrentSpaceY();
+			if (karte->itemExists(karte,x,y)) {
 				TYPE type=karte->checkItemType(karte);
 				char confirm;
 				std::string targetItem=karte->identifyItem(karte);
@@ -188,8 +187,8 @@ void startGame(movement *rhs,map *karte,player *r_player) {
 				confirm=toupper(confirm);
 				if (confirm=='Y') {
 					r_player->addInventoryItem(type,targetItem);
-					karte->removeItemX(karte->getCurrentSpaceX()); // now remove the item from X
-					karte->removeItemY(karte->getCurrentSpaceY()); // now remove the item from Y
+					karte->removeItemX(x); // now remove the item from X
+					karte->removeItemY(y); // now remove the item from Y
 					std::cout << targetItem << " was equiped.\n";
 				}
 				if (confirm=='N')

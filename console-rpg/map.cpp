@@ -1,5 +1,7 @@
 // map.cpp: declarations for map functions
 #include <iostream>
+#include <fstream>
+#include <string>
 #include "map.h"
 
 // map class constructor
@@ -29,8 +31,8 @@ map::~map() {};
 // add item to map on X
 void map::addItemX(item	*thisItem,int spawnX) {
 	if (spawnX<0) {
-		itemSquareNgX[(spawnX-1)*(-1)]=spawnX;
-		itemLineNgX[(spawnX-1)*(-1)]=thisItem;
+		itemSquareNgX[(spawnX+1)*(-1)]=spawnX;
+		itemLineNgX[(spawnX+1)*(-1)]=thisItem;
 	}
 	if (spawnX>0) {
 		itemSquareX[spawnX-1]=spawnX;
@@ -41,8 +43,8 @@ void map::addItemX(item	*thisItem,int spawnX) {
 // add item to map on Y
 void map::addItemY(item *thisItem,int spawnY) {
 	if (spawnY<0) {
-		itemSquareNgY[(spawnY-1)*(-1)]=spawnY;
-		itemLineNgY[(spawnY-1)*(-1)]=thisItem;
+		itemSquareNgY[(spawnY+1)*(-1)]=spawnY;
+		itemLineNgY[(spawnY+1)*(-1)]=thisItem;
 	}
 	if (spawnY>0) {
 		itemSquareY[spawnY-1]=spawnY;
@@ -53,8 +55,8 @@ void map::addItemY(item *thisItem,int spawnY) {
 // remove item from map on X
 void map::removeItemX(int spawnX) {
 	if (spawnX<0) {
-		itemSquareNgX[(spawnX-1)*(-1)]=0;
-		itemLineNgX[(spawnX-1)*(-1)]=0;
+		itemSquareNgX[(spawnX+1)*(-1)]=0;
+		itemLineNgX[(spawnX+1)*(-1)]=0;
 	}
 	if (spawnX>0) {
 		itemSquareX[spawnX-1]=0;
@@ -65,8 +67,8 @@ void map::removeItemX(int spawnX) {
 // remove item from map on Y
 void map::removeItemY(int spawnY) {
 	if (spawnY<0) {
-		itemSquareNgY[(spawnY-1)*(-1)]=0;
-		itemLineNgY[(spawnY-1)*(-1)]=0;
+		itemSquareNgY[(spawnY+1)*(-1)]=0;
+		itemLineNgY[(spawnY+1)*(-1)]=0;
 	}
 	if (spawnY>0) {
 		itemSquareY[spawnY-1]=0;
@@ -85,7 +87,7 @@ bool map::itemExists(map *karte,int currentX,int currentY) {
 		return false;
 	
 	if (currentX<0 && currentY<0) { // if both X & Y are <0
-		if (itemSquareNgX[(currentX-1)*(-1)]==currentX && itemSquareNgY[(currentY-1)*(-1)]==currentY)
+		if (itemSquareNgX[(currentX+1)*(-1)]==currentX && itemSquareNgY[(currentY+1)*(-1)]==currentY)
 			return true;
 		else
 			return false;
@@ -97,13 +99,13 @@ bool map::itemExists(map *karte,int currentX,int currentY) {
 		 	return false;
 	}
 	if (currentX<0 && currentY>0) { // if X<0 BUT Y>0
-	        if (itemSquareNgX[(currentX-1)*(-1)]==currentX && itemSquareY[currentY-1]==currentY)
+	        if (itemSquareNgX[(currentX+1)*(-1)]==currentX && itemSquareY[currentY-1]==currentY)
 	                return true;
 	        else
 	                return false;
 	}
 	if (currentX>0 && currentY<0) { // if X>0 BUT Y<0
-                if (itemSquareX[currentX-1]==currentX && itemSquareNgY[(currentY-1)*(-1)]==currentY)
+                if (itemSquareX[currentX-1]==currentX && itemSquareNgY[(currentY+1)*(-1)]==currentY)
 	                return true;
 	        else
 	                return false;
@@ -116,18 +118,18 @@ std::string map::identifyItem(map *karte) {
 	int currentY=karte->getCurrentSpaceY();
 	
 	if (currentX<0 && currentY>0) { // if X<0 BUT Y>0
-		if ((itemLineNgX[(currentX-1)*(-1)]->getName())==(itemLineY[currentY-1]->getName()))
-			return itemLineNgX[(currentX-1)*(-1)]->getName();
+		if ((itemLineNgX[(currentX+1)*(-1)]->getName())==(itemLineY[currentY-1]->getName()))
+			return itemLineNgX[(currentX+1)*(-1)]->getName();
 	}
 	
 	if (currentX>0 && currentY<0) { // if X>0 BUT Y<0
-		if ((itemLineX[currentX-1]->getName())==(itemLineY[(currentY-1)*(-1)]->getName()))
+		if ((itemLineX[currentX-1]->getName())==(itemLineNgY[(currentY+1)*(-1)]->getName()))
 			return itemLineX[currentX-1]->getName();
 	}
 
 	if (currentX<0 && currentY<0) { // both <0
-		if ((itemLineNgX[(currentX-1)*(-1)]->getName())==(itemLineNgY[(currentY-1)*(-1)]->getName()))
-			return itemLineNgX[(currentX-1)*(-1)]->getName();
+		if ((itemLineNgX[(currentX+1)*(-1)]->getName())==(itemLineNgY[(currentY+1)*(-1)]->getName()))
+			return itemLineNgX[(currentX+1)*(-1)]->getName();
 	}
 	
 	if (currentX>0 && currentY>0) { // both >0
@@ -149,13 +151,13 @@ std::string map::identifyItem(map *karte) {
 			}
 		}
 		if (currentX<0 && currentY<0) {
-			xName=itemLineNgX[(currentX-1)*(-1)]->getName();
-			yName=itemLineNgY[(currentY-1)*(-1)]->getName();
+			xName=itemLineNgX[(currentX+1)*(-1)]->getName();
+			yName=itemLineNgY[(currentY+1)*(-1)]->getName();
 			if (xName==yName)
 				return xName;
 			if (xName!=yName) {
                                 int id=karte->getGroundID();
-                                std::string ground=karte->parseGroundID(id);
+				std::string ground=karte->parseGroundID(id);
                                 return ground;
 			}
 		}
@@ -176,9 +178,10 @@ std::string map::parseGroundID(int id) {
 		case 1: groundType="grass"; break;
 		case 2: groundType="pavement"; break;
 		case 3: groundType="water"; break;
+		case 4: groundType="dirt"; break;
 		default: groundType="grass"; break;
 	}
-	
+
 	return groundType;
 };
 
@@ -188,18 +191,18 @@ TYPE map::checkItemType(map *karte) {
 	int currentY=karte->getCurrentSpaceY();
 	
 	if (currentX<0 && currentY>0) { // if X<0 BUT Y>0
-		if ((itemLineNgX[(currentX-1)*(-1)]->checkType())==(itemLineY[currentY-1]->checkType()))
-			return itemLineNgX[(currentX-1)*(-1)]->checkType();
+		if ((itemLineNgX[(currentX+1)*(-1)]->checkType())==(itemLineY[currentY-1]->checkType()))
+			return itemLineNgX[(currentX+1)*(-1)]->checkType();
 	}
 	
 	if (currentX>0 && currentY<0) { // if X>0 BUT Y<0
-		if ((itemLineX[currentX-1]->checkType())==(itemLineY[(currentY-1)*(-1)]->checkType()))
+		if ((itemLineX[currentX-1]->checkType())==(itemLineNgY[(currentY+1)*(-1)]->checkType()))
 			return itemLineX[currentX-1]->checkType();
 	}
 
 	if (currentX<0 && currentY<0) { // both <0
-		if ((itemLineNgX[(currentX-1)*(-1)]->checkType())==(itemLineNgY[(currentY-1)*(-1)]->checkType()))
-			return itemLineNgX[(currentY-1)*(-1)]->checkType();
+		if ((itemLineNgX[(currentX+1)*(-1)]->checkType())==(itemLineNgY[(currentY+1)*(-1)]->checkType()))
+			return itemLineNgX[(currentY+1)*(-1)]->checkType();
 	}
 	
 	if (currentX>0 && currentY>0) { // both >0
@@ -219,8 +222,8 @@ TYPE map::checkItemType(map *karte) {
 		}
 		
 		if (currentX<0 && currentY<0) {
-			xType=itemLineNgX[(currentX-1)*(-1)]->checkType();
-			yType=itemLineNgY[(currentY-1)*(-1)]->checkType();
+			xType=itemLineNgX[(currentX+1)*(-1)]->checkType();
+			yType=itemLineNgY[(currentY+1)*(-1)]->checkType();
 			if (xType==yType)
 				return xType;
 			if (xType!=yType)
@@ -232,3 +235,134 @@ TYPE map::checkItemType(map *karte) {
 		return npe;
 };
 
+// save the current map data to file
+// todo: merge the map.dat file into savefile.dat
+int map::saveMapData() {
+	std::ofstream fout;
+	fout.open("data/map.dat"); // open a new map file
+	
+	if (!fout) {
+		std::cout << "\nFailed to save map data!\n";
+		return 0;
+	}
+	
+	// now we save the item squares to file
+	// format is: number <space> number <space>...
+	for (int i=0;i<max;i++)
+		fout << itemSquareX[i] << " ";
+	fout << std::endl;
+	
+	for (int i=0;i<max;i++)
+		fout << itemSquareNgX[i] << " ";
+	fout << std::endl;
+	
+	for (int i=0;i<max;i++)
+		fout << itemSquareY[i] << " "; 
+	fout << std::endl;
+
+	for (int i=0;i<max;i++)
+		fout << itemSquareNgY[i] << " "; 
+	fout << std::endl << std::endl;
+	
+	// now we save the item object arrays to the same file
+	for (int i=0;i<max;i++) {
+		fout.write((char*) &itemLineX[i],sizeof(itemLineX[i]));
+		fout << " ";
+	}
+	fout << std::endl;
+	
+	for (int i=0;i<max;i++) {
+		fout.write((char*) &itemLineNgX[i],sizeof(itemLineNgX[i]));
+		fout << " ";
+	}
+	fout << std::endl;
+	
+	for (int i=0;i<max;i++) {
+		fout.write((char*) &itemLineY[i],sizeof(itemLineY[i]));
+		fout << " ";
+	}
+	fout << std::endl;
+	
+	for (int i=0;i<max;i++) {
+		fout.write((char*) &itemLineNgY[i],sizeof(itemLineNgY[i]));
+		fout << " ";
+	}
+	fout << std::endl;
+	
+	fout.close();
+};
+
+// load saved map data from file
+int map::loadMapData() {
+	std::ifstream fin;
+	fin.open("data/map.dat"); // try to load a map file
+
+	if (!fin) {
+		std::cout << "\nFailed to load map data!\n";
+		return 0;
+	}
+	
+	for (int i=0;i<max;i++) {
+		itemSquareX[i]=0;
+		itemSquareNgX[i]=0;
+		itemSquareY[i]=0;
+		itemSquareNgY[i]=0;
+		
+		itemLineX[i]=NULL;
+		itemLineNgX[i]=NULL;
+		itemLineY[i]=NULL;
+		itemLineNgY[i]=NULL;
+	}
+	
+	// load the first 4 lines of the file into itemSquare
+	for (int i=0;i<max;i++) {
+		fin >> itemSquareX[i];
+		fin.ignore(256,' ');
+	}
+	fin.clear();
+
+	for (int i=0;i<max;i++) {
+		fin >> itemSquareNgX[i];
+		fin.ignore(256,' ');
+	}
+	fin.clear();
+
+	for (int i=0;i<max;i++) {
+		fin >> itemSquareY[i];
+		fin.ignore(256,' ');
+	}
+	fin.clear();
+
+	for (int i=0;i<max;i++) {
+		fin >> itemSquareNgY[i];
+		fin.ignore(256,' ');
+	}
+	fin.clear(); fin.clear();
+	
+	// load the last 4 lines of the file into itemLine
+	for (int i=0;i<max;i++) {
+		fin.read((char*) &itemLineX[i],sizeof(itemLineX[i]));
+		fin.ignore(256,' ');
+	}	
+	fin.clear();
+	
+	for (int i=0;i<max;i++) {
+		fin.read((char*) &itemLineNgX,sizeof(itemLineNgX[i]));
+		fin.ignore(256,' ');
+	}
+	fin.clear();
+	
+	for (int i=0;i<max;i++) {
+		fin.read((char*) &itemLineY[i],sizeof(itemLineY[i]));
+		fin.ignore(256,' ');
+	}
+	fin.clear();
+	
+	for (int i=0;i<max;i++) {
+		fin.read((char*) &itemLineNgY[i],sizeof(itemLineNgY[i]));
+		fin.ignore(256,' ');
+	}
+	fin.clear();
+
+	fin.close();
+};

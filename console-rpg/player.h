@@ -1,17 +1,15 @@
 // player.h: holds player class and member data
 #include <iostream>
+
 #include "creature.h"
-
-//#ifndef __nItems
 #include "items.h"
-//#endif
 
-#ifndef __nPlayer
-#define __nPlayer
+#ifndef player_h
+#define player_h
 
 enum vocation {warrior,mage,archer};
 
-class player: private creature {
+class player: public creature {
 	public:
 		player();
 		player(int,int,int,int); // new player constructor

@@ -129,7 +129,8 @@ void movement::look(map *karte) {
 	
 	if (karte->itemExists(karte,karte->getCurrentSpaceX(),karte->getCurrentSpaceY())) {
 		std::string theName=karte->identifyItem(karte);
-		std::cout << "\nYou see a " << theName << ".\n";
+		
+		std::cout << "\nYou see " << theName << ".\n";
 	}
 	else
 		std::cout << "\nYou see " << groundType << ".";
@@ -162,6 +163,7 @@ int movement::getCurrentPosition(map *karte) const {
 
 // spawn some initial map items
 void movement::spawnMapItems(movement *rhs,map *karte) {
+	
 	item *plant0=new item("fern",1,2,npe);
 	rhs->placeItem(plant0,karte);
 

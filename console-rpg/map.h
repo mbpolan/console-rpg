@@ -36,6 +36,8 @@ class map {
 		std::string parseGroundID(int);
 		TYPE checkItemType(map*);
 		int getGroundID() const {return groundID;}
+		int saveMapData();
+		int loadMapData();
 		
 		
 	private:
