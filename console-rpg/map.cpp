@@ -30,7 +30,6 @@ map::map(int X,int Y,int NgY,int NgX) {
 	MapMaxSizeY=Y;
 	MapMaxSizeNgY=NgY;
 	MapMaxSizeNgX=NgX;
-	currentSquareX=0,currentSquareY=0;
 	groundID=0;
 
 	for (int i=0;i<max;i++) {
@@ -100,9 +99,7 @@ void map::removeItemY(int spawnY) {
 };
 
 // check to see if the item exists on this space
-bool map::itemExists(map *karte,int currentX,int currentY) {
-	currentX=karte->getCurrentSpaceX();
-	currentY=karte->getCurrentSpaceY();
+bool map::itemExists(int currentX,int currentY) {
 	if (currentX==0 && currentY==0)
 		return false;
 
@@ -136,10 +133,7 @@ bool map::itemExists(map *karte,int currentX,int currentY) {
 };
 
 // get the item's name, similar to itemExists()
-item* map::identifyItem(map *karte) {
-	int currentX=karte->getCurrentSpaceX();
-	int currentY=karte->getCurrentSpaceY();
-	
+item* map::identifyItem(int currentX,int currentY) {
 	if (currentX<0 && currentY>0) { // if X<0 BUT Y>0
 		if ((itemLineNgX[(currentX+1)*(-1)]->getName())==(itemLineY[currentY-1]->getName()))
 			return itemLineNgX[(currentX+1)*(-1)];
@@ -202,10 +196,7 @@ std::string map::parseGroundID(int id) {
 };
 
 // check the type of item (head,torso,leg,boot,npe)
-TYPE map::checkItemType(map *karte) {
-	int currentX=karte->getCurrentSpaceX();
-	int currentY=karte->getCurrentSpaceY();
-	
+TYPE map::checkItemType(int currentX,int currentY) {
 	if (currentX<0 && currentY>0) { // if X<0 BUT Y>0
 		if ((itemLineNgX[(currentX+1)*(-1)]->checkType())==(itemLineY[currentY-1]->checkType()))
 			return itemLineNgX[(currentX+1)*(-1)]->checkType();
@@ -404,30 +395,30 @@ int map::loadMapData(int game) {
 	fin.close();
 };
 
-// map method for adding players to the list
-void map::addToList(player *rhs) {
-     int j=0;
-     
-     while(1) {
-        j++;      
-     	if (players[j]!=NULL) {
-           players[j]=rhs;
-     	   break;
-        }
-     }
-};
-
 // map method for removing players from the list
 void map::removeFromList(player *rhs) {
-     int j=0;
-     
-     while(1) {
-        j++;
-        if (players[j]) {
-           if (players[j]->getName()==rhs->getName()) {
-              players[j]=0;
-              return;
-           }                         
-        }
-     } // while(1)
+	std::list<player*>::iterator it;
+
+	for (it=players.begin();it!=players.end();++it) {
+		if ((*it)) {
+			std::string name=(*it)->getName();
+
+			if (name==rhs->getName())
+				players.pop_front();
+		}
+	} // for(...)
+};
+
+// map method for removing npcs from the list
+void map::removeFromList(npc *rhs) {
+	std::list<npc*>::iterator it;
+
+	for (it=npcs.begin();it!=npcs.end();++it) {
+		if ((*it)) {
+			int id=(*it)->getID();
+
+			if (id==rhs->getID())
+				npcs.pop_front();
+		}
+	} // for(...)
 };

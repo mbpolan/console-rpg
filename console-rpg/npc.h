@@ -32,23 +32,6 @@
 #include "map.h"
 #include "player.h"
 
-// enumerated actions the NPC can preform
-enum ACTIONS {
-	MOVE_NORTH,
-	MOVE_SOUTH,
-	MOVE_WEST,
-	MOVE_EAST,
-	MOVE_NW,
-	MOVE_NE,
-	MOVE_SW,
-	MOVE_SE,
-	TALK,
-	DROP_ITEM,
-
-	MOVE, // this is generic
-	DO_NOTHING // stand still
-};
-
 class map;
 
 class npc: public creature {
@@ -57,13 +40,49 @@ class npc: public creature {
 		npc(int,int,std::string _name); // our constructor
 		~npc();
 
+		// methods for npc entity
+		int getHP() const {return hp;}
+		void setHP(int _hp) {hp=_hp;}
+
+		int getMP() const {return mp;}
+		void setMP(int _mp) {mp=_mp;}
+
+		void setName(std::string initialName) {name=initialName;}
+		std::string getName() const {return name;}
+
+		void setLuck(int _luck) {luck=_luck;};
+		int getLuck() const {return luck;}
+
+		void setPower(int _power) {power=_power;}
+		int getPower() const {return power;}
+
+		void setStrength(int _strength) {strength=_strength;}
+		int getStrength() const {return strength;}
+
+		void setDefense(int _defense) {defense=_defense;}
+		int getDefense() const {return defense;}
+
+		// methods for AI and actions
 		ACTIONS preformThink(map*);
 		void preformMove(map*,bool);
 		void preformAction(int,ACTIONS);
 
+		// other methods
+		int getID() const {return id;}
+
+		static void setNpcsOn(int npcs) {npcsOn=npcs;}
+		static int getNpcsOn() {return npcsOn;}
+
+		// coordinates
+		int posx;
+		int posy;
+
 	private:
-		int posx, posy;
+		int id;
+		static int npcsOn;
+
 		std::string name;
+		int hp,mp,luck,strength,power,defense;
 };
 
 #endif

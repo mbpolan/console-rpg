@@ -46,6 +46,7 @@ bool load=false;
 
 // set the static number of players to 0
 int player::playersOn=0;
+int npc::npcsOn=0;
 
 // movement strings
 std::string N="n",S="s",W="w",E="e",NW="nw",NE="ne",SW="sw",SE="se";
@@ -83,7 +84,7 @@ int generic::menu() {
     std::cin >> a_menuChoice;
     menuChoice=atoi(a_menuChoice);
     std::cin.ignore(); // remove the newline
-    
+
     switch(menuChoice) {
        case 1: generic::configurePlayers();break;
        case 2: generic::loadGame();break;
@@ -97,13 +98,13 @@ int generic::menu() {
 int generic::configurePlayers() {
     
     CRPG_CLEAR_SCREEN;
-    
+
     char ch[5];
     int players; // the amount of players
     std::cout << "\nEnter amount of players (max 10): ";
     std::cin >> ch;
     std::cin.ignore(); // remove the newline
-      
+
     players=atoi(ch);
       
     if (!(players<=10 && players>0)) {
@@ -133,13 +134,14 @@ int generic::configurePlayers() {
     // we need to set name and look
     // make a temporary player object
     player *pPlayer=new player;
-  
+
+    std::string name;
     // now we configure each player's character
-    CRPG_CLEAR_SCREEN;
+ //   CRPG_CLEAR_SCREEN;
+
     std::cout << "\n==========================";
     std::cout << "\nPlayer " << i+1 << " Configuration\n";
     std::cout << "\nEnter player name: ";
-    std::string name;
     std::getline(std::cin,name,'\n');
 
     pPlayer->setPlayerID(i+1);
@@ -148,7 +150,7 @@ int generic::configurePlayers() {
 
     // put this temporary object into the array for good
     list[i]=pPlayer;
-    karte->addToList(pPlayer);
+    karte->players.push_back(pPlayer);
 
     std::cin.ignore();
     std::cout << "==========================\n";
@@ -248,16 +250,17 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
   if (!load)
   std::cout << "\nLoad NOT defined. Reset.\n";
   #endif
-  
+
+  /*
   if (firstTurn && !load) {
     karte->setCurrentSpaceX(0);
     karte->setCurrentSpaceY(0);
-  }
+  }*/
 
   // if it is NOT the first turn
   // 99 is the temporary directory number for saved files
   if (!firstTurn)
-    list[playerNow]->loadPlayerData(karte,list[playerNow]->getPlayerID(),99);
+    list[playerNow]->loadPlayerData(list[playerNow],list[playerNow]->getPlayerID(),99);
 
   while(moves>0) {
     int count=rhs->getStepCount(); // count the amount of spaces moved
@@ -281,49 +284,49 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
     }
 
     if (moverVar==N) {
-      rhs->moveN(karte);
+      rhs->moveN(list[playerNow],karte);
       rhs->controlTime(count);
       moves--;
     }
 
     if (moverVar==S) {
-      rhs->moveS(karte);
+      rhs->moveS(list[playerNow],karte);
       rhs->controlTime(count);
       moves--;
     }
 
     if (moverVar==W) {
-      rhs->moveW(karte);
+      rhs->moveW(list[playerNow],karte);
       rhs->controlTime(count);
       moves--;
     }
 
     if (moverVar==E) {
-      rhs->moveE(karte);
+      rhs->moveE(list[playerNow],karte);
       rhs->controlTime(count);
       moves--;
     }
 
     if (moverVar==NW) {
-      rhs->moveNW(karte);
+      rhs->moveNW(list[playerNow],karte);
       rhs->controlTime(count);
       moves--;
     }
 
     if (moverVar==NE) {
-      rhs->moveNE(karte);
+      rhs->moveNE(list[playerNow],karte);
       rhs->controlTime(count);
       moves--;
     }
 
     if (moverVar==SW) {
-      rhs->moveSW(karte);
+      rhs->moveSW(list[playerNow],karte);
       rhs->controlTime(count);
       moves--;
     }
 
     if (moverVar==SE) {
-      rhs->moveSE(karte);
+      rhs->moveSE(list[playerNow],karte);
       rhs->controlTime(count);
       moves--;
     }
@@ -333,12 +336,12 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
     }
 
     if (moverVar=="pos") {
-      rhs->getCurrentPosition(karte);
+      rhs->getCurrentPosition(list[playerNow]);
     }
 
     if (moverVar=="look") {
       rhs->checkTime();
-      rhs->look(karte);
+      rhs->look(list[playerNow],karte);
     }
 
     if (moverVar=="help") {
@@ -381,7 +384,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
           if (i>0)
              exists=true;
              
-          list[i]->savePlayerData(karte,list[i]->getPlayerID(),slot,exists);
+          list[i]->savePlayerData(list[playerNow],list[playerNow]->getPlayerID(),slot,exists);
         }
         karte->saveMapData(slot);
         std::cout << "\nPlayer and map saved!\n";
@@ -398,13 +401,13 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
     }
 
     if (moverVar=="equip") {
-      int x=karte->getCurrentSpaceX();
-      int y=karte->getCurrentSpaceY();
+      int x=list[playerNow]->x;
+      int y=list[playerNow]->y;
 
-      if (karte->itemExists(karte,x,y)) {
-        TYPE type=karte->checkItemType(karte);
+      if (karte->itemExists(x,y)) {
+        TYPE type=karte->checkItemType(x,y);
         char confirm;
-        item *targetItem=karte->identifyItem(karte);
+        item *targetItem=karte->identifyItem(x,y);
 
 	// if the target item is NULL, then disable equipping since
 	// it will mostly likely cause a segfault
@@ -415,7 +418,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
 	  
           if (confirm=='Y') {
             list[playerNow]->addInventoryItem(type,targetItem);
-            rhs->removeItem(karte);
+            rhs->removeItem(karte,x,y);
             //std::cout << targetItem->getName(); << " was equipped.\n";
           }
           if (confirm=='N')
@@ -460,7 +463,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       if (list[playerNow]->getPlayerID()>1)
         ignore=true;
 
-      list[playerNow]->savePlayerData(karte,list[playerNow]->getPlayerID(),99,ignore); // save the player's data
+      list[playerNow]->savePlayerData(list[playerNow],list[playerNow]->getPlayerID(),99,ignore); // save the player's data
       break;
     }
 
@@ -531,7 +534,7 @@ int generic::loadGame() {
 
        fin.open(path);
 
-       #ifdef DEBUG
+           #ifdef DEBUG
 	   std::cout << "\nLoading from " << path << "...\n";
 	   #endif
 
@@ -541,7 +544,7 @@ int generic::loadGame() {
           return 0;
         }
 
-       pPlayer->loadPlayerData(karte,i+1,slot);
+       pPlayer->loadPlayerData(list[i+1],i+1,slot);
        pPlayer->loadFromIndex(slot);
        list[i]=pPlayer;
 

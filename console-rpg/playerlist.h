@@ -51,11 +51,13 @@ class playerList {
 		// other methods/operators
 		template <class> friend std::ostream &operator<<(std::ostream&,playerList<T>&);
 
+		int objects;
+
 	private:
 		T *AType; // type of playerList
 		int length; // length of playerList
 };
- 
+
  /***************************************
  / Implementations of playerList class */
 
@@ -66,6 +68,8 @@ playerList<T>::playerList():length(size) {
 
 	for (int i=0;i<length;i++)
 		AType[i]=0;
+
+	objects=0;
 };
 
 // constructor taking an int (size)
@@ -97,6 +101,7 @@ playerList<T> &playerList<T>::operator=(const playerList &rhs) {
 	for (int i=0;i<length;i++)
 		type[i]=rhs[i];
 
+	objects++;
 	return *this;
 };
  
@@ -119,7 +124,7 @@ playerList<T> &playerList<T>::operator=(const playerList &rhs) {
 	
 	for (int i=0;i<rhs.getLength();i++)
 		AType[orig++]=rhs[i];
-		
+
 	return *this;
 };
 

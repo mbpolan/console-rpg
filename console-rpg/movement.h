@@ -22,7 +22,15 @@
 #define movement_t
 
 // movement.h: holds movement system and map stuff
+#include "creature.h"
 #include "map.h"
+
+enum BLOCK {
+	BLOCK_NPC,
+	BLOCK_PLAYER,
+	BLOCK_MONSTER,
+	CLEAR
+};
 
 class movement { 
 	public:
@@ -30,29 +38,35 @@ class movement {
 		virtual ~movement() {};
 
 		// movement methods
-		void moveN(map*);
-		void moveS(map*);
-		void moveW(map*);
-		void moveE(map*);
-		void moveNE(map*);
-		void moveNW(map*);
-		void moveSE(map*);
-		void moveSW(map*);
+		void moveN(player*,map*);
+		void moveS(player*,map*);
+		void moveW(player*,map*);
+		void moveE(player*,map*);
+		void moveNE(player*,map*);
+		void moveNW(player*,map*);
+		void moveSE(player*,map*);
+		void moveSW(player*,map*);
 
 		// other methods
-		void look(map*);
+		void look(player*,map*);
 		void placeItem(item*,map*);
-		void removeItem(map*);
+		void removeItem(map*,int,int);
 		void spawnMapItems(movement*,map*);
+		int isOccupied(player*,map*);
+
+		// get creatures methods
+		npc *getNPC(map*,int,int);
+		player *getPlayer(map*,int,int);
+		void parseCreature(map*,player*,int);
 
 		// public accessors
-		signed int getCurrentPosition(map*) const;
+		signed int getCurrentPosition(player*) const;
 
 		// time related methods
 		void checkTime();
 		int controlTime(int);
 		int getStepCount() const {return stepCount;}
-		
+
 	private:
 		std::string itemWarning;
 		bool fDay;

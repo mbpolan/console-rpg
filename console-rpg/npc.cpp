@@ -23,8 +23,7 @@
 // npc class default constructor
 npc::npc() {
 	name="Arbba";
-	posx=0;
-	posy=0;
+	posx=0;	posy=0;
 };
 
 // npc class constructor
@@ -70,45 +69,54 @@ ACTIONS npc::preformThink(map *karte) {
 
 	// first we check if there are any players nearby and
 	// execute actions accordingly.
-	pPlayer=karte->players[posx++]; // player to north
-	if (pPlayer) {
-		action=(rand()%3)-1;
-	}
+	std::list<player*>::iterator it;
+	for (it=karte->players.begin();it!=karte->players.end();++it) {
+		if ((*it)) {
+			int x=(*it)->x;
+			int y=(*it)->y;
 
-	pPlayer=karte->players[posx--]; // player to south
-	if (pPlayer) {
-		do {
-		action=(rand()%3);
-		}
-		while(action!=MOVE_SOUTH);
-	}
+			// player to north
+			if ((posx++)==x) {
+				action=(rand()%3)-1;
+			}
 
-	pPlayer=karte->players[posy++]; // player to east
-	if (pPlayer) {
-		do {
-		action=(rand()%3);
-		}
-		while(action!=MOVE_EAST);
-	}
+			// player to south
+			else if ((posx--)==x) {
+				do {
+					action=(rand()%3);
+				}
+				while(action!=MOVE_SOUTH);
+			}
 
-	pPlayer=karte->players[posy--]; // player to west
-	if (pPlayer) {
-		do {
-		action=(rand()%3);
-		}
-		while(action!=MOVE_WEST);
-	}
+			// player to east
+			else if ((posy++)==y) {
+				do {
+					action=(rand()%3);
+				}
+				while(action!=MOVE_EAST);
+			}
 
-	// so there were no players...
-	else {
-		// do a random move for now
-		action=(rand()%7);
+			// player to west
+			else if ((posy--)==y) {
+				do {
+					action=(rand()%3);
+				}
+				while(action!=MOVE_WEST);
+			}
 
-		// todo: do an action other than move, such as talk
-		// to the player(s), etc.
-	}
+			// so there are no nearby players
+			else {
+				// do a random move for now
+				action=(rand()%7);
 
-	delete pPlayer;
+				// todo: do an action other than move, such as talk
+				// to the player(s), etc.
+			}
+
+		} // if ((*it))...
+	} // for(...)
+
+	// todo: we should also check if there are any npcs nearby =\
 
 	// parse the move and return it
 	switch(action) {

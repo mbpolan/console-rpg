@@ -22,10 +22,11 @@
 #define map_h
 
 // map.h: map class and related stuff
+#include <list>
+
 #include "items.h"
 #include "npc.h"
 #include "player.h"
-#include "playerlist.h"
 
 // our maximum map size (+/-)
 #define max 30
@@ -39,11 +40,6 @@ class map {
 		virtual ~map();
 		
 		// public accessors
-		int getCurrentSpaceX() const {return currentSquareX;}
-		int getCurrentSpaceY() const {return currentSquareY;}
-		void setCurrentSpaceX(int x) {currentSquareX=x;}
-		void setCurrentSpaceY(int y) {currentSquareY=y;}
-		
 		int getMapMaxSizeX() const {return MapMaxSizeX;}
 		int getMapMaxSizeY() const {return MapMaxSizeY;}
 		int getMapMaxSizeNgX() const {return MapMaxSizeNgX;}
@@ -54,24 +50,26 @@ class map {
 		void addItemY(item*,int);
 		void removeItemX(int);
 		void removeItemY(int);
-		
+
 		// misc methods for map
-		bool itemExists(map*,int,int);
-		item* identifyItem(map*);
+		bool itemExists(int,int);
+
+		item* identifyItem(int,int);
 		std::string parseGroundID(int);
-		TYPE checkItemType(map*);
+		TYPE checkItemType(int,int);
+
 		int getGroundID() const {return groundID;}
 		int saveMapData(int);
 		int loadMapData(int);
-		
-		void addToList(player*);
+
 		void removeFromList(player*);
+		void removeFromList(npc*);
 		
 		// list of players on the map
-		playerList<player*> players;
-		
+		std::list<player*> players;
+
 		// list of npcs on the map
-		playerList<npc*> npcs;
+		std::list<npc*> npcs;
 		
 	private:
 		int MapMaxSizeX,MapMaxSizeY,MapMaxSizeNgY,MapMaxSizeNgX;

@@ -76,8 +76,8 @@ class player: public creature {
 		void increaseLevel(int);
 		
 		// for saving the data to a savefile
-		int savePlayerData(map*,int,int,bool);
-		int loadPlayerData(map*,int,int);
+		int savePlayerData(player*,int,int,bool);
+		int loadPlayerData(player*,int,int);
 		int saveToIndex(int);
 		int loadFromIndex(int);
 		int removeTemp();
@@ -115,7 +115,9 @@ class player: public creature {
 		static void setPlayersOn(int players) {playersOn=players;}
 		static int getPlayersOn() {return playersOn;}
 		void setLook();
-		
+
+		int x,y;
+
 	private:
 		std::string name;
 		std::string hairOutfit, legsOutfit, torsoOutfit;

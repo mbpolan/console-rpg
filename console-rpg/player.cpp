@@ -37,8 +37,10 @@ player::player() {
 	torsoEq=new item("Jacket",torso);
 	legEq=new item("Travel Pants",legs);
 	bootEq=new item("Boots",boots);
-	
+
 	playerID=0;
+	x=0;
+	y=0;
 
 };
 
@@ -60,8 +62,10 @@ player::player(int fixedHP, int fixedMP, int id) {
 	legEq=new item("Travel Pants",legs);
 	bootEq=new item("Boots",boots);
 	
-	playerID=id;;
-	
+	playerID=id;
+	x=0;
+	y=0;
+
 };
 
 // player class enhanced constructor
@@ -83,7 +87,9 @@ player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense,int id)
 	bootEq=new item("Boots",boots);
 	
 	playerID=id;
-	
+	x=0;
+	y=0;
+
 };
 
 // player class destructor
@@ -180,10 +186,10 @@ void player::setLook() {
 		std::cout << "\nYou are now an archer.\n";
 		playerVocation=archer;
 	}
-	
+
 	std::cout << "\nWhat is your hair color? ";
 	std::cin >> hairOutfit;
-	
+
 	std::cout << "\nWhat is your shirt color? ";
 	std::cin >> torsoOutfit;
 
@@ -261,15 +267,15 @@ int player::displayStats() {
 };
 
 // saves the current player status to file
-int player::savePlayerData(map *karte,int player,int game,bool ignoreTemp) {
+int player::savePlayerData(player *Player,int player,int game,bool ignoreTemp) {
 
 	// get the player's coordinates
-	int x=karte->getCurrentSpaceX();
-	int y=karte->getCurrentSpaceY();
-	
+	int x=Player->x;
+	int y=Player->y;
+
 	std::ofstream fout;
 	std::ifstream fin;
-	
+
 	char savefile[256];
 	char namefile[256];
 	char targetDir[256];
@@ -339,11 +345,11 @@ int player::savePlayerData(map *karte,int player,int game,bool ignoreTemp) {
 };
 
 // load the savefile and continue the game
-int player::loadPlayerData(map *karte,int player,int game) {
-	
+int player::loadPlayerData(player *Player,int player,int game) {
+
 	std::fstream fin;
 	int x,y;
-	
+
 	// once again, check what the client's system is and use
 	// the appropriate file separator.
 	#ifdef __LINUX__
@@ -372,11 +378,11 @@ int player::loadPlayerData(map *karte,int player,int game) {
 	fin.clear();*/
 	
 	fin.read((char*) &x,sizeof(x));
-	karte->setCurrentSpaceX(x);
+	Player->x=x;
 	fin.clear();
 
 	fin.read((char*) &y,sizeof(y));
-	karte->setCurrentSpaceY(y);
+	Player->y=y;
 	fin.clear();
 	
 	fin.read((char*) &currentHP,sizeof(currentHP));

@@ -31,137 +31,146 @@ movement::movement() {
 };
 
 // move north
-void movement::moveN(map *karte) {
-	if (karte->getCurrentSpaceX()==karte->getMapMaxSizeX()) {
-		std::cout << "\nYou can't move any further north!";
+void movement::moveN(player *Player,map *karte) {
+	if (Player->x==karte->getMapMaxSizeX()) {
+		std::cout << "\nYou can't move any further north!\n";
+		return;
 	}
-	else {
-		int x=karte->getCurrentSpaceX();
-		int y=karte->getCurrentSpaceY();
-		karte->setCurrentSpaceX(++x);
-		std::cout << "\nMoved north.";
-	}
+
+	Player->x+=1;
+	std::cout << "\nMoved north.\n";
+
+	int block=isOccupied(Player,karte);
+
+	parseCreature(karte,Player,block);
 };
 
 // move south
-void movement::moveS(map *karte) {
-	if (karte->getCurrentSpaceX()==karte->getMapMaxSizeNgX()) {
-		std::cout << "\nYou can't move any further south!";
+void movement::moveS(player *Player,map *karte) {
+	if (Player->x==karte->getMapMaxSizeNgX()) {
+		std::cout << "\nYou can't move any further south!\n";
 	}
-	else {
-		int x=karte->getCurrentSpaceX();
-		int y=karte->getCurrentSpaceY();
-		karte->setCurrentSpaceX(--x);
-		std::cout << "\nMoved south.";
-	}
+
+	Player->x-=1;
+	std::cout << "\nMoved south.\n";
+
+	int block=isOccupied(Player,karte);
+
+	parseCreature(karte,Player,block);
 };
 
 // move west
-void movement::moveW(map *karte) {
-	if (karte->getCurrentSpaceY()==karte->getMapMaxSizeNgY()) {
-		std::cout << "\nYou can't move any further west!";
+void movement::moveW(player *Player,map *karte) {
+	if (Player->y==karte->getMapMaxSizeNgY()) {
+		std::cout << "\nYou can't move any further west!\n";
 	}
-	else {
-		int y=karte->getCurrentSpaceY();
-		int x=karte->getCurrentSpaceX();
-		karte->setCurrentSpaceY(--y);
-		std::cout << "\nMoved west.";
-	}
+
+	Player->y-=1;
+	std::cout << "\nMoved west.\n";
+
+	int block=isOccupied(Player,karte);
+
+	parseCreature(karte,Player,block);
 };
 
 // move east
-void movement::moveE(map *karte) {
-	if (karte->getCurrentSpaceY()==karte->getMapMaxSizeY())  {
-		std::cout << "\nYou can't move any further east!";
+void movement::moveE(player *Player,map *karte) {
+	if (Player->y==karte->getMapMaxSizeY())  {
+		std::cout << "\nYou can't move any further east!\n";
 	}
-	else { 
-		int y=karte->getCurrentSpaceY();
-		int x=karte->getCurrentSpaceX();
-		karte->setCurrentSpaceY(++y);
-		std::cout << "\nMoved east.";
-	}
+
+	Player->y+=1;
+	std::cout << "\nMoved east.\n";
+
+	int block=isOccupied(Player,karte);
+
+	parseCreature(karte,Player,block);
 };
 
 // move northeast
-void movement::moveNE(map *karte) {
-	if (karte->getCurrentSpaceY()==karte->getMapMaxSizeY() || karte->getCurrentSpaceX()==karte->getMapMaxSizeX() 
-       || karte->getCurrentSpaceY()==karte->getMapMaxSizeNgY() || karte->getCurrentSpaceX()==karte->getMapMaxSizeNgX()) {
+void movement::moveNE(player *Player,map *karte) {
+        if (Player->y==karte->getMapMaxSizeY() || Player->x==karte->getMapMaxSizeX()
+        || Player->y==karte->getMapMaxSizeNgY() || Player->x==karte->getMapMaxSizeNgX()) {
 		std::cout << "\nYou can't move any further!";
 	}
-	else {
-                int x=karte->getCurrentSpaceX();
-                int y=karte->getCurrentSpaceY();
-		karte->setCurrentSpaceY(++y);
-		karte->setCurrentSpaceX(++x);
-		std::cout << "\nMove northeast.";
-	}
+
+	Player->y+=1;
+	Player->x+=1;
+	std::cout << "\nMoved northeast.";
+
+	int block=isOccupied(Player,karte);
+
+	parseCreature(karte,Player,block);
+
 };
 
 // move northwest
-void movement::moveNW(map *karte) {
-	if (karte->getCurrentSpaceY()==karte->getMapMaxSizeY() || karte->getCurrentSpaceX()==karte->getMapMaxSizeX()
-       || karte->getCurrentSpaceY()==karte->getMapMaxSizeNgY() || karte->getCurrentSpaceX()==karte->getMapMaxSizeNgX()) {
+void movement::moveNW(player *Player,map *karte) {
+        if (Player->y==karte->getMapMaxSizeY() || Player->x==karte->getMapMaxSizeX()
+        || Player->y==karte->getMapMaxSizeNgY() || Player->x==karte->getMapMaxSizeNgX()) {
                 std::cout << "\nYou can't move any further!";
         }
-	else {
-                int x=karte->getCurrentSpaceX();
-                int y=karte->getCurrentSpaceY();
-		karte->setCurrentSpaceY(--y);
-		karte->setCurrentSpaceX(++x);
-		std::cout << "\nMoved northwest.";
-	}
+
+	Player->y-=1;
+	Player->x+=1;
+	std::cout << "\nMoved northwest.";
+
+	int block=isOccupied(Player,karte);
+
+	parseCreature(karte,Player,block);
 };
 
 // move southeast
-void movement::moveSE(map *karte) {
-        if (karte->getCurrentSpaceY()==karte->getMapMaxSizeY() || karte->getCurrentSpaceX()==karte->getMapMaxSizeX()
-       || karte->getCurrentSpaceY()==karte->getMapMaxSizeNgY() || karte->getCurrentSpaceX()==karte->getMapMaxSizeNgX()) {
+void movement::moveSE(player *Player,map *karte) {
+        if (Player->y==karte->getMapMaxSizeY() || Player->x==karte->getMapMaxSizeX()
+        || Player->y==karte->getMapMaxSizeNgY() || Player->x==karte->getMapMaxSizeNgX()) {
                 std::cout << "\nYou can't move any further!";
 	}
-	else {
-                int x=karte->getCurrentSpaceX();
-                int y=karte->getCurrentSpaceY();
-		karte->setCurrentSpaceY(++y);
-		karte->setCurrentSpaceX(--x);
-		std::cout << "\nMoved southeast.";
-	}
+
+	Player->y+=1;
+	Player->x-=1;
+	std::cout << "\nMoved southeast.";
+
+	int block=isOccupied(Player,karte);
+
+	parseCreature(karte,Player,block);
 };
 
 // move southwest
-void movement::moveSW(map *karte) {
-        if (karte->getCurrentSpaceY()==karte->getMapMaxSizeY() || karte->getCurrentSpaceX()==karte->getMapMaxSizeX()
-       || karte->getCurrentSpaceY()==karte->getMapMaxSizeNgY() || karte->getCurrentSpaceX()==karte->getMapMaxSizeNgX()) {
+void movement::moveSW(player *Player,map *karte) {
+        if (Player->y==karte->getMapMaxSizeY() || Player->x==karte->getMapMaxSizeX()
+        || Player->y==karte->getMapMaxSizeNgY() || Player->x==karte->getMapMaxSizeNgX()) {
 		std::cout << "\nYou can't move any further!";
 	}
-	else {
-		int x=karte->getCurrentSpaceX();
-		int y=karte->getCurrentSpaceY();
-		karte->setCurrentSpaceY(--y);
-		karte->setCurrentSpaceX(--x);
-		std::cout << "\nMoved southwest.";
-	}
+
+	Player->y-=1;
+	Player->x-=1;
+	std::cout << "\nMoved southwest.";
+
+	int block=isOccupied(Player,karte);
+
+	parseCreature(karte,Player,block);
 };
 	
 // look(): look command
-void movement::look(map *karte) {
+void movement::look(player *Player,map *karte) {
 	std::string groundType; // this is the ground type
 	
 	int gID=(karte->getGroundID());
 	groundType=karte->parseGroundID(gID); // parse the id
-	
-	if (karte->itemExists(karte,karte->getCurrentSpaceX(),karte->getCurrentSpaceY())) {
-		item* theName=karte->identifyItem(karte);
-		
-		if (theName!=NULL)
-			std::cout << "\nYou see " << theName->getName() << ".\n";
-		
+
+	if (karte->itemExists(Player->x,Player->y)) {
+		item* theName=karte->identifyItem(Player->x,Player->y);
+
+		if (theName)
+			std::cout << "You see " << theName->getName() << ".\n";
+
 		else
-			std::cout << "\nYou see " << groundType << ".";
+			std::cout << "You see " << groundType << ".\n";
 	}
+
 	else
-		std::cout << "\nYou see " << groundType << ".";
-	// If there is an item on the ground, then display item instead
-	// of ground type. (Do this later)
+		std::cout << "\nYou see " << groundType << ".\n";
 };
 
 // place item on the map
@@ -174,29 +183,23 @@ void movement::placeItem(item *thisItem,map *karte) {
 	
 	// shows what this function is doing when called
 	#ifdef DEBUG
-		int x=karte->getCurrentSpaceX();
-		int y=karte->getCurrentSpaceY();
-		
-		if (karte->itemExists(karte,x,y)) {
+		if (karte->itemExists(karte,itemX,itemY)) {
 			if (x!=0 && y!=0)
-				std::cout << "\nItem added at " << x << "," << y << std::endl;
+				std::cout << "\nItem added at " << itemX << "," << itemY << std::endl;
 		}
 		
-		else if (!karte->itemExists(karte,x,y)) {
+		else if (!karte->itemExists(karte,itemX,itemY)) {
 			if (x!=0 && y!=0)
-				std::cout << "\nFailed to add item at " << x << "," << y << std::endl;
+				std::cout << "\nFailed to add item at " << itemX << "," << itemY << std::endl;
 		}
 	#endif
 };
 
 // remove the item from the map
-void movement::removeItem(map *karte) {
-	int x=karte->getCurrentSpaceX();
-	int y=karte->getCurrentSpaceY();
-	
+void movement::removeItem(map *karte,int x,int y) {
 	karte->removeItemX(x);
 	karte->removeItemY(y);
-	
+
 	// shows what this function is doing when called
 	#ifdef DEBUG		
 		if (karte->itemExists(karte,x,y)) {
@@ -212,13 +215,11 @@ void movement::removeItem(map *karte) {
 };
 
 // fetch the player's current position on X/Y
-int movement::getCurrentPosition(map *karte) const {
-	int x=karte->getCurrentSpaceX();
-	int y=karte->getCurrentSpaceY();
-	std::cout << "X: " << x << " Y: " << y << std::endl;
+int movement::getCurrentPosition(player *Player) const {
+	std::cout << "X: " << Player->x << " Y: " << Player->y << std::endl;
 };
 
-// spawn some initial map items
+// spawn some initial map items/creatures
 void movement::spawnMapItems(movement *rhs,map *karte) {
 
 	// syntax for new item is name,x,y,type.
@@ -229,6 +230,9 @@ void movement::spawnMapItems(movement *rhs,map *karte) {
 	rhs->placeItem(new item("bush",-10,5,npe),karte);
 	rhs->placeItem(new item("sunflowers",20,5,npe),karte);
 	rhs->placeItem(new item("Leather Armor",4,6,torso),karte);
+
+	// syntax for new npcs is x,y,name
+	karte->npcs.push_back(new npc(2,3,"Mike"));
 };
 
 // toggle between night and day, or increase step count if none
@@ -255,8 +259,81 @@ int movement::controlTime(int steps) {
 // fetch the current time
 void movement::checkTime() {
 	if (fDay)
-		std::cout << "\nIt is day time.\n";
+		std::cout << "\nIt is day time.";
 	if (!fDay)
-		std::cout << "\nIt is night time.\n";
+		std::cout << "\nIt is night time.";
 };
 
+int movement::isOccupied(player *Player,map *karte) {
+	std::list<player*>::iterator playerIt;
+	std::list<npc*>::iterator npcIt;
+
+	for (playerIt=karte->players.begin();playerIt!=karte->players.end();++playerIt) {
+		if ((*playerIt!=Player)) {
+			int x=(*playerIt)->x;
+			int y=(*playerIt)->y;
+
+			if (x==Player->x && y==Player->y)
+				return BLOCK_PLAYER;
+		}
+	}
+
+	for (npcIt=karte->npcs.begin();npcIt!=karte->npcs.end();++npcIt) {
+		if ((*npcIt)) {
+			int x=(*npcIt)->posx;
+			int y=(*npcIt)->posy;
+
+			if (x==Player->x && y==Player->y)
+				return BLOCK_NPC;
+		}
+	}
+
+	return CLEAR;
+};
+
+// get an NPC based on coordinates
+npc* movement::getNPC(map *karte,int x,int y) {
+	std::list<npc*>::iterator it;
+
+	for (it=karte->npcs.begin();it!=karte->npcs.end();++it) {
+		if ((*it)) {
+			int nx=(*it)->posx;
+			int ny=(*it)->posy;
+
+			if (x==nx && y==ny)
+				return (*it);
+		}
+	}
+};
+
+// get a player based on coordinates
+player* movement::getPlayer(map *karte,int x,int y) {
+	std::list<player*>::iterator it;
+
+	for (it=karte->players.begin();it!=karte->players.end();++it) {
+		if ((*it)) {
+			int nx=(*it)->x;
+			int ny=(*it)->y;
+
+			if (x==nx && y==ny)
+				return (*it);
+		}
+	}
+};
+
+// parse the creature and do some actions appropriately
+void movement::parseCreature(map *karte,player *Player,int block) {
+	if (block!=CLEAR) {
+		if (block==BLOCK_NPC) {
+			npc *myNpc=getNPC(karte,Player->x,Player->y);
+			if (myNpc)
+				std::cout << "(!) ~ You encounter " << myNpc->getName() << " (NPC) ~ (!)\n";
+		}
+
+		else if (block==BLOCK_PLAYER) {
+			player *myPlayer=getPlayer(karte,Player->x,Player->y);
+			if (myPlayer)
+				std::cout << "(!) ~ You encounter " << myPlayer->getName() << " (Player) ~ (!)\n";
+		}
+	}
+};
