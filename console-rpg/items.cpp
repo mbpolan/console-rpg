@@ -1,3 +1,4 @@
+// items.cpp: declarations for item functions
 #include "items.h"
 
 item::item(std::string fixedItemName, int spawnX, int spawnY) {
@@ -29,3 +30,38 @@ void item::setLocationY(int YLOCATION) {
 		*itemLocationY=YLOCATION;
 };
 
+TYPE item::checkType() {
+	return itemType;
+};
+
+bool item::isHeadItem(item *thisItem) {
+	TYPE result=thisItem->checkType();
+	if (result==head)
+		return 1;
+	else
+		return 0;
+};
+
+bool item::isTorsoItem(item *thisItem) {
+	TYPE result=thisItem->checkType();
+	if (result==torso)
+		return 1;
+	else
+		return 0;
+};
+
+bool item::isLegsItem(item *thisItem) {
+	TYPE result=thisItem->checkType();
+	if (result==legs)
+		return 1;
+	else
+		return 0;
+};
+
+bool item::isBootsItem(item *thisItem) {
+	TYPE result=thisItem->checkType();
+	if (result==boots)
+		return 1;
+	else
+		return 0;
+};

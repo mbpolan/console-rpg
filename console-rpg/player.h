@@ -4,7 +4,8 @@
 class player {
 	public:
 		player(int fixedHP, int fixedMP, int fixedHeight, int fixedAge); // our constructor
-		~player();
+		virtual ~player();
+		
 		int getHP() const {return *currentHP;}
 		void setHP(int hp) {*currentHP=hp;}
 		
@@ -20,40 +21,37 @@ class player {
 		void setAge(int age) {*playerAge=age;}
 		int getAge() const {return *playerAge;}
 
-		void setLook(player&);
+		void setLook(player*);
 		void setHair(std::string hairColor) {hair=hairColor;}
 		void setTorso(std::string torsoColor) {torso=torsoColor;}
 		void setLegs(std::string legsColor) {legs=legsColor;}
-
+		std::string getHair() const {return hair;}
+		std::string getTorso() const {return torso;}
+		std::string getLegs() const {return legs;}
+		
+		int savePlayerData(player*);
+		
+		void setHeadItem(item*);
+		void setTorsoItem(item*);
+		void setLegsItem(item*);
+		void setBootsItem(item*);
+		std::string getHeadItem() const {return headEq;}
+		std::string getTorsoItem() const {return torsoEq;}
+		std::string getLegsItem() const {return legEq;}
+		std::string getBootsItem() const {return bootEq;}
+		std::string displayInventory(player*);
+		
+		void removeInventoryItem(int);
+		void addInventoryItem(item*);
+		int searchInventory(player*,std::string);
+		
 	private:
 		int *currentHP;
 		int *currentMP;
 		int *playerHeight;
 		int *playerAge;
-		std::string hair, legs, torso;
+		
 		std::string *playerName;
+		std::string hair, legs, torso;
+		std::string headEq,torsoEq,legEq,bootEq;
 };
-
-player::player(int fixedHP, int fixedMP, int fixedHeight, int fixedAge) {
-	currentHP=new int(fixedHP);
-	currentMP=new int(fixedMP);
-	playerHeight=new int(fixedHeight);
-	playerAge=new int(fixedAge);
-	playerName=new std::string;
-	hair="brown", legs="blue", torso="brown";
-	*playerName="Arbba";
-};
-
-player::~player() {
-	delete currentHP;
-	delete currentMP;
-	delete playerName;
-	delete playerHeight;
-	delete playerAge;
-	currentHP=0;
-	currentMP=0;
-	playerName=0;
-	playerHeight=0;
-	playerAge=0;
-};
-

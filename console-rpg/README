@@ -1,6 +1,6 @@
-Console-RPG 0.1
----------------
-(released: 8/3/04)
+Console-RPG 0.1.5
+-----------------
+(released: 9/20/04)
 
 
 Background
@@ -18,15 +18,20 @@ Install
 -------
 Type the following in a shell:
 1)$ make
-2) chmod a+x crpg
-3) ./crpg
+2)$ chmod a+x crpg
+3)$ ./crpg
 
 Console-RPG should now start.
 
 What's New?
 -----------
-The only thing now is walking around in the compass directions. Expect
-much more in future releases.
+Some pre-alpha items have been added. You now have an inventory, which you
+can look at by typing 'inventory' in-game. Also, you can now save your
+current stats to a file (can't be loaded yet) by typing 'save' in-game.
+
+Player customization is in. You will be prompted whether you want to
+customize your player before starting a new game. The map is now
+30x30 tiles as well.
 
 Credits
 -------

@@ -1,4 +1,6 @@
+// map.h: map class and related stuff
 #include <iostream>
+#include <list>
 
 class map {
 	public:
@@ -15,17 +17,19 @@ class map {
 		int getMapMaxSizeNgX() const {return MapMaxSizeNgX;}
 		int getMapMaxSizeNgY() const {return MapMaxSizeNgY;}
 
-		int getItemSquareX() const {return itemSquareX;}
-		int getItemSquareY() const {return itemSquareY;}
-		void setItemSquareX(int x) {itemSquareX=x;}
-		void setItemSquareY(int y) {itemSquareY=y;}
+		int getItemSquareX();
+		int getItemSquareY();
+		void setItemSquareX(int x);
+		void setItemSquareY(int y);
 
 		int getGroundID() const {return groundID;}
 		
 	private:
 		int MapMaxSizeX,MapMaxSizeY,MapMaxSizeNgY,MapMaxSizeNgX;
 		int currentSquareX,currentSquareY;
-		int itemSquareX,itemSquareY,groundID;
+		int /*itemSquareX,itemSquareY,*/groundID;
+		std::list<int> itemSquareX;
+		std::list<int> itemSquareY;
 };
 
 
