@@ -51,7 +51,7 @@ class movement {
 		void look(player*,map*);
 		void placeItem(item*,map*);
 		void removeItem(map*,int,int);
-		void spawnMapItems(movement*,map*);
+		void spawnMapItems(map*);
 		int isOccupied(player*,map*);
 
 		// get creatures methods

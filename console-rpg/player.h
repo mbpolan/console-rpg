@@ -76,8 +76,8 @@ class player: public creature {
 		void increaseLevel(int);
 		
 		// for saving the data to a savefile
-		int savePlayerData(player*,int,int,bool);
-		int loadPlayerData(player*,int,int);
+		int savePlayerData(int,int,bool);
+		int loadPlayerData(int,int);
 		int saveToIndex(int);
 		static int loadFromIndex(int);
 		int removeTemp();

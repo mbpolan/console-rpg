@@ -267,12 +267,7 @@ int player::displayStats() {
 };
 
 // saves the current player status to file
-int player::savePlayerData(player *Player,int player,int game,bool ignoreTemp) {
-
-	// get the player's coordinates
-	int x=Player->x;
-	int y=Player->y;
-
+int player::savePlayerData(int player,int game,bool ignoreTemp) {
 	std::ofstream fout;
 	std::ifstream fin;
 
@@ -288,14 +283,12 @@ int player::savePlayerData(player *Player,int player,int game,bool ignoreTemp) {
 	sprintf(savefile,"data/game%d/savefile%d.dat",game,player);// the savefile
 	sprintf(targetDir,"mkdir data/game%d",game); // command to make a new slot
 	sprintf(index,"data/game%d/index.dat",game); // index file
-	sprintf(namefile,"data/game%d/name%d.dat",game,player);
 	#endif
 	
 	#ifdef __WINDOWS__
 	sprintf(savefile,"data\\game%d\\savefile%d.dat",game,player);// the savefile
 	sprintf(targetDir,"mkdir data\\game%d",game); // command to make a new slot
 	sprintf(index,"data\\game%d\\index.dat",game); // index file
-	sprintf(namefile,"data\\game%d\\name%d.dat",game,player);
 	#endif
 	
 	// if this slot doesn't exist, then make a directory for the savefiles.
@@ -318,53 +311,39 @@ int player::savePlayerData(player *Player,int player,int game,bool ignoreTemp) {
 		std::cout << "\nUnable to save file!";
 		return 0;
 	}
-
-	fout.write((char*) &x,sizeof(x));
-	fout.write((char*) &y,sizeof(y));
-	fout.write((char*) &currentHP,sizeof(currentHP));
-	fout.write((char*) &currentMP,sizeof(currentMP));
 	
-	fout.write((char*) &luck,sizeof(luck));
-	fout.write((char*) &strength,sizeof(strength));
-	fout.write((char*) &power,sizeof(power));
-	fout.write((char*) &defense,sizeof(defense));
+	fout << name << std::endl;
+	fout << x << std::endl;
+	fout << y << std::endl;
+	fout << currentHP << std::endl;
+	fout << currentMP << std::endl;
+	fout << luck << std::endl;
+	fout << strength << std::endl;
+	fout << power << std::endl;
+	fout << defense << std::endl;
 
 	// todo: save eq
 
-	fout.close();
-	
-	fout.open(namefile);
-	if (!fout) {
-		std::cout << "\nUnable to save file!";
-		return 0;
-	}
-	
-	fout << name;
 	fout.close();
 	
 	saveToIndex(game);
 };
 
 // load the savefile and continue the game
-int player::loadPlayerData(player *Player,int player,int game) {
-
+int player::loadPlayerData(int player,int game) {
 	std::fstream fin;
-	int x,y;
+	
+	char savefile[256];
+	char namefile[256];
 
 	// once again, check what the client's system is and use
 	// the appropriate file separator.
 	#ifdef __LINUX__
-	char savefile[256];
-	char namefile[256];
 	sprintf(savefile,"data/game%d/savefile%d.dat",game,player);
-	sprintf(namefile,"data/game%d/name%d.dat",game,player);
 	#endif
 	
 	#ifdef __WINDOWS__
-	char savefile[256];
-	char namefile[256];
 	sprintf(savefile,"data\\game%d\\savefile%d.dat",game,player);
-	sprintf(namefile,"data\\game%d\\name%d.dat",game,player);
 	#endif
 	
 	fin.open(savefile);
@@ -373,44 +352,18 @@ int player::loadPlayerData(player *Player,int player,int game) {
 		std::cout << "\nFailed to load savefile!";
 		return 0;
 	}
-
-	fin.read((char*) &x,sizeof(x));
-	Player->x=x;
-	fin.clear();
-
-	fin.read((char*) &y,sizeof(y));
-	Player->y=y;
-	fin.clear();
-
-	fin.read((char*) &currentHP,sizeof(currentHP));
-	fin.clear();
 	
-	fin.read((char*) &currentMP,sizeof(currentMP));
-	fin.clear();
-
-	fin.read((char*) &luck,sizeof(luck));
-	fin.clear();
-
-	fin.read((char*) &strength,sizeof(strength));
-	fin.clear();
-
-	fin.read((char*) &power,sizeof(power));
-	fin.clear();
-
-	fin.read((char*) &defense,sizeof(defense));
-	fin.clear();
+	fin >> name; fin.clear();
+	fin >> x; fin.clear();
+	fin >> y; fin.clear();
+	fin >> currentHP; fin.clear();
+	fin >> currentMP; fin.clear();
+	fin >> luck; fin.clear();
+	fin >> strength; fin.clear();
+	fin >> power; fin.clear();
+	fin >> defense; fin.clear();
 	 
 	fin.close();
-	
-	fin.open(namefile);
-	if (!fin) {
-		std::cout << "\nFailed to load namefile!";
-		return 0;
-	}
-	
-	fin >> name;
-	fin.close();
-
 };
 
 // save to index file

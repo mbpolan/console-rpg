@@ -41,6 +41,10 @@ typedef unsigned long long __int64;
 #define CRPG_CLEAR_SCREEN system("cls") // clear screen macro
 #endif
 
+// maximum map sizes
+#define PMAX 30
+#define NMAX -30
+
 // are we loading a savefile?
 bool load=false;
 
@@ -123,34 +127,31 @@ int generic::configurePlayers() {
     }
 
     movement *grid=new movement; // make a new movement grid
-    map *karte=new map(30,30,-30,-30); // make a new map
+    map *karte=new map(PMAX,PMAX,NMAX,NMAX); // make a new map
 
-    grid->spawnMapItems(grid,karte); // spawn items on map NOW
+    grid->spawnMapItems(karte); // spawn items on map NOW
 
     char cVar; // confirmation variable
 
     // loop for as long as there are players
     for (int i=0;i<players;i++) {
-    // we need to set name and look
-    // make a temporary player object
-    player *pPlayer=new player;
-
     std::string name;
+    list[i]=new player;
+    
     // now we configure each player's character
- //   CRPG_CLEAR_SCREEN;
+    CRPG_CLEAR_SCREEN;
 
     std::cout << "\n==========================";
     std::cout << "\nPlayer " << i+1 << " Configuration\n";
     std::cout << "\nEnter player name: ";
     std::getline(std::cin,name,'\n');
-
-    pPlayer->setPlayerID(i+1);
-    pPlayer->setName(name);
-    pPlayer->setLook();
+    
+    list[i]->setPlayerID(i+1);
+    list[i]->setName(name);
+    list[i]->setLook();
 
     // put this temporary object into the array for good
-    list[i]=pPlayer;
-    karte->players.push_back(pPlayer);
+    karte->players.push_back(list[i]);
 
     std::cin.ignore();
     std::cout << "==========================\n";
@@ -193,7 +194,7 @@ void generic::preGame(movement *rhs,map *karte,playerList<player*> &r_list,int p
     std::cout << "current player: " << j << std::endl;
     #endif
 
-//    CRPG_CLEAR_SCREEN;
+    CRPG_CLEAR_SCREEN;
     std::cout << "\n*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*";
     std::cout << "\nWelcome to Console RPG, " << r_list[j]->getName() << std::endl
     << "Type 'help' to display a help menu.";
@@ -240,21 +241,10 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
   if (turns>playerCount)
     firstTurn=false;
 
-  // reset the coordinates for the next player as long as it's
-  // still his first turn.
-  
-  #ifdef DEBUG
-  if (load)
-  std::cout << "\nLoad defined. Avoid reset.\n";
-  
-  if (!load)
-  std::cout << "\nLoad NOT defined. Reset.\n";
-  #endif
-
-  // if it is NOT the first turn
+  // if it is NOT the first turn, we load the player's file
   // 99 is the temporary directory number for saved files
-  if (!firstTurn)
-    list[playerNow]->loadPlayerData(list[playerNow],list[playerNow]->getPlayerID(),99);
+  //if (!firstTurn)
+  //  list[playerNow]->loadPlayerData(list[playerNow]->getPlayerID(),99);
 
   while(moves>0) {
     int count=rhs->getStepCount(); // count the amount of spaces moved
@@ -263,13 +253,6 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
 
     std::string moverVar;
     std::cin >> moverVar;
-
-    // for debugging purposes only!
-#ifdef DEBUG
-    if (moverVar=="mod") {
-      list[playerNow]->setHP(0);
-    }
-#endif
 
     // if this is the final move, then make sure to save the player's
     // stats before passing in the next player
@@ -378,8 +361,9 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
           if (i>0)
              exists=true;
              
-          list[i]->savePlayerData(list[playerNow],list[playerNow]->getPlayerID(),slot,exists);
+          list[i]->savePlayerData(list[i]->getPlayerID(),slot,exists);
         }
+	
         karte->saveMapData(slot);
         std::cout << "\nPlayer and map saved!\n";
       }
@@ -416,6 +400,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
 
 	    karte->removeItem(x,y);
           }
+	  
           if (confirm=='N')
             std::cout << std::endl << targetItem->getName() << " was not equipped.\n";
         }
@@ -461,7 +446,7 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       if (list[playerNow]->getPlayerID()>1)
         ignore=true;
 
-      list[playerNow]->savePlayerData(list[playerNow],list[playerNow]->getPlayerID(),99,ignore); // save the player's data
+      list[playerNow]->savePlayerData(list[playerNow]->getPlayerID(),99,ignore); // save the player's data
       karte->creaturesDoAction(); // move any npcs/monsters
 
       break;
@@ -516,14 +501,15 @@ int generic::loadGame() {
    // allocate memory for the core compenents of the game.
    playerList<player*> list; // list of players
    movement *grid=new movement; // movement grid
-   map *karte=new map; // world map
+   map *karte=new map(PMAX,PMAX,NMAX,NMAX); // world map
+   
+   grid->spawnMapItems(karte);
 
 //   karte->loadMapData(slot);
 
    // start the loop to fill up array with saved player data
    for (int i=0;i<players;i++) {
-//       list[i]=new player;
-       player *pPlayer=new player;
+       list[i]=new player;
 
 	   #ifdef __LINUX__
 	   sprintf(path,"data/game%d/savefile%d.dat",slot,i+1);
@@ -545,14 +531,20 @@ int generic::loadGame() {
           return 0;
         }
 
-       pPlayer->loadPlayerData(pPlayer,i+1,slot);
-       list[i]=pPlayer;
+       list[i]->loadPlayerData(i+1,slot);
 
        fin.close();
        load=true;
    }
 
    generic::preGame(grid,karte,list,players);
+   
+   // free up the memory allocated for these objects
+   delete grid; 
+   delete karte;
+   
+   grid=0;
+   karte=0;
 }
 
 /***************************************
