@@ -37,7 +37,7 @@ namespace utilities {
 	int random_range(int,int);
 	
 	// method to remove a temp directory
-	int removeTemp();
+	int removeDir(const char*);
 };
 
 #endif

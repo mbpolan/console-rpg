@@ -25,10 +25,13 @@
 #include "creature.h"
 #include "items.h"
 #include "map.h"
+#include "movement.h"
+#include "npc.h"
 
 enum VOCATION {WARRIOR,MAGE,ARCHER};
 
 class map;
+class movement;
 
 class player: public creature {
 	public:
@@ -116,6 +119,9 @@ class player: public creature {
 		static void setPlayersOn(int players) {playersOn=players;}
 		static int getPlayersOn() {return playersOn;}
 		void setLook();
+		
+		// communication methods
+		void sendNpcMsg(map*,movement*);
 
 		int x,y;
 

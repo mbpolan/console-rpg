@@ -34,12 +34,12 @@ movement::movement() {
 
 // move north
 void movement::moveN(player *Player,map *karte) {
-	if (Player->x==karte->getMapMaxSizeX()) {
+	if (Player->x==0) {
 		std::cout << "\nYou can't move any further north!\n";
 		return;
 	}
 
-	Player->x+=1;
+	Player->x-=1;
 	std::cout << "\nMoved north.\n";
 
 	int block=isOccupied(Player,karte);
@@ -49,11 +49,12 @@ void movement::moveN(player *Player,map *karte) {
 
 // move south
 void movement::moveS(player *Player,map *karte) {
-	if (Player->x==karte->getMapMaxSizeNgX()) {
+	if (Player->x==karte->getMapMaxSizeX()) {
 		std::cout << "\nYou can't move any further south!\n";
+		return;
 	}
 
-	Player->x-=1;
+	Player->x+=1;
 	std::cout << "\nMoved south.\n";
 
 	int block=isOccupied(Player,karte);
@@ -63,8 +64,9 @@ void movement::moveS(player *Player,map *karte) {
 
 // move west
 void movement::moveW(player *Player,map *karte) {
-	if (Player->y==karte->getMapMaxSizeNgY()) {
+	if (Player->y==0) {
 		std::cout << "\nYou can't move any further west!\n";
+		return;
 	}
 
 	Player->y-=1;
@@ -79,6 +81,7 @@ void movement::moveW(player *Player,map *karte) {
 void movement::moveE(player *Player,map *karte) {
 	if (Player->y==karte->getMapMaxSizeY())  {
 		std::cout << "\nYou can't move any further east!\n";
+		return;
 	}
 
 	Player->y+=1;
@@ -91,7 +94,7 @@ void movement::moveE(player *Player,map *karte) {
 
 // move northeast
 void movement::moveNE(player *Player,map *karte) {
-        if (Player->y==karte->getMapMaxSizeY() || Player->x==karte->getMapMaxSizeX()
+/*        if (Player->y==karte->getMapMaxSizeY() || Player->x==karte->getMapMaxSizeX()
         || Player->y==karte->getMapMaxSizeNgY() || Player->x==karte->getMapMaxSizeNgX()) {
 		std::cout << "\nYou can't move any further!";
 	}
@@ -102,13 +105,13 @@ void movement::moveNE(player *Player,map *karte) {
 
 	int block=isOccupied(Player,karte);
 
-	parseCreature(karte,Player,block);
+	parseCreature(karte,Player,block);*/
 
 };
 
 // move northwest
 void movement::moveNW(player *Player,map *karte) {
-        if (Player->y==karte->getMapMaxSizeY() || Player->x==karte->getMapMaxSizeX()
+/*        if (Player->y==karte->getMapMaxSizeY() || Player->x==karte->getMapMaxSizeX()
         || Player->y==karte->getMapMaxSizeNgY() || Player->x==karte->getMapMaxSizeNgX()) {
                 std::cout << "\nYou can't move any further!";
         }
@@ -119,12 +122,12 @@ void movement::moveNW(player *Player,map *karte) {
 
 	int block=isOccupied(Player,karte);
 
-	parseCreature(karte,Player,block);
+	parseCreature(karte,Player,block);*/
 };
 
 // move southeast
 void movement::moveSE(player *Player,map *karte) {
-        if (Player->y==karte->getMapMaxSizeY() || Player->x==karte->getMapMaxSizeX()
+ /*       if (Player->y==karte->getMapMaxSizeY() || Player->x==karte->getMapMaxSizeX()
         || Player->y==karte->getMapMaxSizeNgY() || Player->x==karte->getMapMaxSizeNgX()) {
                 std::cout << "\nYou can't move any further!";
 	}
@@ -135,12 +138,12 @@ void movement::moveSE(player *Player,map *karte) {
 
 	int block=isOccupied(Player,karte);
 
-	parseCreature(karte,Player,block);
+	parseCreature(karte,Player,block);*/
 };
 
 // move southwest
 void movement::moveSW(player *Player,map *karte) {
-        if (Player->y==karte->getMapMaxSizeY() || Player->x==karte->getMapMaxSizeX()
+/*        if (Player->y==karte->getMapMaxSizeY() || Player->x==karte->getMapMaxSizeX()
         || Player->y==karte->getMapMaxSizeNgY() || Player->x==karte->getMapMaxSizeNgX()) {
 		std::cout << "\nYou can't move any further!";
 	}
@@ -151,7 +154,7 @@ void movement::moveSW(player *Player,map *karte) {
 
 	int block=isOccupied(Player,karte);
 
-	parseCreature(karte,Player,block);
+	parseCreature(karte,Player,block);*/
 };
 	
 // look(): look command
@@ -160,15 +163,28 @@ void movement::look(player *Player,map *karte) {
 	
 	int gID=(karte->getGroundID());
 	groundType=karte->parseGroundID(gID); // parse the id
+	bool Npc=false;
+	
+	std::list<npc*>::iterator nit;
+	for (nit=karte->npcs.begin();nit!=karte->npcs.end();++nit) {
+		if ((*nit)) {
+			if ((*nit)->posx==Player->x && (*nit)->posy==Player->y) {
+				std::cout << std::endl << (*nit)->name << " is standing here.";
+				Npc=true;
+			}
+		}
+	} // for (...)
 
 	if (karte->itemExists(Player->x,Player->y)) {
 		item* theName=karte->getItem(Player->x,Player->y);
 
 		if (theName)
 			std::cout << "\nYou see " << theName->getName() << ".\n";
-
-		else
-			std::cout << "\nYou see " << groundType << ".\n";
+			
+		if (theName && Npc)
+			std::cout << "\nYou see " << theName->getName() << " on the ground.\n";
+			
+		return;
 	}
 
 	else
@@ -230,8 +246,8 @@ void movement::spawnMapItems(map *karte) {
 	srand(static_cast<unsigned> (time(0)));
 	
 	for (int i=0;i<((karte->getMapMaxSizeX()*2)*4)*2;i++) {
-		int x=(rand()%60)-30;
-		int y=(rand()%60)-30;
+		int x=(rand()%100);
+		int y=(rand()%100);
 		int id=(rand()%5)+1;
 		
 		// syntax for new item is id,x,y
@@ -239,7 +255,7 @@ void movement::spawnMapItems(map *karte) {
 	}
 
 	// syntax for new npcs is x,y,name
-	placeNPC(new npc(2,3,"Mike"),karte);
+	placeNPC(new npc(26,26,"Mike"),karte);
 };
 
 // toggle between night and day, or increase step count if none

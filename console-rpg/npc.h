@@ -54,6 +54,9 @@ class npc {
 		static int getNpcsOn() {return npcsOn;}
 		
 		xmlNodePtr compressToXML();
+		
+		// communication methods
+		std::string replyToMsg(std::string);
 
 		// coordinates
 		int posx;

@@ -62,39 +62,26 @@ VOCATION utilities::itov(int voc) {
 	return myvoc;
 };
 
-// delete the temporary directory (99)
-int utilities::removeTemp() {
+// remove a directory
+int utilities::removeDir(const char *dir) {
 	// last time we need to check the client's system and
-	// use the appropriate file separator.
-	char path[256];
+	// use the appropriate command
 	char delCommand[256];
 	
 	#ifdef __LINUX__
-	sprintf(path,"data/game99/savefile1.dat");
-	sprintf(delCommand,"rm -rf data/game99");
+	sprintf(delCommand,"rm -rf %s",dir);
 	#endif
 	
 	#ifdef __WINDOWS__
-	sprintf(path,"data\\game99\\savefile1.dat");
-	sprintf(delCommand,"rm -rf data\est_number\game99");
+	sprintf(delCommand,"rmdir /Q /S %s",dir);
 	#endif
 
-	std::ifstream fin;
-	
-	// first we attempt to load a savefile from the temporary
-	// directory. if it fails, then there is no need to remove
-	// the directory since it doesn't exist. otherwise, remove it!
-	fin.open(path);
-	
-	if (fin) {
-		fin.close();
-		system(delCommand);
-	}
+	system(delCommand);
 };
 
 // produce a random number based on a given range (low to high)
 int utilities::random_range(int low, int high) {
-    srand(time(NULL));
+    srand(static_cast<unsigned> (time(0)));
     
     if(low>high) {
         std::swap(low,high);

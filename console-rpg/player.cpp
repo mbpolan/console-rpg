@@ -42,8 +42,8 @@ player::player() {
 	bootEq=new item(130,boots);
 
 	playerID=0;
-	x=0;
-	y=0;
+	x=25;
+	y=25;
 
 };
 
@@ -66,8 +66,8 @@ player::player(int fixedHP, int fixedMP, int id) {
 	bootEq=new item(130,boots);
 	
 	playerID=id;
-	x=0;
-	y=0;
+	x=25;
+	y=25;
 
 };
 
@@ -90,8 +90,8 @@ player::player(int hp,int mp,int Luck,int Strength,int Power,int Defense,int id)
 	bootEq=new item(130,boots);
 	
 	playerID=id;
-	x=0;
-	y=0;
+	x=25;
+	y=25;
 
 };
 
@@ -260,13 +260,13 @@ void player::increaseLevel(int increase) {
 
 // display player statistics
 int player::displayStats() {
-	std::cout << "\n\nStats\n";
+	std::cout << "\nStats\n";
 	std::cout << "HP: " << currentHP << std::endl;
 	std::cout << "MP: " << currentMP << std::endl;
 	std::cout << "Luck: " << luck << std::endl;
 	std::cout << "Strength: " << strength << std::endl;
 	std::cout << "Power: " << power << std::endl;
-	std::cout << "Defense: " << defense << "\n\n";
+	std::cout << "Defense: " << defense;
 };
 
 // saves the current player status to file
@@ -275,7 +275,6 @@ int player::savePlayerData(int player,int game,bool ignoreTemp) {
 	std::ifstream fin;
 
 	char savefile[256];
-	char namefile[256];
 	char targetDir[256];
 	char index[256];
 	
@@ -295,13 +294,12 @@ int player::savePlayerData(int player,int game,bool ignoreTemp) {
 	// if this slot doesn't exist, then make a directory for the savefiles.
 	fin.open(savefile);
 	
-	// if we flag ignoreTemp to be false, then we need to make a temporary
-	// directory for savefiles. otherwise we assume to temporary directory exists.
 	if (!ignoreTemp) {
 		if (!fin) {
 			system(targetDir);
 		}
 	}
+	
 	fin.close();
 	
 	xmlDocPtr doc;
@@ -538,4 +536,26 @@ int player::loadFromIndex(int game,int &playersOnGame) {
 	
 	fin >> playersOnGame; fin.clear();
 	fin.close();
+};
+
+void player::sendNpcMsg(map *karte,movement *rhs) {
+	std::string msg;
+	
+	std::cout << "Enter message: ";
+	std::cin >> msg;
+	
+	npc *myNpc=rhs->getNPC(karte,x,y);
+	if (myNpc) {
+		msg=myNpc->replyToMsg(msg);
+		
+		if (msg!=(std::string) "NULL")
+			std::cout << std::endl << myNpc->name << " says: " << msg;
+			
+		else
+			std::cout << std::endl << myNpc->name << " says: ???";
+		
+		return;
+	}
+	
+	std::cout << "\nThere is no one here to talk to.";
 };

@@ -213,10 +213,10 @@ void generic::preGame(movement *rhs,map *karte,playerList<player*> &r_list,int p
 int generic::optionMenu() {
   CRPG_CLEAR_SCREEN;
   std::cout << "\nOptions\n";
-  std::cout << "-------\n\n";
+  std::cout << "-------\n";
   std::cout << "(1) Redefine controls\n"
             << "(2) Return to main\n"
-            << "-------\n\n> ";
+            << "-------\n> ";
             
   std::string ch;
   int command;
@@ -238,102 +238,136 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
 
   std::cout << "\nTURN: " << turns << std::endl;
 
-  // if amount of turns is greater than the amount of players,
-  // then flag firstTurn to false so we can load the player's
-  // stats before he starts.
-  if (turns>playerCount)
-    firstTurn=false;
-
-  // if it is NOT the first turn, we load the player's file
-  // 99 is the temporary directory number for saved files
-  //if (!firstTurn)
-  //  list[playerNow]->loadPlayerData(list[playerNow]->getPlayerID(),99);
-
-  while(moves>0) {
+  while(1) {
     int count=rhs->getStepCount(); // count the amount of spaces moved
 
     std::cout << "\nAction: ";
 
     std::string moverVar;
     std::cin >> moverVar;
-
-    // if this is the final move, then make sure to save the player's
-    // stats before passing in the next player
-    if (moves==1) {
-      moverVar="end";
+    
+    if (moves==0) {
+      std::cout << "\n----------";
+      std::cout << "\nYour turn is now over. Press enter to continue...";
+      std::cout << "\n----------\n> ";          
+      std::cin.ignore();
+      std::cin.get();
+      
+      karte->creaturesDoAction();
+      break;
     }
 
     if (moverVar==N) {
+      std::cout << "\n----------";    
       rhs->moveN(list[playerNow],karte);
       rhs->controlTime(count);
+      std::cout << "----------\n";      
+      
       moves--;
     }
 
     if (moverVar==S) {
+      std::cout << "\n----------";    
       rhs->moveS(list[playerNow],karte);
       rhs->controlTime(count);
+      std::cout << "----------\n";      
+      
       moves--;
     }
 
     if (moverVar==W) {
+      std::cout << "\n----------";    
       rhs->moveW(list[playerNow],karte);
       rhs->controlTime(count);
+      std::cout << "----------\n";      
+      
       moves--;
     }
 
     if (moverVar==E) {
+      std::cout << "\n----------";    
       rhs->moveE(list[playerNow],karte);
       rhs->controlTime(count);
+      std::cout << "----------\n";
+            
       moves--;
     }
 
     if (moverVar==NW) {
+      std::cout << "\n----------";    
       rhs->moveNW(list[playerNow],karte);
       rhs->controlTime(count);
+      std::cout << "\n----------\n";      
+      
       moves--;
     }
 
     if (moverVar==NE) {
+      std::cout << "\n----------";    
       rhs->moveNE(list[playerNow],karte);
       rhs->controlTime(count);
+      std::cout << "\n----------\n";      
+      
       moves--;
     }
 
     if (moverVar==SW) {
+      std::cout << "\n----------";    
       rhs->moveSW(list[playerNow],karte);
       rhs->controlTime(count);
+      std::cout << "\n----------\n";      
+      
       moves--;
     }
 
     if (moverVar==SE) {
+      std::cout << "\n----------";    
       rhs->moveSE(list[playerNow],karte);
       rhs->controlTime(count);
+      std::cout << "\n----------\n";      
+      
       moves--;
     }
 
     if (moverVar=="stats") {
+      std::cout << "\n----------";    
       list[playerNow]->displayStats();
+      std::cout << "\n----------\n";     
     }
 
     if (moverVar=="pos") {
-      std::cout << "Position: X:" << list[playerNow]->x << " / Y: " << list[playerNow]->y << std::endl;
+      std::cout << "\n----------\n";    
+      std::cout << "Position: X: " << list[playerNow]->x << " / Y: " << list[playerNow]->y;
+      std::cout << "\n----------\n";     
     }
 
     if (moverVar=="look") {
+      std::cout << "\n----------";
       rhs->checkTime();
       rhs->look(list[playerNow],karte);
+      std::cout << "----------\n";
+    }
+    
+    if (moverVar=="talk") {
+      std::cout << "\n----------\n";
+      list[playerNow]->sendNpcMsg(karte,rhs);
+      std::cout << "\n----------\n";
     }
 
     if (moverVar=="help") {
+      std::cout << "\n----------";    
       std::cout << "\nYou may move around the map using the following directions:\n"
       << "n, w, e, s, nw, ne, sw, se."
       << "\nType 'quit' to exit the game. Further instructions are provided\n"
       << "in the documentation that came with this game.\n"
       << "\nConsole-RPG is licensed under the GNU GPL. Coded by KanadaKid.";
+      std::cout << "\n----------";      
     }
 
     if (moverVar=="save") {
       int slot;
+      std::cout << "\n----------";
+            
       std::cout << "\nSave to which slot (1-9)? ";
       std::cin >> slot;
       std::cin.ignore();
@@ -375,15 +409,19 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
         std::cout << "\nSlot " << slot << " is already full. Please select another.\n";
       
       fin.close();
+      std::cout << "\n----------";      
     }
 
     if (moverVar=="inv") {
+      std::cout << "\n----------";    
       list[playerNow]->displayInventory();
+      std::cout << "----------\n";      
     }
 
     if (moverVar=="equip") {
       int x=list[playerNow]->x;
       int y=list[playerNow]->y;
+      std::cout << "\n----------";      
 
       if (karte->itemExists(x,y)) {
         TYPE type=karte->checkItemType(x,y);
@@ -415,9 +453,13 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       
       else
         std::cout << "\nThere is no item here that can be equipped.\n";
+	
+      std::cout << "----------\n";
     }
 
     if (moverVar=="unequip") {
+      std::cout << "\n----------";
+          
       std::cout << "\nUnequip which item? ";
       std::string targetItem;
       std::cin.ignore();
@@ -438,33 +480,35 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
 
       if (equiped)
         std::cout << "\nYou unequipped the " << targetItem << ".\n";
+	
+      std::cout << "----------\n";
     }
 
     if (moverVar=="end") {
-      bool ignore=false; // should we ignore making a temp directory?
-
-      // after the first player ends his turn, then the temp directory is made.
-      // since it's already there, we ignore remaking it based upon the player's
-      // id. any id's above 1 are NOT the first players.
-      if (list[playerNow]->getPlayerID()>1)
-        ignore=true;
-
-      list[playerNow]->savePlayerData(list[playerNow]->getPlayerID(),99,ignore); // save the player's data
       karte->creaturesDoAction(); // move any npcs/monsters
+      
+      std::cout << "\n----------";
+      std::cout << "\nYou ended your turn. Press enter to continue...";
+      std::cout << "\n----------\n";
+      
+      std::cin.ignore();
+      std::cin.get();
 
       break;
     }
 
     std::string quitVer;
     if (moverVar=="quit") {
+      std::cout << "\n----------";    
       std::cout << "\nAre you sure you want to quit the game? (y,n)  ";
+      std::cout << "\n----------\n> ";
+      
       std::cin >> quitVer;
-      if (quitVer=="n")
+      if (quitVer[0]=='n' || quitVer[0]=='N')
         continue;
 
       else {
-        removeTemp(); // remove the temporary directory
-	CRPG_CLEAR_SCREEN;
+        CRPG_CLEAR_SCREEN;
         exit(0);
       }
     } // if (moverVar=="quit")
@@ -566,6 +610,7 @@ int generic::loadGame() {
  
 int options::redefCtrl() {
     CRPG_CLEAR_SCREEN;
+    std::cout << "\n-----------------";
     std::cout << "\nRedefine Controls\n";
     std::cout << "-----------------\n\n";
     std::string ch;

@@ -28,7 +28,7 @@
 #include "npc.h"
 #include "player.h"
 
-// our maximum map size (+/-)
+// our maximum map size
 #define max 50
 
 class item;
@@ -44,8 +44,6 @@ class map {
 		// public accessors
 		int getMapMaxSizeX() const {return MapMaxSizeX;}
 		int getMapMaxSizeY() const {return MapMaxSizeY;}
-		int getMapMaxSizeNgX() const {return MapMaxSizeNgX;}
-		int getMapMaxSizeNgY() const {return MapMaxSizeNgY;}
 		
 		// map methods
 		void addItem(item*);
@@ -77,7 +75,7 @@ class map {
 		std::list<item*> items;
 		
 	private:
-		int MapMaxSizeX,MapMaxSizeY,MapMaxSizeNgY,MapMaxSizeNgX;
+		int MapMaxSizeX,MapMaxSizeY;
 		int currentSquareX,currentSquareY,groundID;
 };
 

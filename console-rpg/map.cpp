@@ -30,11 +30,9 @@
 using namespace utilities;
 
 // map class constructor
-map::map(int X,int Y,int NgY,int NgX) {
+map::map(int X,int Y,int x,int y) {
 	MapMaxSizeX=X;
 	MapMaxSizeY=Y;
-	MapMaxSizeNgY=NgY;
-	MapMaxSizeNgX=NgX;
 	groundID=0;
 
 	players.clear();

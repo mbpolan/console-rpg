@@ -48,7 +48,7 @@ npc::~ npc() {
 
 // method for determining where to move
 void npc::preformMove(map *karte,bool dest) {
-	srand(time(NULL));
+	srand(static_cast<unsigned> (time(0)));
 	int action; // our action
 
 	// should we preform a random move or a controlled move?
@@ -175,4 +175,14 @@ xmlNodePtr npc::compressToXML() {
 	ss.str("");
 	
 	return ptr;
+};
+
+// method for talking to a user
+// TODO: make this different for every npc
+std::string npc::replyToMsg(std::string msg) {
+	// just a test message for now
+	if (msg=="hi")
+		return std::string("Hello!");
+	
+	return std::string("NULL");
 };

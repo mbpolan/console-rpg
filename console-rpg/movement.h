@@ -24,6 +24,8 @@
 // movement.h: holds movement system and map stuff
 #include "creature.h"
 #include "map.h"
+#include "npc.h"
+#include "player.h"
 
 enum BLOCK {
 	BLOCK_NPC,
@@ -31,6 +33,10 @@ enum BLOCK {
 	BLOCK_MONSTER,
 	CLEAR
 };
+
+class map;
+class npc;
+class player;
 
 class movement { 
 	public:
