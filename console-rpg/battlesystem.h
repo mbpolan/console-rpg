@@ -19,6 +19,10 @@
  ***************************************************************************/
  
  #include <iostream>
+ #include <vector>
+ 
+ // an enumeration of different effects
+ enum statusEffect { EFFECT_NONE=0x00, EFFECT_POISON=0x01, EFFECT_ELECTRIC=0x02, EFFECT_BURN=0x03 };
  
  // adt class
  class battleAction {
@@ -31,6 +35,9 @@
 		// methods to work on internal buffer
 		virtual void addByte(char);
 		virtual void addBuffer(std::string buf, bool clear=false);
+		
+		// get the first byte from the buffer
+		char header() const {return (char) buffer[0];}
 		
 		// build the complete action
 		virtual void build();
@@ -83,10 +90,48 @@
 		// (virtual) build the complete action
 		virtual void build();
 		
-	private:
+	protected:
 		int attack_damage; // damage to be taken
 		int mana_reduction; // mana to be reduced
 		
 		// effects
 		bool poisonous, electrifying, burning, strong;
+};
+
+// class to manage info about a special type of attack
+class spAttackAction: public attackAction {
+	public:
+		spAttackAction();
+		spAttackAction(int damage, int mana_reduc, int count=1);
+		
+		// methods to work on internal buffer
+		virtual void addByte(char);
+		virtual void addBuffer(std::string buf, bool clear=false);
+		
+		void addTurnEffect(int turn, statusEffect effect, bool replace=false); // add an effect to take place on a specific turn
+		statusEffect getTurnEffect(int turn) const {return effects[turn];}
+		
+		// (virtual) build the complete action
+		virtual void build();
+		
+	protected:
+		std::vector<statusEffect> effects; // effects on turn, TODO: multiple effects per turn
+		int count;
+};
+
+// class to manage info about a magic attack
+class magicAttackAction: public spAttackAction {
+	public:
+		magicAttackAction();
+		magicAttackAction(int damage, int mana_reduc, int count=1, statusEffect effect=EFFECT_NONE);
+		
+		// methods to work on internal buffer
+		virtual void addByte(char);
+		virtual void addBuffer(std::string buf, bool clear=false);
+		
+		// (virtual) build the complete action
+		virtual void build();
+		
+	protected:
+		std::string name; // attack name
 };

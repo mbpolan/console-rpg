@@ -146,3 +146,172 @@ void attackAction::build() {
 	
 	return;
 };
+
+ /***************************************************************************
+  * Start spAttackAction class implementation
+  **************************************************************************/
+
+// spAttackAction default constructor
+spAttackAction::spAttackAction(): attackAction(100, 0) {
+	count=1;
+};
+
+// spAttackAction constructor taking extra count parameter
+spAttackAction::spAttackAction(int damage, int mana_reduc, int _count): attackAction(damage, mana_reduc) {
+	count=_count;
+};
+
+// method to add a byte to the buffer
+void spAttackAction::addByte(char byte) {
+	if (buffer[0]!=(char) 0x02)
+		buffer.insert(0, "2");
+	
+	buffer+=(char) byte;
+};
+
+// method to add another buffer into this one
+void spAttackAction::addBuffer(std::string buf, bool clear) {
+	if (clear)
+		buffer.clear();
+	
+	buffer+=buf;
+};
+
+// method to add an effect to take place on a specific turn
+void spAttackAction::addTurnEffect(int turn, statusEffect e, bool replace) {
+	if (effects[turn] && !replace)
+		return;
+	
+	else if (!effects[turn])
+		effects[turn]=e;
+};
+
+void spAttackAction::build() {
+	std::stringstream ss;
+	
+	if (buffer[0]!=(char) 0x02)
+		buffer.insert(0, "2");
+	
+	// count of all bytes
+	int byte_count=0;
+	
+	// add damage and mana reduction first
+	buffer+=attack_damage;
+	buffer+=mana_reduction;
+	byte_count+=2;
+	
+	// add a count of how many turns this attack lasts
+	ss << count;
+	buffer+=ss.str();
+	byte_count+=1;
+	ss.str("");
+	
+	// add turn effects
+	for (int i=0; i<effects.size(); i++) {
+		ss << effects[i];
+		buffer+=ss.str();
+		byte_count+=1;
+		
+		ss.str("");
+	}
+	
+	// add initial attack effects
+	buffer+=poisonous;
+	buffer+=electrifying;
+	buffer+=burning;
+	buffer+=strong;
+	byte_count+=4;
+	
+	// finally add the total amount of bytes
+	ss << byte_count;
+	buffer.insert(1, ss.str());
+	
+	// signify that this action is built
+	built=true;
+	
+	return;
+};
+
+ /***************************************************************************
+  * Start magicAttackAction class implementation
+  **************************************************************************/
+
+ // magicAttackAction constructor
+ magicAttackAction::magicAttackAction(): spAttackAction() {
+ 	name="";
+};
+
+// makeAttackAction constructor taking extra parameters
+magicAttackAction::magicAttackAction(int damage, int mana_reduc, int count, statusEffect init_effect): spAttackAction(damage, mana_reduc, count) {
+	name="";
+	effects[0]=init_effect;
+};
+
+// method for adding a byte to the buffer
+void magicAttackAction::addByte(char byte) {
+	if (buffer[0]!=(char) 0x03)
+		buffer.insert(0, "3");
+	
+	buffer+=(char) byte;
+};
+
+// method for adding another buffer into this one
+void magicAttackAction::addBuffer(std::string buf, bool clear) {
+	if (clear)
+		buffer.clear();
+	
+	buffer+=buf;
+};
+
+void magicAttackAction::build() {
+	std::stringstream ss;
+	
+	if (buffer[0]!=(char) 0x03)
+		buffer.insert(0, "3");
+		
+	// count of bytes
+	int byte_count=0;
+	
+	// add damage and mana reduction
+	buffer+=attack_damage;
+	buffer+=mana_reduction;
+	byte_count+=2;
+	
+	// add name length
+	buffer+=name.length();
+	byte_count+=1;
+	
+	// add the attack name
+	buffer+=name;
+	
+	// add a count of how many turns this attack lasts
+	ss << count;
+	buffer+=ss.str();
+	byte_count+=1;
+	ss.str("");
+	
+	// add turn effects
+	for (int i=0; i<effects.size(); i++) {
+		ss << effects[i];
+		buffer+=ss.str();
+		byte_count+=1;
+		
+		ss.str("");
+	}
+	
+	// add initial attack effects
+	buffer+=poisonous;
+	buffer+=electrifying;
+	buffer+=burning;
+	buffer+=strong;
+	byte_count+=4;
+	
+	// finally add the total amount of bytes
+	ss << byte_count;
+	buffer.insert(1, ss.str());
+	
+	// signify that this action is built
+	built=true;
+	
+	return;
+};
