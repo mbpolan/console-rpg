@@ -110,8 +110,8 @@ class player: public creature {
 		// misc methods
 		void setPlayerID(int id) {playerID=id;}
 		int getPlayerID() const {return playerID;}
-		void setPlayersOn(int players) {playersOn=players;}
-		int getPlayersOn() {return playersOn;}
+		static void setPlayersOn(int players) {playersOn=players;}
+		static int getPlayersOn() {return playersOn;}
 		void setLook();
 		
 	private:

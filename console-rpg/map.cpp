@@ -21,7 +21,7 @@
 // map.cpp: declarations for map functions
 #include <iostream>
 #include <fstream>
-#include <string>
+#include <sstream>
 #include "map.h"
 
 // map class constructor
@@ -44,6 +44,8 @@ map::map(int X,int Y,int NgY,int NgX) {
 		itemLineY[i]=NULL;
 		itemLineNgY[i]=NULL;
 	}
+	
+	npcs.clear();
 };
 
 // map class destructor
@@ -254,17 +256,17 @@ TYPE map::checkItemType(map *karte) {
 int map::saveMapData(int game) {
 	std::ofstream fout;
 	
-	char path[256];
+	std::stringstream path;
 	
 	#ifdef __LINUX__
-	sprintf(path,"data/game%d/map.dat",game);
+	path << "data/game" << game << "/map.dat";
 	#endif
 	
 	#ifdef __WINDOWS__
-	sprintf(path,"data\\game%d\\map.dat",game);
+	path << "data\\game" << game << "\\map.dat";
 	#endif
 	
-	fout.open(path); // open a new map file
+	fout.open(path.str().c_str()); // open a new map file
 	
 	if (!fout) {
 		std::cout << "\nFailed to save map data!\n";

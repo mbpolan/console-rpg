@@ -12,7 +12,8 @@ OFLAG = -o
 CFLAG = -c
 EXT = 
 OSUFFIX = .o
-CPPFLAGS = -D__LINUX__ -DDEBUG
+#CPPFLAGS = -D__LINUX__ -DDEBUG #for debugging
+CPPFLAGS = -D__LINUX__
 DEL = rm -f
 
 #########################
@@ -23,7 +24,8 @@ DEL = rm -f
 #CFLAG = -c
 #EXT = .exe
 #OSUFFIX = .obj
-#CPPFLAGS = -D__WINDOWS__
+#CPPFLAGS = -D__WINDOWS__ -DDEBUG #for debugging
+#CPPFLAGS = -D__WINDOWS__ 
 #DEL = rm
 #
 ############################

@@ -20,7 +20,7 @@
 
  #include <iostream>
  #include <fstream>
- 
+
 // player.cpp: declarations for player functions
 #include "player.h"
 
@@ -267,26 +267,26 @@ int player::savePlayerData(map *karte,int player,int game,bool ignoreTemp) {
 	int x=karte->getCurrentSpaceX();
 	int y=karte->getCurrentSpaceY();
 	
-	char savefile[256];
-	char targetDir[256];
-	char index[256];
-	char namefile[256];
-	
 	std::ofstream fout;
 	std::ifstream fin;
+	
+	char savefile[256];
+	char namefile[256];
+	char targetDir[256];
+	char index[256];
 	
 	// check which system the client is using. this is nessesary
 	// because the file separators in linux and windows are different,
 	// which will cause problems if they are not defined specifically ;)
 	#ifdef __LINUX__
-	sprintf(savefile,"data/game%d/savefile%d.dat",game,player); // the savefile
+	sprintf(savefile,"data/game%d/savefile%d.dat",game,player);// the savefile
 	sprintf(targetDir,"mkdir data/game%d",game); // command to make a new slot
 	sprintf(index,"data/game%d/index.dat",game); // index file
 	sprintf(namefile,"data/game%d/name%d.dat",game,player);
 	#endif
 	
 	#ifdef __WINDOWS__
-	sprintf(savefile,"data\\game%d\\savefile%d.dat",game,player); // the savefile
+	sprintf(savefile,"data\\game%d\\savefile%d.dat",game,player);// the savefile
 	sprintf(targetDir,"mkdir data\\game%d",game); // command to make a new slot
 	sprintf(index,"data\\game%d\\index.dat",game); // index file
 	sprintf(namefile,"data\\game%d\\name%d.dat",game,player);
@@ -343,17 +343,19 @@ int player::loadPlayerData(map *karte,int player,int game) {
 	
 	std::fstream fin;
 	int x,y;
-	char savefile[256];
-	char namefile[256];
 	
 	// once again, check what the client's system is and use
 	// the appropriate file separator.
 	#ifdef __LINUX__
+	char savefile[256];
+	char namefile[256];
 	sprintf(savefile,"data/game%d/savefile%d.dat",game,player);
 	sprintf(namefile,"data/game%d/name%d.dat",game,player);
 	#endif
 	
 	#ifdef __WINDOWS__
+	char savefile[256];
+	char namefile[256];
 	sprintf(savefile,"data\\game%d\\savefile%d.dat",game,player);
 	sprintf(namefile,"data\\game%d\\name%d.dat",game,player);
 	#endif
@@ -438,14 +440,15 @@ int player::saveToIndex(int game) {
 // load data from the index file
 int player::loadFromIndex(int game) {
 
+	// this is the path to the index file
 	#ifdef __LINUX__
 	char index[256];
-	sprintf(index,"data/game%d/index.dat",game); // index file
+	sprintf(index,"data/game%d/index.dat",game);
 	#endif
 	
 	#ifdef __WINDOWS__
 	char index[256];
-	sprintf(index,"data\\game%d\\index.dat",game); // index file
+	sprintf(index,"data\\game%d\\index.dat",game);
 	#endif
 
 	std::ifstream fin;
@@ -468,14 +471,17 @@ int player::removeTemp() {
 
 	// last time we need to check the client's system and
 	// use the appropriate file separator.
+	char path[256];
+	char delCommand[256];
+	
 	#ifdef __LINUX__
-	char path[]="data/game99/savefile1.dat";
-	char delCommand[]="rm -rf data/game99";
+	sprintf(path,"data/game99/savefile1.dat");
+	sprintf(delCommand,"rm -rf data/game99");
 	#endif
 	
 	#ifdef __WINDOWS__
-	char path[]="data\\game99\\savefile1.dat";
-	char delCommand[]="rmdir /S /Q data\\game99";
+	sprintf(path,"data\\game99\\savefile1.dat");
+	sprintf(delCommand,"rm -rf data\\game99");
 	#endif
 
 	std::ifstream fin;

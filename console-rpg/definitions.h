@@ -26,10 +26,16 @@
 #include <fstream>
 #include <ctype.h> // for toupper()
 #include <stdlib.h> // for atoi()
+#include <sstream> // for stringstream
 
 #include "player.h"
 #include "playerlist.h"
 #include "movement.h"
+
+#ifdef __LINUX__
+typedef unsigned long long __int64;
+#endif
+bool load=false;
 
 // set the static number of players to 0
 int player::playersOn=0;
@@ -65,15 +71,23 @@ int generic::menu() {
     // the user wants to start a new game
     if (menuChoice==1) {
 
+      char ch[5];
       int players; // the amount of players
-      std::cout << "\nHow many players in this game? ";
-      std::cin >> players;
+      std::cout << "\nEnter amount of players (max 10): ";
+      std::cin >> ch;
       std::cin.ignore(); // remove the newline
+      
+      players=atoi(ch);
+      
+      if (!(players<=10 && players>0)) {
+        std::cout << "\nInvalid player amount!\n";
+        return 0;
+      }
 
       // make an array of current players
       //player *list[players];
       playerList<player*> list;
-      list[0]->setPlayersOn(players);
+      player::setPlayersOn(players);
 
       // fill up this array
       for (int i=0;i<players;i++) {
@@ -97,15 +111,17 @@ int generic::menu() {
 
       // now we declare some paths based on the client's
       // operating system.
-#ifdef __LINUX__
-      char index[256];
-      sprintf(index,"data/game%d/index.dat",slot); // path to index file
-#endif
+      #ifdef __LINUX__
+      std::stringstream index;
+      char path[256];
+      index << "data/game" << slot << "/index.dat"; // path to index file
+      #endif
 
-#ifdef __WINDOWS__
-      char index[256];
-      sprintf(index,"data\\game%d\\index.dat",slot); // path to index file
-#endif
+      #ifdef __WINDOWS__
+      char path[256];
+      std::stringstream index;
+      index << "data\\game" << slot << "\\index.dat"; // path to index file
+      #endif
 
       // now we attempt to open the index file
       player *pPlayer=new player;
@@ -119,16 +135,25 @@ int generic::menu() {
       map *karte=new map(30,30,-30,-30); // world map
 
       // start the loop to fill up array with saved player data
-      char path[256];
       for (int i=0;i<players;i++) {
         list[i]=new player;
         player *pPlayer=new player;
 
-        sprintf(path,"data/game%d/savefile%d.dat",slot,i+1);
+	#ifdef __LINUX__
+	sprintf(path,"data/game%d/savefile%d.dat",slot,i+1);
+	#endif
+
+	#ifdef __WINDOWS__
+	sprintf(path,"data\\game%d\\savefile%d.dat",slot,i+1);	
+	#endif
 
         fin.open(path);
 
-        if (!fin) {
+    #ifdef DEBUG
+	std::cout << "\nLoading from " << path << "...\n";
+	#endif
+
+        if (!fin) {           
           std::cout << "\nGame: " << slot;
           std::cout << "\nSavefile " << i << " is either corrupt or not present. Aborting...\n";
           return 0;
@@ -139,6 +164,7 @@ int generic::menu() {
         list[i]=pPlayer;
 
         fin.close();
+	load=true;
       }
 
       generic::preGame(grid,karte,list,players);
@@ -216,7 +242,10 @@ void generic::preGame(movement *rhs,map *karte,playerList<player*> &r_list,int p
     // reset the counter
     if (j==playerCount)
       j=0;
-      std::cout << "j: " << j << std::endl;
+      
+    #ifdef DEBUG
+    std::cout << "j: " << j << std::endl;
+    #endif
 
     std::cout << "\n*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*";
     std::cout << "\nWelcome to Console RPG, " << r_list[j]->getName() << std::endl
@@ -250,7 +279,16 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
 
   // reset the coordinates for the next player as long as it's
   // still his first turn.
-  if (firstTurn) {
+  
+  #ifdef DEBUG
+  if (load)
+  std::cout << "\nLoad defined. Avoid reset.\n";
+  
+  if (!load)
+  std::cout << "\nLoad NOT defined. Reset.\n";
+  #endif
+  
+  if (firstTurn && !load) {
     karte->setCurrentSpaceX(0);
     karte->setCurrentSpaceY(0);
   }
@@ -354,15 +392,43 @@ void generic::startGame(movement *rhs,map *karte,playerList<player*> &list,int p
       std::cout << "\nSave to which slot (1-9)? ";
       std::cin >> slot;
       std::cin.ignore();
-
-      // since the slot doesn't yet exist, we pass in 'false' as the
-      // parameter to make the slot directory. loop until every players'
-      // stats are saved in the slot.
-      for (int i=0;i<playerCount;i++) {
-        list[i]->savePlayerData(karte,list[i]->getPlayerID(),slot,false);
+      
+      std::stringstream ss;
+      
+      #ifdef __LINUX__
+      ss << "data/game" << slot << "/";
+      #endif
+      
+      #ifdef __WINDOWS__
+      ss << "data\\game" << slot << "\\";
+      #endif
+      
+      bool exists=false;
+      std::ifstream fin;
+      fin.open(ss.str().c_str());
+      
+      if (fin) {
+        std::cout << "\nSlot " << slot << " is already full. Please select another.\n";
+        exists=true;
+        break;
       }
-      karte->saveMapData(slot);
-      std::cout << "\nPlayer and map saved!\n";
+      
+      // only if the slot is not occupied
+      if (!fin) {
+        // since the slot doesn't yet exist, we pass in 'false' as the
+        // parameter to make the slot directory. loop until every players'
+        // stats are saved in the slot.
+        for (int i=0;i<playerCount;i++) {
+          list[i]->savePlayerData(karte,list[i]->getPlayerID(),slot,exists);
+        }
+        karte->saveMapData(slot);
+        std::cout << "\nPlayer and map saved!\n";
+      }
+      
+      else
+        std::cout << "\nSlot " << slot << " is already full. Please select another.\n";
+      
+      fin.close();
     }
 
     if (moverVar=="inv") {

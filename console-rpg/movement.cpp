@@ -223,23 +223,12 @@ void movement::spawnMapItems(movement *rhs,map *karte) {
 
 	// syntax for new item is name,x,y,type.
 	// then call placeItem to put these on the map.
-	item *plant0=new item("fern",1,2,npe);
-	rhs->placeItem(plant0,karte);
-
-	item *rock0=new item("rock",-1,-1,npe);
-	rhs->placeItem(rock0,karte);
-
-	item *plant1=new item("herb",-2,3,npe);
-	rhs->placeItem(plant1,karte);
-
-	item *plant2=new item("bush",-10,5,npe);
-	rhs->placeItem(plant2,karte);
-
-	item *plant3=new item("sunflowers",20,5,npe);
-	rhs->placeItem(plant3,karte);
-
-	item *equip=new item("Leather Armor",4,6,torso);
-	rhs->placeItem(equip,karte);
+	rhs->placeItem(new item("fern",1,2,npe),karte);
+	rhs->placeItem(new item("rock",-1,-1,npe),karte);
+	rhs->placeItem(new item("herb",-2,3,npe),karte);
+	rhs->placeItem(new item("bush",-10,5,npe),karte);
+	rhs->placeItem(new item("sunflowers",20,5,npe),karte);
+	rhs->placeItem(new item("Leather Armor",4,6,torso),karte);
 };
 
 // toggle between night and day, or increase step count if none

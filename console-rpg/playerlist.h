@@ -43,6 +43,10 @@ class playerList {
 
 		// public accessor
 		int getLength() const {return length;}
+		
+		// member functions
+		void clear();
+		void fill(T&);
 
 		// other methods/operators
 		template <class> friend std::ostream &operator<<(std::ostream&,playerList<T>&);
@@ -135,6 +139,22 @@ const T &playerList<T>::operator[](int offset) const {
 		return AType[length-1];
 	else
 		return AType[offset];
+};
+
+// member function clear
+template <class T>
+void playerList<T>::clear() {
+	for (int i=0;i<length;i++)
+		AType[i]=0;
+};
+
+// member function fill
+template <class T>
+void playerList<T>::fill(T &type) {
+	clear();
+
+	for (int i=0;i<length;i++)
+		AType[i]=type;
 };
 
 // overloaded operator<<

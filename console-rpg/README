@@ -1,6 +1,6 @@
-Console-RPG 0.1.8
+Console-RPG 0.2.0a
 -----------------
-(released: 10/18/04)
+(released: 12/7/04)
 
 
 Background
@@ -11,8 +11,9 @@ monsters, items, equipment, etc.
 
 Package Info
 ------------
-Initial release 0.1. Don't expect much in this version. The only thing
-you can really do is move around, etc.
+Much as been done since the 0.1 release of the package. Many new features
+were added with more stability. Also, Console-RPG now runs on Windows 2000/XP
+systems, and of course on Linux.
 
 Install
 -------
@@ -25,21 +26,19 @@ Console-RPG should now start.
 
 What's New?
 -----------
-Much has been done since the last release. The inventory bug
-was fixed, so viewing your inventory is now possible again. A
-few more map bugs have been taken care of, so the map system is
-near fully functional, with the exception of a few more annoying
-bugs that need work. Finally, file loading is working, so you can
-continue from where you left off. :)
+The biggest improvement since the previous release is the ability to run the
+package on Windows systems (2000 and higher). Many map bugs were fixed, one being
+the item removal bug that disabled items from being removed from the map.
 
-NOTE about file saving/loading: the savefile is saved to a data/
-directory where the CRPG binary is. If that directory doesn't exist,
-then please make it! Example:
+There is also more stability. Most user input code has been reworked so that strange
+input doesn't crash the game or throw it into an infinite loop. The long awaited multiplayer
+system should now work without any problems, hopefully. Finally, file saving and loading is 
+now fully functional.
 
-(Current directory: /home/mike/crpg/)
-$ mkdir data
-
-That outta be it. ;)
+Note that there are a few unresolved, but not critical, bugs that are in this release. When
+you do the save command, a message from the command mkdir will appear informing you that a
+directory cannot be made. Ignore that error for now since the directory is indeed made, and
+this bug shouldn't disturb gameplay in any way.
 
 List of Commands In-game
 ------------------------

@@ -23,6 +23,8 @@
 
 // map.h: map class and related stuff
 #include "items.h"
+#include "npc.h"
+#include "playerlist.h"
 
 // our maximum map size (+/-)
 #define max 30
@@ -71,6 +73,9 @@ class map {
 		item *itemLineY[max];
 		item *itemLineNgX[max];
 		item *itemLineNgY[max];
+		
+		// list of npcs on the map
+		playerList<npc*> npcs;
 };
 
 #endif
