@@ -92,9 +92,11 @@ void startGame(movement *rhs,map *karte,player *r_player) {
 		std::string moverVar;
 		std::cin >> moverVar;
 		
+		#ifdef DEBUG
 		if (moverVar=="mod") {
 			r_player->setHP(0);
 		}
+		#endif
 		
 		if (moverVar=="n") {
 			rhs->moveN(karte);
@@ -168,11 +170,11 @@ void startGame(movement *rhs,map *karte,player *r_player) {
 		/* ********************************************** *
 		 * Displaying the inventory results in a loop bug *
 		 * Fix it before making equipment spawnable!      *
-		 * ********************************************** *
+		 * ********************************************** */
 		if (moverVar=="inv") {
-			r_player->displayInventory(r_player);
+			r_player->displayInventory();
 		}
-		* ******************** *
+		/* ******************** *
 		* End bug segment code *
 		* ******************** */
 		

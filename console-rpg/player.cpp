@@ -145,12 +145,12 @@ void player::setLook(player *r_player) {
 
 // display player's inventory
 // BUG: there is a bug here, fix it!
-std::string player::displayInventory(player *r_player) {
+void player::displayInventory() {
 	std::cout << "\nYour Inventory:\n\n";
-	std::cout << "Head: " << r_player->getHeadItem() << ".\n";
-	std::cout << "Torso: " << r_player->getTorsoItem() << ".\n";
-	std::cout << "Legs: " << r_player->getLegsItem() << ".\n";
-	std::cout << "Feet: " << r_player->getBootsItem() << ".\n";
+	std::cout << "Head: " << headEq << "\n";
+	std::cout << "Torso: " << torsoEq << "\n";
+	std::cout << "Legs: " << legEq << "\n";
+	std::cout << "Feet: " << bootEq << "\n";
 };
 
 // remove item from inventory
@@ -205,10 +205,10 @@ void player::increaseLevel() {
 // display player statistics
 int player::displayStats(player *r_player) {
 	std::cout << "\n\nStats\n";
-	std::cout << "HP: " << r_player->getHP() << std::endl;
-	std::cout << "MP: " << r_player->getMP() << std::endl;
-	std::cout << "Luck: " << r_player->getLuck() << std::endl;
-	std::cout << "Strength: " << r_player->getStrength() << std::endl;
-	std::cout << "Power: " << r_player->getPower() << std::endl;
-	std::cout << "Defense: " << r_player->getDefense() << "\n\n";
+	std::cout << "HP: " << currentHP << std::endl;
+	std::cout << "MP: " << currentMP << std::endl;
+	std::cout << "Luck: " << luck << std::endl;
+	std::cout << "Strength: " << strength << std::endl;
+	std::cout << "Power: " << power << std::endl;
+	std::cout << "Defense: " << defense << "\n\n";
 };

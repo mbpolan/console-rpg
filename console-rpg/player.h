@@ -82,7 +82,6 @@ class player: private creature {
 		std::string getTorsoItem() const {return torsoEq;}
 		std::string getLegsItem() const {return legEq;}
 		std::string getBootsItem() const {return bootEq;}
-		std::string displayInventory(player*);
 		
 		// inventory actions
 		void removeInventoryItem(int);
@@ -90,6 +89,7 @@ class player: private creature {
 		int searchInventory(player*,std::string);
 
 		// to display player's stats
+		void displayInventory();
 		int displayStats(player*);
 		
 	private:

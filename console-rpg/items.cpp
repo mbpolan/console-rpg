@@ -3,44 +3,32 @@
 
 // item class default constructor
 item::item() {
-	itemLocationX=new int(0);
-	itemLocationY=new int(0);
-	itemName=new std::string("NULL");
+	itemLocationX=0;
+	itemLocationY=0;
+	itemName="NULL";
 	itemTYPE=npe;
 };
 
 // our item class constructor
 item::item(std::string fixedItemName,int spawnX,int spawnY,TYPE thisType) {
-	itemLocationX=new int(spawnX);
-	itemLocationY=new int(spawnY);
-	itemName=new std::string(fixedItemName);
+	itemLocationX=spawnX;
+	itemLocationY=spawnY;
+	itemName=fixedItemName;
 	itemTYPE=thisType;
 };
 
 // item class destructor
 item::~item() {
-	delete itemLocationX;
-	delete itemLocationY;
-	delete itemName;
-	itemName=0;
-	itemLocationX=0;
-	itemLocationY=0;
 };
 
 // set item location on X
 void item::setLocationX(int XLOCATION) {
-	if (*itemLocationX==XLOCATION)
-		*itemLocationX=*itemLocationX;
-	else
-		*itemLocationX=XLOCATION;
+	itemLocationX=XLOCATION;
 };
 
 // set item location on Y
 void item::setLocationY(int YLOCATION) {
-	if (*itemLocationY==YLOCATION)
-		*itemLocationY=*itemLocationY;
-	else
-		*itemLocationY=YLOCATION;
+	itemLocationY=YLOCATION;
 };
 
 // check the item's enumerated type

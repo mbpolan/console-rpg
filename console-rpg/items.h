@@ -15,12 +15,12 @@ class item {
 		void setLocationX(int);
 		void setLocationY(int);
 		void setItemID(int);
-		void setItemName(std::string nameOfItem) {*itemName=nameOfItem;}
+		void setItemName(std::string nameOfItem) {itemName=nameOfItem;}
 		
-		int getLocationX() const {return *itemLocationX;}
-		int getLocationY() const {return *itemLocationY;}
-		std::string getName() const {return *itemName;}
-		int getItemID() const {return *itemID;}
+		int getLocationX() const {return itemLocationX;}
+		int getLocationY() const {return itemLocationY;}
+		std::string getName() const {return itemName;}
+		int getItemID() const {return itemID;}
 		
 		bool isHeadItem(item*);
 		bool isTorsoItem(item*);
@@ -30,10 +30,8 @@ class item {
 		TYPE checkType();
 
 	private:
-		int *itemLocationX;
-		int *itemLocationY;
-		int *itemID;
-		std::string *itemName;
+		int itemLocationX, itemLocationY, itemID;
+		std::string itemName;
 		TYPE itemTYPE;
 };
 
