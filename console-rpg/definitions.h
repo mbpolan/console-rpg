@@ -1,7 +1,7 @@
 // definitions.h: holds function declarations and definitions
 #include <iostream>
 
-void startGame(movement*);
+void startGame(movement*,map*);
 int mainMenu(player&);
 void optionMenu();
 
@@ -33,6 +33,7 @@ int menu(player &r_player) { // takes a reference to player
 // mainMenu: function for displaying the main menu
 int mainMenu(player &r_player2) { // takes a reference to player
 	movement *grid=new movement;
+	map *karte=new map(30,30,-30,-30);
 	std::string cVar;
 	std::cout << "\nEnter player name: ";
 	std::string name;
@@ -49,7 +50,7 @@ int mainMenu(player &r_player2) { // takes a reference to player
 	if (connect=="y") {
 		std::cout << "\nWelcome to Console RPG, " << r_player2.getName() << std::endl
 		     << "Type 'help' to display a help menu.";
-		startGame(grid); // this is where we actually start
+		startGame(grid,karte); // this is where we actually start
 		delete grid; // we are done with the grid map; delete it
 		grid=0;
 	}
@@ -65,42 +66,44 @@ void optionMenu() {
 }
 
 // startGame function: this will start the movement system
-void startGame(movement *rhs) {
+void startGame(movement *rhs,map *karte) {
 	while(1) {
 		item *torch=new item("torch",1,1);
-		rhs->placeItem(torch,rhs);
+		rhs->placeItem(torch,karte);
 		std::cout << "\nMove: ";
+		
 		std::string moverVar;
 		std::cin >> moverVar;
+		
 		if (moverVar=="n") {
-			rhs->moveN();
+			rhs->moveN(karte);
 		}
 		if (moverVar=="s") {
-			rhs->moveS();
+			rhs->moveS(karte);
 		}
 		if (moverVar=="w") {
-			rhs->moveW();
+			rhs->moveW(karte);
 		}
 		if (moverVar=="e") {
-			rhs->moveE();
+			rhs->moveE(karte);
 		}
 		if (moverVar=="nw") {
-			rhs->moveNW();
+			rhs->moveNW(karte);
 		}
 		if (moverVar=="ne") {
-			rhs->moveNE();
+			rhs->moveNE(karte);
 		}
 		if (moverVar=="sw") {
-			rhs->moveSW();
+			rhs->moveSW(karte);
 		}
 		if (moverVar=="se") {
-			rhs->moveSE();
+			rhs->moveSE(karte);
 		}	
 		if (moverVar=="position") {
-			rhs->getCurrentPosition();
+			rhs->getCurrentPosition(karte);
 		}
 		if (moverVar=="look") {
-			rhs->look(rhs);
+			rhs->look(karte);
 		}
 		if (moverVar=="help") {
 			std::cout << "\nYou may move around the map using the following directions:\n"
