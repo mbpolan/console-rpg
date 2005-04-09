@@ -58,7 +58,7 @@ enemy$(OSUFFIX): enemy.cpp enemy.h creature.h
 items$(OSUFFIX): items.cpp items.h
 	$(CPP) $(CPPFLAGS) $(CFLAG) items.cpp $(OFLAG) items$(OSUFFIX)
 
-map$(OSUFFIX): map.cpp map.h items.h
+map$(OSUFFIX): map.cpp map.h items.h db.h
 	$(CPP) $(CPPFLAGS) $(CFLAG) map.cpp $(OFLAG) map$(OSUFFIX)
 
 npc$(OSUFFIX): npc.cpp npc.h creature.h

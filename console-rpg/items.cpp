@@ -19,6 +19,8 @@
  ***************************************************************************/
 
 // items.cpp: declarations for item functions
+#include <fstream>
+
 #include "items.h"
 
 int item::itemCount=0;
@@ -168,55 +170,36 @@ xmlNodePtr item::compressToXML() {
 
 // parse the id and set some variables
 void item::parseItem(int id) {
-	switch(id) {
-		// item ids are compared in hex values to avoid the user editing
-		// the map file and messing stuff up =\
+  // map related item
+	if (id >= 0x00 && id < 0x64) {
+		switch(id) {
+			// generic
+      default:
+			case 0x00: itemName="nothing"; itemTYPE=npe; break;
 		
-		// generic
-		case 0x00: itemName="nothing"; itemTYPE=npe; break;
-		
-		// inanimate objects
-		case 0x01: itemName="a bush"; itemTYPE=npe; break;
-		case 0x02: itemName="a rock"; itemTYPE=npe; break;
-		case 0x03: itemName="sunflowers"; itemTYPE=npe; break;
-		case 0x04: itemName="a fern"; itemTYPE=npe; break;
-		case 0x05: itemName="an herb"; itemTYPE=npe; break;
-		case 0x06: itemName="a puddle"; itemTYPE=npe; break;
-		
-		// equipment
-		// armors
-		case 0x64: itemName="Jacket"; itemTYPE=torso; break;
-		case 0x65: itemName="Leather Armor"; itemTYPE=torso; break;
-		case 0x66: itemName="Chain Mail"; itemTYPE=torso; break;
-		case 0x67: itemName="Full Chain Armor"; itemTYPE=torso; break;
-		case 0x68: itemName="Steel Mail"; itemTYPE=torso; break;
-		case 0x69: itemName="Full Steel Armor"; itemTYPE=torso; break;
-		
-		// legs
-		case 0x72: itemName="Leather Legs"; itemTYPE=legs; break;
-		case 0x73: itemName="Chain Legs"; itemTYPE=legs; break;
-		case 0x74: itemName="Light Steel Legs"; itemTYPE=legs; break;
-		case 0x75: itemName="Heavy Steel Legs"; itemTYPE=legs; break;
-		case 0x76: itemName="Fighter Legs"; itemTYPE=legs; break;
-		case 0x77: itemName="Noble Legs"; itemTYPE=legs; break;
-		case 0x78: itemName="Warrior Legs"; itemTYPE=legs; break;
-		
-		// boots
-		case 0x82: itemName="Boots"; itemTYPE=boots; break;
-		case 0x83: itemName="War Boots"; itemTYPE=boots; break;
-		case 0x84: itemName="Ares Boots"; itemTYPE=boots; break;
-		
-		// helmets
-		case 0x8C: itemName="Leather Cap"; itemTYPE=head; break;
-		case 0x8D: itemName="Chain Helmet"; itemTYPE=head; break;
-		case 0x8E: itemName="Light Steel Helmet"; itemTYPE=head; break;
-		case 0x8F: itemName="Heavy Steel Helmet"; itemTYPE=head; break;
-		case 0x90: itemName="Fighter Helmet"; itemTYPE=head; break;
-		case 0x91: itemName="Noble Helmet"; itemTYPE=head; break;
-		case 0x92: itemName="Warrior Helmet"; itemTYPE=head; break;
-		
-		default: itemName=""; itemTYPE=npe; break;
+			// inanimate objects
+			case 0x01: itemName="a bush"; itemTYPE=npe; break;
+			case 0x02: itemName="a rock"; itemTYPE=npe; break;
+			case 0x03: itemName="sunflowers"; itemTYPE=npe; break;
+			case 0x04: itemName="a fern"; itemTYPE=npe; break;
+			case 0x05: itemName="an herb"; itemTYPE=npe; break;
+			case 0x06: itemName="a puddle"; itemTYPE=npe; break;
+		}
 	}
+
+  // this is an item
+  else if (id >= 0x64) {
+/*    // known item
+    if (karte->itemDb.getObject(id))
+      return;
+      //this=items[id];*/
+  }
+
+  // unknown item
+  else {
+    itemName="";
+    itemTYPE=npe;
+  }
 };
 
 /********************************************************************

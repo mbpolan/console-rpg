@@ -310,3 +310,31 @@ void map::creaturesDoAction() {
 		}
 	}
 };
+
+// load items from a file
+bool map::loadItemDb(const char *path) {
+/*  std::fstream f(path, std::ios::in | std::ios::binary);
+  if (!f)
+    return false;
+
+  char buffer[256];
+  std::stringstream ss;
+
+  // count of items
+  int count=0;
+
+  // get the amount of items in the database
+  f.read((char*) buffer, sizeof(int));
+  count=atoi(buffer);
+
+  // load in the items
+  item *Item;
+  for (int i=0; i<count; i++) {
+    Item=new item;
+    f.read((char*) Item, sizeof(item));
+    itemDb.addObject(Item);
+  }
+
+  f.close();
+  */
+};

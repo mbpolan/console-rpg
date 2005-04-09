@@ -39,6 +39,7 @@ enum VOCATION {WARRIOR,MAGE,ARCHER};
 #define INV_BOOTS 3
 
 class battleAction;
+class item;
 class map;
 class movement;
 

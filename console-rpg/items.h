@@ -27,6 +27,7 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <list>
+#include <vector>
 
 // enumerate the types of items
 enum TYPE {head,torso,legs,boots,npe};

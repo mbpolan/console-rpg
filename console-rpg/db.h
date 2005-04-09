@@ -17,82 +17,82 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
+#ifndef db_h
+#define db_h
  
-#ifndef map_h
-#define map_h
+// db.h: template class 'database' that holds various info depending on type
+#include <fstream>
+#include <vector>
 
-// map.h: map class and related stuff
-#include <list>
-#include <libxml/parser.h>
-
-#include "db.h"
-#include "enemy.h"
 #include "items.h"
-#include "npc.h"
-#include "player.h"
 
-// our maximum map size
-#define max 50
-
-//class database<item*>;
-class enemy;
+// forward declarations
 class item;
-class player;
-class npc;
 
-class map {
+// template class database
+template <class T>
+class database {
 	public:
-		map() {};
-		map(int,int,int,int);
-		virtual ~map();
-		
-		// public accessors
-		int getMapMaxSizeX() const {return MapMaxSizeX;}
-		int getMapMaxSizeY() const {return MapMaxSizeY;}
-		
-		// map methods
-		void addItem(item*);
-		void removeItem(int, int, int);
-		
-		void removeEnemy(enemy*);
-		void removePlayer(player*);
-		void removeNpc(npc*);
+		database(int maxSize=0);
 
-		// misc methods for map
-		bool itemExists(int, int, int);
+    // accessor methods
+    int size() const {return data.size();}
 
-		item* getItem(int, int, int);
-		std::string parseGroundID(int);
-		TYPE checkItemType(int, int, int);
-	
-		int getGroundID() const {return groundID;}
-		xmlNodePtr saveMapData();
-		bool loadMapData(xmlNodePtr);
-	
-		void creaturesDoAction();
-    bool loadItemDb(const char*);
-	
-		// list of players on the map
-		std::list<player*> players;
-	
-		// list of npcs on the map
-		std::list<npc*> npcs;
-	
-		// list of all items on the map
-		std::list<item*> items;
-		
-		// list of all special items/tiles on map
-		std::list<item*> spItems;
-		
-		// list of all enemies on map
-		std::list<enemy*> enemies;
+    void addObject(const T);
+    void removeObject(int);
 
-    // database of info on items
-    database<item*> itemDb;
-		
-	private:
-		int MapMaxSizeX,MapMaxSizeY;
-		int currentSquareX,currentSquareY,groundID;
+    T* getObject(int) const;
+
+  private:
+    std::vector<T> data;
+    int dbMaxSize; // maximum size
+
+    bool ignoreSize; // ignore size restrictions?
+
+    void resync();
+};
+
+/******************************************************
+ * Start template class database implementations...   *
+ *****************************************************/
+
+// constructor
+template <class T>
+database<T>::database(int maxSize): dbMaxSize(maxSize) {
+  if (maxSize > 0)
+    ignoreSize=false;
+
+  else
+    ignoreSize=true;
+};
+
+// add an object
+template <class T>
+void database<T>::addObject(const T obj) {
+  if (!ignoreSize) {
+    // db is full
+    if (data.size() == dbMaxSize)
+      return;
+  }
+        
+  data.push_back(obj);
+};
+
+// remove an object
+template <class T>
+void database<T>::removeObject(int pos) {
+  if (data[pos])
+    delete data[pos];
+
+  // resync the vector 
+  // resync();
+};
+
+// return a pointer to an object in the vector
+template <class T>
+T* database<T>::getObject(int pos) const {
+  return data[pos];
 };
 
 #endif
