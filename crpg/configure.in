@@ -1,0 +1,26 @@
+dnl Run this file with autoconf
+AC_INIT(src/crpg.cpp)
+
+AC_CONFIG_SRCDIR([src/crpg.cpp])
+
+dnl the config directory
+AC_CONFIG_AUX_DIR(config)
+
+dnl our app and version
+AM_INIT_AUTOMAKE(crpg,0.2)
+
+dnl other macros
+AC_LANG_CPLUSPLUS
+
+AC_EXEEXT
+
+AC_OBJEXT
+
+AC_PROG_CC
+
+AC_PROG_CXX
+
+AC_PROG_INSTALL
+
+dnl the output
+AC_OUTPUT(Makefile src/Makefile)
