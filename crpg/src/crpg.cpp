@@ -24,7 +24,7 @@
 #include "map.h"
 
 // version
-const std::string version="2.0";
+const std::string version="0.3.0";
 
 // main
 int main(int argc, char *argv[]) {

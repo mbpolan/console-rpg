@@ -26,11 +26,17 @@
 #include <vector>
 #include "map.h"
 #include "player.h"
+#include "position.h"
 
 // define's for menu
 #define GAME_MENU_NEW_GAME	1
 #define GAME_MENU_LOAD_GAME	2
 #define GAME_MENU_OPTIONS	3
+
+// different types of situations that could result from movement
+#define GAME_MOVEMENT_OUT_OF_BOUNDS	0
+#define GAME_MOVEMENT_OK		1
+#define GAME_MOVEMENT_BLOCKING_SPACE	2
 
 /** Class that controls all aspects of the game.
   * This is an important class that pretty much serves as the "core" of
@@ -75,10 +81,11 @@ class Game {
 		int runMenu();
 		
 		/// Action functions
-		void creatureMoveNorth(Creature*);
-		void creatureMoveSouth(Creature*);
-		void creatureMoveEast(Creature*);
-		void creatureMoveWest(Creature*);
+		int creatureMoveNorth(Creature*);
+		int creatureMoveSouth(Creature*);
+		int creatureMoveEast(Creature*);
+		int creatureMoveWest(Creature*);
+		void printMovementMessage(int move_code, const Direction dir);
 		
 		/// Amount of actions before the turn ends
 		int actionCount;

@@ -63,7 +63,7 @@ void Map::setWidth(int width) {
 // function to return a pointer to an object on the map
 Object* Map::getObject(int x, int y, int z) {
 	for (MapObjectIterator it=objects.begin(); it!=objects.end(); ++it) {
-		if ((*it) && (*it)->getPosition().y==x && (*it)->getPosition().y==y && (*it)->getPosition().z==z)
+		if ((*it) && (*it)->position.y==x && (*it)->position.y==y && (*it)->position.z==z)
 			return (*it);
 	}
 	
@@ -80,7 +80,7 @@ void Map::placeObject(Object *obj) {
 bool Map::removeObject(int x, int y, int z) {
 	// find the first object and remove it
 	for (MapObjectIterator it=objects.begin(); it!=objects.end(); ++it) {
-		if ((*it) && (*it)->getPosition().x==x && (*it)->getPosition().y==y && (*it)->getPosition().z==z) {
+		if ((*it) && (*it)->position.x==x && (*it)->position.y==y && (*it)->position.z==z) {
 			delete (*it);
 			it=objects.erase(it);
 			break;

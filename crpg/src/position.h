@@ -24,6 +24,40 @@
 
 #include <iostream>
 
+// directional define's
+#define DIRECTION_NORTH	0
+#define DIRECTION_SOUTH	1
+#define DIRECTION_WEST	2
+#define DIRECTION_EAST	3
+
+/** Class that stores direction.
+  * This class simply stores an integral direction and provides a function,
+  * getString(), to parse a string from the direction.
+*/
+class Direction {
+	public:
+		/// Constructor
+		/** \param dir The integral direction
+		*/
+		Direction(int dir): direction(dir) {};
+		
+		/// Returns a string parsed from the integral direction
+		/** \return An std::string with the direction
+		*/
+		std::string getString() const {
+			switch(direction) {
+				case DIRECTION_NORTH: return std::string("north");
+				case DIRECTION_SOUTH: return std::string("south");
+				case DIRECTION_WEST: return std::string("west");
+				case DIRECTION_EAST: return std::string("east");
+			}
+		};
+		
+	private:
+		/// The direction of type int
+		int direction;
+};
+
 /** Class containing the position of an object.
   * The Position class simply holds 3 integral members which represent
   * the location of an object on the coordinate plane.

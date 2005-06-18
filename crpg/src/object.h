@@ -46,17 +46,6 @@ class Object {
 		/// Destructor
 		virtual ~Object() {};
 		
-		/// Sets the position of this object
-		/** \param pos The position of this object
-		*/
-		void setPosition(Position &pos) { position=pos; };
-		
-		/// Get the position of this object
-		/** \return The position of this object
-		*/
-		Position getPosition() const { return position; };
-		
-	protected:
 		/// Position of this object
 		Position position;
 };

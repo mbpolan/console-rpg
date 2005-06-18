@@ -48,13 +48,12 @@ void Game::initLoop() {
 	// cycle through each player keeping the turn count in mind
 	std::string buffer;
 	for (int t=0; t<turnCount; t++) {
-		std::cout << "<-> Turn " << t+1 << " <->" << std::endl;
+		std::cout << "\n<-> Turn " << t+1 << " <->";
 		
 		for (int p=0; p<players.size(); p++) {
-			std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n"
+			std::cout << "\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n"
 				  << players[p]->getName() << "'s turn\n"
-				  << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n";
-			std::cin.ignore();
+				  << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=";
 		
 			// action loop
 			int act=0;
@@ -66,47 +65,77 @@ void Game::initLoop() {
 					break;
 				
 				// action message
-				std::cout << std::endl << players[p]->getName() << " Action > ";
+				std::cout << std::endl << players[p]->getName() << "'s Action > ";
 			
 				std::cin >> action;
 				
 				// parse the action
 				// move north
 				if (action=="n") {
-					creatureMoveNorth(players[p]);
-					std::cout << "------------------\n"
-						  << "Moved north\n"
-						  << "------------------\n";
-					act+=1;
+					int c=creatureMoveNorth(players[p]);
+					if (c==GAME_MOVEMENT_OK) {
+						std::cout << "------------------\n"
+							  << "Moved north\n"
+							  << "------------------\n";
+						act+=1;
+					}
+					
+					else
+						printMovementMessage(c, Direction(DIRECTION_NORTH));
 				}
 			
 				// move south
 				else if (action=="s") {
-					creatureMoveSouth(players[p]);
-					std::cout << "------------------\n"
-						  << "Moved south\n"
-						  << "------------------\n";
-					act+=1;
+					int c=creatureMoveSouth(players[p]);
+					if (c==GAME_MOVEMENT_OK) {
+						std::cout << "------------------\n"
+							  << "Moved south\n"
+							  << "------------------\n";
+						act+=1;
+					}
+					
+					else
+						printMovementMessage(c, Direction(DIRECTION_SOUTH));
 				}
 				
 				// move east
 				else if (action=="e") {
-					creatureMoveEast(players[p]);
-					std::cout << "------------------\n"
-						  << "Moved east\n"
-						  << "------------------\n";
-					act+=1;
+					int c=creatureMoveEast(players[p]);
+					if (c==GAME_MOVEMENT_OK) {
+						std::cout << "------------------\n"
+							  << "Moved east\n"
+						  	<< "------------------\n";
+						act+=1;
+					}
+					
+					else
+						printMovementMessage(c, Direction(DIRECTION_EAST));
 				}
 				
 				// move west
 				else if (action=="w") {
-					creatureMoveWest(players[p]);
-					std::cout << "------------------\n"
-						  << "Moved west\n"
-						  << "------------------\n";
-					act+=1;
+					int c=creatureMoveWest(players[p]);
+					if (c==GAME_MOVEMENT_OK) {
+						std::cout << "------------------\n"
+						  	<< "Moved west\n"
+							  << "------------------\n";
+						act+=1;
+					}
+					
+					else
+						printMovementMessage(c, Direction(DIRECTION_WEST));
 				}
 				
+				// reveal position
+				else if (action=="pos") {
+					std::cout << "------------------\n"
+						  << "Your position: X: " << players[p]->position.x 
+						  << " | Y: " << players[p]->position.y 
+						  << " | Z: " << players[p]->position.z
+						  << "\n------------------\n";
+				}
+				
+				// quit the game
 				else if (action=="quit") {
 					std::string q;
 					std::cout << "------------------\n"
@@ -120,6 +149,7 @@ void Game::initLoop() {
 					}
 				}
 				
+				// end turn early
 				else if (action=="end") {
 					std::string q;
 					std::cout << "------------------\n"
@@ -131,6 +161,7 @@ void Game::initLoop() {
 						break;
 				}
 			
+				// appears to be an invalid action...
 				else
 					std::cout << "Invalid action!\n";
 			
@@ -228,21 +259,46 @@ int Game::runMenu() {
 };
 
 // function to move a creature north
-void Game::creatureMoveNorth(Creature *c) {
-	c->getPosition().x+=1;
+int Game::creatureMoveNorth(Creature *c) {
+	if (c->position.x+1 > gmap->getHeight())
+		return GAME_MOVEMENT_OUT_OF_BOUNDS;
+	
+	c->position.x+=1;
+	return GAME_MOVEMENT_OK;
 };
 
 // function to move a creature south
-void Game::creatureMoveSouth(Creature *c) {
-	c->getPosition().x-=1;
+int Game::creatureMoveSouth(Creature *c) {
+	if (c->position.x-1 < 0)
+		return GAME_MOVEMENT_OUT_OF_BOUNDS;
+		
+	c->position.x-=1;
+	return GAME_MOVEMENT_OK;
 };
 
 // function to move a creature east
-void Game::creatureMoveEast(Creature *c) {
-	c->getPosition().y-=1;
+int Game::creatureMoveEast(Creature *c) {
+	if (c->position.y+1 > gmap->getWidth())
+		return GAME_MOVEMENT_OUT_OF_BOUNDS;
+		
+	c->position.y+=1;
+	return GAME_MOVEMENT_OK;
 };
 
 // function to move a creature west
-void Game::creatureMoveWest(Creature *c) {
-	c->getPosition().y+=1;
+int Game::creatureMoveWest(Creature *c) {
+	if (c->position.y-1 < 0)
+		return GAME_MOVEMENT_OUT_OF_BOUNDS;
+	
+	c->position.y-=1;
+	return GAME_MOVEMENT_OK;
+};
+
+// function that displays an error message if needed about a move
+void Game::printMovementMessage(int move_code, Direction dir) {
+	switch(move_code) {
+		case GAME_MOVEMENT_OUT_OF_BOUNDS: std::cout << "\nYou can't move any further " << dir.getString() << "!\n"; break;
+		case GAME_MOVEMENT_BLOCKING_SPACE: std::cout << "\nThat space is blocked!\n"; break;
+		default: return;
+	}
 };
