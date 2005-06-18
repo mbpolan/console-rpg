@@ -4,6 +4,7 @@ crpg2_LDFLAGS =  -lxml2
 
 crpg2_SOURCES = creature.h \
                 crpg.cpp \
+		event.h \
 		game.cpp game.h \
 		map.cpp map.h \
 		object.h \

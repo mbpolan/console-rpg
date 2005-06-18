@@ -23,7 +23,9 @@
 #define GAME_H
 
 #include <iostream> 
+#include <queue>
 #include <vector>
+#include "event.h"
 #include "map.h"
 #include "player.h"
 #include "position.h"
@@ -65,8 +67,14 @@ class Game {
 		/// Game map
 		Map *gmap;
 		
+		/// Function that starts the internal thread
+		void createGameThread();
+		
 		/// Function that initializes the main game loop
 		void initLoop();
+		
+		// Function that initializes the main thread
+		static void* initThread(void *data);
 		
 		/// Function that starts a new game
 		void startNewGame();
@@ -98,6 +106,9 @@ class Game {
 		
 		/// Vector of players
 		std::vector<Player*> players;
+		
+		/// Event queue
+		std::priority_queue<Event*> eventQueue;
 };
 
 #endif

@@ -30,12 +30,27 @@ void Game::init() {
 	if (op==GAME_MENU_NEW_GAME)
 		startNewGame();
 	
-	//
+	// load a saved game
 	else if (op==GAME_MENU_LOAD_GAME)
 		loadGame();
 	
+	// run the options menu
 	else if (op==GAME_MENU_OPTIONS)
 		runOptionsMenu();
+	
+	// create an thread to run in the background and process events
+	createGameThread();
+};
+
+// function that initializes the internal thread
+void Game::createGameThread() {
+	pthread_t thread;
+	pthread_attr_t attr;
+	
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+	
+	pthread_create(&thread, &attr, initThread, this);
 };
 
 // function that starts the internal game loop
@@ -177,6 +192,27 @@ void Game::initLoop() {
 			 
 			std::cin.ignore();
 			std::cin.get();
+		}
+	}
+};
+
+// function to start the internal thread
+void* Game::initThread(void *data) {
+	Game *game=(Game*) data;
+	
+	// event loop
+	while(1) {
+		// check for events
+		if (!game->eventQueue.empty()) {
+			Event *e=game->eventQueue.top();
+			//std::cout << "Found event: " << e->eventName << std::endl;
+			
+			// create a thread to handle this
+			pthread_t thread;
+			pthread_create(&thread, NULL, e->routine, e->eventData);
+			
+			// remove this event
+			game->eventQueue.pop();
 		}
 	}
 };
