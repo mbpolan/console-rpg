@@ -32,8 +32,8 @@
 */
 class PlayerTraits {
 	public:
-		/// Constructor
-		/** \param _luck The amount of luck to allocate to the player
+		/** Constructor
+		  * \param _luck The amount of luck to allocate to the player
 		  * \param _strength The strength skill level
 		  * \param _power The power skill level
 		  * \param _defense The defense skill level

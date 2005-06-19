@@ -58,7 +58,7 @@ class Game {
 		/** Function that prepares and starts the game */
 		void init();
 		
-		/** Get a pointer to the storied map
+		/** Get a pointer to the stored map
 		  * \return A pointer to this map
 		*/
 		Map* map() const { return gmap; };
@@ -93,6 +93,10 @@ class Game {
 		int creatureMoveSouth(Creature*);
 		int creatureMoveEast(Creature*);
 		int creatureMoveWest(Creature*);
+		int creatureMoveNorthwest(Creature*);
+		int creatureMoveNortheast(Creature*);
+		int creatureMoveSouthwest(Creature*);
+		int creatureMoveSoutheast(Creature*);
 		void printMovementMessage(int move_code, const Direction dir);
 		
 		/// Amount of actions before the turn ends

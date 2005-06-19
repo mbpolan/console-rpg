@@ -23,6 +23,8 @@
 #define MAP_H
 
 #include <list>
+#include <map>
+#include "itemmodel.h"
 #include "object.h"
 
 /// Map Object iterator
@@ -59,8 +61,8 @@ class Map {
 		*/
 		void setHeight(int height);
 		
-		/// Get the height of the map
-		/** \return The height of this map in tiles
+		/** Get the height of the map
+		  * \return The height of this map in tiles
 		*/
 		int getHeight() const { return mapHeight; };
 		
@@ -72,8 +74,8 @@ class Map {
 		*/
 		void setWidth(int width);
 		
-		/// Get the width of the map
-		/** \return The width of this map in tiles
+		/** Get the width of the map
+		  * \return The width of this map in tiles
 		*/
 		int getWidth() const { return mapWidth; };
 		
@@ -100,9 +102,18 @@ class Map {
 		*/
 		bool removeObject(int x, int y, int z);
 		
+		/** Load an item database from XML file
+		  * \param file The path to the target file
+		  * \return true if the database was loaded, false otherwise
+		*/
+		void loadItemsFromXML(std::string file);
+		
 	protected:
 		/// List of all objects on the map
 		std::list<Object*> objects;
+		
+		/// Map of item database
+		std::map<int, ItemModel*> itemDB;
 		
 		/// Width of the map
 		int mapWidth;

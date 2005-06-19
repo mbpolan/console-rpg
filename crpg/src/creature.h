@@ -54,7 +54,7 @@ class Creature: public Object {
 		/// Destructor
 		virtual ~Creature() {};
 		
-		/// Set the amount of hitpoints the creature has <i>now</i>
+		/// Set the amount of hitpoints the creature has
 		/** This function sets the amount of hitpoints that the creature should
 		  * have at this point. Note that this is not the maximum hitpoints allowed!
 		  * \param hitpoints The amount of hitpoints
@@ -67,8 +67,8 @@ class Creature: public Object {
 		*/
 		int getHP() const { return hp; };
 		
-		/// Set the amount of hitpoints for this creature
-		/** \param hitpoints The amount of hitpoints to be the new total
+		/** Set the amount of hitpoints for this creature
+		  * \param hitpoints The amount of hitpoints to be the new total
 		*/
 		void setMaxHP(int hitpoints) { maxHP=hitpoints; };
 		

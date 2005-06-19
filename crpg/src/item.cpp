@@ -17,48 +17,20 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/ 
-// event.h: Event class
+// item.cpp: implementations of Item class
 
-#ifndef EVENT_H
-#define EVENT_H
+#include "item.h"
 
-#include <iostream>
-
-/** Class that prepares an event for execution.
-  * Event is a class that stores two members: a pointer to a routine
-  * function and the arguments for that function. An instance of Event
-  * should be made avaiable to the Game event thread where it will be
-  * processed and executed.
-*/
-class Event {
-	public:
-		/** Factory function to create an event
-		  * \param name A name for this event
-		  * \param _routine The function to be executed
-		  * \param data Data passed to the routine function
-		*/
-		static Event* create(std::string name, void* (*_routine)(void*), void *data) {
-			Event *e=new Event;
-			e->eventName=name;
-			e->routine=_routine;
-			e->eventData=data;
-			
-			return e;
-			
-		};
-		
-		/// Name for this event
-		std::string eventName;
-		
-		/// Data for this event
-		void *eventData;
-		
-		/// Routine to do
-		void* (*routine)(void*);
-		
-	private:
-		/// Hidden constructor
-		Event() {};
+// default constructor
+Item::Item(): Object(0, 0, 0), itemID(0), luck(0), defense(0), power(0), strength(0), itemName("NULL_ITEM"), usable(false) {
 };
 
-#endif
+// constructor taking three parameters
+Item::Item(int id, std::string name, Position pos, bool use): 
+	Object(pos.x, pos.y, pos.z), itemID(id), luck(0), defense(0), power(0), strength(0), itemName(name), usable(use) {
+};
+
+// constructor taking eight parameters
+Item::Item(int id, std::string name, Position pos, bool use, int _luck, int def, int pow, int str):
+	Object(pos.x, pos.y, pos.z), itemID(id), luck(_luck), defense(def), power(pow), strength(str) {
+};

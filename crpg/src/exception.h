@@ -17,48 +17,47 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/ 
-// event.h: Event class
+// exception.h: Exception and friend classes
 
-#ifndef EVENT_H
-#define EVENT_H
+#ifndef EXCEPTION_H
+#define EXCEPTION_H
 
-#include <iostream>
-
-/** Class that prepares an event for execution.
-  * Event is a class that stores two members: a pointer to a routine
-  * function and the arguments for that function. An instance of Event
-  * should be made avaiable to the Game event thread where it will be
-  * processed and executed.
+/** General exception class.
+  * This is a base class from which all exceptions derive from.
 */
-class Event {
+class CException {
 	public:
-		/** Factory function to create an event
-		  * \param name A name for this event
-		  * \param _routine The function to be executed
-		  * \param data Data passed to the routine function
+		/** Constructor
+		  * \param msg The error message this exception holds
+		  * \param _fatal A fatal exception (halts program)
 		*/
-		static Event* create(std::string name, void* (*_routine)(void*), void *data) {
-			Event *e=new Event;
-			e->eventName=name;
-			e->routine=_routine;
-			e->eventData=data;
-			
-			return e;
-			
-		};
+		CException(const char *msg, bool _fatal=false): message(msg), fatal(_fatal) {};
 		
-		/// Name for this event
-		std::string eventName;
+		/** Returns the exception message
+		  * \return The message in an std::string
+		*/
+		const char* what() const { return message; };
 		
-		/// Data for this event
-		void *eventData;
+		/** Returns whether or not this exception is fatal
+		  * \return true if this exception is fatal, false otherwise
+		*/
+		bool isFatal() const { return fatal; };
+	
+	protected:
+		/// Message
+		const char* message;
 		
-		/// Routine to do
-		void* (*routine)(void*);
-		
-	private:
-		/// Hidden constructor
-		Event() {};
+		/// Whether or not this exception is fatal
+		bool fatal;
+};
+
+/** File loading exception.
+  * Exception thrown when a file can't be loaded. 
+*/
+class CLoadErrorEx: public CException {
+	public:
+		/// Constructor
+		CLoadErrorEx(): CException("Unable to load file!", true) {};
 };
 
 #endif

@@ -25,10 +25,14 @@
 #include <iostream>
 
 // directional define's
-#define DIRECTION_NORTH	0
-#define DIRECTION_SOUTH	1
-#define DIRECTION_WEST	2
-#define DIRECTION_EAST	3
+#define DIRECTION_NORTH		0
+#define DIRECTION_SOUTH		1
+#define DIRECTION_WEST		2
+#define DIRECTION_EAST		3
+#define DIRECTION_NORTHWEST	4
+#define DIRECTION_NORTHEAST	5
+#define DIRECTION_SOUTHWEST	6
+#define DIRECTION_SOUTHEAST	7
 
 /** Class that stores direction.
   * This class simply stores an integral direction and provides a function,
@@ -36,20 +40,24 @@
 */
 class Direction {
 	public:
-		/// Constructor
-		/** \param dir The integral direction
+		/** Constructor
+		  * \param dir The integral direction
 		*/
 		Direction(int dir): direction(dir) {};
 		
-		/// Returns a string parsed from the integral direction
-		/** \return An std::string with the direction
+		/** Returns a string parsed from the integral direction
+		  * \return An std::string with the direction
 		*/
 		std::string getString() const {
 			switch(direction) {
-				case DIRECTION_NORTH: return std::string("north");
-				case DIRECTION_SOUTH: return std::string("south");
-				case DIRECTION_WEST: return std::string("west");
-				case DIRECTION_EAST: return std::string("east");
+				case DIRECTION_NORTH: return std::string("north"); break;
+				case DIRECTION_SOUTH: return std::string("south"); break;
+				case DIRECTION_WEST: return std::string("west"); break;
+				case DIRECTION_EAST: return std::string("east"); break;
+				case DIRECTION_NORTHWEST: return std::string("northwest"); break;
+				case DIRECTION_NORTHEAST: return std::string("northeast"); break;
+				case DIRECTION_SOUTHWEST: return std::string("southwest"); break;
+				case DIRECTION_SOUTHEAST: return std::string("southeast"); break;
 			}
 		};
 		
@@ -64,8 +72,8 @@ class Direction {
 */
 class Position {
 	public:
-		/// Constructor
-		/** \param _x The x coordinate
+		/** Constructor
+		  * \param _x The x coordinate
 		  * \param _y The y coordinate
 		  * \param _z The z coordinate
 		*/

@@ -141,6 +141,62 @@ void Game::initLoop() {
 						printMovementMessage(c, Direction(DIRECTION_WEST));
 				}
 				
+				// move northwest
+				else if (action=="nw") {
+					int c=creatureMoveNorthwest(players[p]);
+					if (c==GAME_MOVEMENT_OK) {
+						std::cout << "------------------\n"
+						  	<< "Moved northwest\n"
+							  << "------------------\n";
+						act+=1;
+					}
+					
+					else
+						printMovementMessage(c, Direction(DIRECTION_NORTHWEST));
+				}
+				
+				// move northeast
+				else if (action=="ne") {
+					int c=creatureMoveNortheast(players[p]);
+					if (c==GAME_MOVEMENT_OK) {
+						std::cout << "------------------\n"
+						  	<< "Moved northeast\n"
+							  << "------------------\n";
+						act+=1;
+					}
+					
+					else
+						printMovementMessage(c, Direction(DIRECTION_NORTHEAST));
+				}
+				
+				// move southwest
+				else if (action=="sw") {
+					int c=creatureMoveSouthwest(players[p]);
+					if (c==GAME_MOVEMENT_OK) {
+						std::cout << "------------------\n"
+						  	<< "Moved southwest\n"
+							  << "------------------\n";
+						act+=1;
+					}
+					
+					else
+						printMovementMessage(c, Direction(DIRECTION_SOUTHWEST));
+				}
+				
+				// move southeast
+				else if (action=="se") {
+					int c=creatureMoveSoutheast(players[p]);
+					if (c==GAME_MOVEMENT_OK) {
+						std::cout << "------------------\n"
+						  	<< "Moved southeast\n"
+							  << "------------------\n";
+						act+=1;
+					}
+					
+					else
+						printMovementMessage(c, Direction(DIRECTION_SOUTHEAST));
+				}
+				
 				// reveal position
 				else if (action=="pos") {
 					std::cout << "------------------\n"
@@ -327,6 +383,46 @@ int Game::creatureMoveWest(Creature *c) {
 		return GAME_MOVEMENT_OUT_OF_BOUNDS;
 	
 	c->position.y-=1;
+	return GAME_MOVEMENT_OK;
+};
+
+// function to move a creature northwest
+int Game::creatureMoveNorthwest(Creature *c) {
+	if (c->position.y-1 < 0 || c->position.x > gmap->getHeight())
+		return GAME_MOVEMENT_OUT_OF_BOUNDS;
+	
+	c->position.y-=1;
+	c->position.x+=1;
+	return GAME_MOVEMENT_OK;
+};
+
+// function to move a creature northeast
+int Game::creatureMoveNortheast(Creature *c) {
+	if (c->position.y+1 > gmap->getWidth() || c->position.x+1 > gmap->getHeight())
+		return GAME_MOVEMENT_OUT_OF_BOUNDS;
+	
+	c->position.y+=1;
+	c->position.x+=1;
+	return GAME_MOVEMENT_OK;
+};
+
+// function to move a creature southwest
+int Game::creatureMoveSouthwest(Creature *c) {
+	if (c->position.y-1 < 0 || c->position.x-1 < 0)
+		return GAME_MOVEMENT_OUT_OF_BOUNDS;
+	
+	c->position.y-=1;
+	c->position.x-=1;
+	return GAME_MOVEMENT_OK;
+};
+
+// function to move a creature southeast
+int Game::creatureMoveSoutheast(Creature *c) {
+	if (c->position.y+1 > gmap->getWidth() || c->position.x-1 < 0)
+		return GAME_MOVEMENT_OUT_OF_BOUNDS;
+	
+	c->position.y+=1;
+	c->position.x-=1;
 	return GAME_MOVEMENT_OK;
 };
 

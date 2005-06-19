@@ -19,10 +19,28 @@
  ***************************************************************************/ 
 // map.cpp: implementations of the Map class
 
+#include <fstream>
+#include <libxml/parser.h>
+#include "exception.h"
 #include "map.h"
 
 // constructor 
 Map::Map(int width, int height): mapWidth(width), mapHeight(height) {
+	try {
+		loadItemsFromXML("itemdb.xml");
+	}
+	
+	// catch exceptions
+	// load error
+	catch (const CLoadErrorEx &e) {
+		std::cout << "Error loading item database: " << e.what() << std::endl;
+		if (e.isFatal())
+			exit(1);
+	}
+	
+	// everything else
+	catch (...) {
+	}
 };
 
 // destructor
@@ -88,3 +106,64 @@ bool Map::removeObject(int x, int y, int z) {
 	}
 };
 
+// function that loads an item database from file
+void Map::loadItemsFromXML(std::string file) {
+	xmlDocPtr doc=xmlParseFile(file.c_str());
+	
+	if (doc) {
+		xmlNodePtr root, ptr;
+		root=xmlDocGetRootElement(doc);
+		
+		// check the root element
+		if (strcmp((const char*) root->name, "item-db")!=0) {
+			throw CLoadErrorEx();
+		}
+		
+		ptr=root->children;
+		
+		// check the ptr node
+		if (strcmp((const char*) ptr->name, "items")!=0) {
+			throw CLoadErrorEx();
+		}
+		
+		// get a count
+		int count=atoi((const char*) xmlGetProp(ptr, (const xmlChar*) "count"));
+		
+		// load the items
+		xmlNodePtr item=ptr->children, attr;
+		ItemModel *imodel;
+		int counter=0;
+		for (int i=0; i<count; i++) {
+			std::string name=(std::string) ((const char*) xmlGetProp(item, (const xmlChar*) "name"));
+			int id=atoi((const char*) xmlGetProp(item, (const xmlChar*) "id"));
+			
+			// load attributes
+			attr=item->children;
+			int pow=atoi((const char*) xmlGetProp(attr, (const xmlChar*) "power"));
+			int luck=atoi((const char*) xmlGetProp(attr, (const xmlChar*) "luck"));
+			int str=atoi((const char*) xmlGetProp(attr, (const xmlChar*) "luck"));
+			int def=atoi((const char*) xmlGetProp(attr, (const xmlChar*) "defense"));
+			
+			// create a model
+			imodel=new ItemModel(name, id, luck, def, pow, str);
+			
+			// add it to the database
+			itemDB[id]=imodel;
+			counter+=1;
+			
+			// next item
+			item=item->next;
+			
+		}
+		
+		#ifdef DEBUG
+		std::cout << "DEBUG: loaded " << counter << " out of " << count << " items.\n";
+		#endif
+		
+		// free the document
+		xmlFreeDoc(doc);
+	}
+	
+	else
+		throw CLoadErrorEx();
+};
