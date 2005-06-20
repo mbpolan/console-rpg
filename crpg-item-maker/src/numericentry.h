@@ -36,7 +36,7 @@ class NumericEntry: public Gtk::Entry {
 	protected:
 		// signal handlers
 		virtual void insert_text_vfunc(const Glib::ustring &text, int &pos) {
-			if ((atof(text.c_str()) && text!="0") || text=="0") || text=="." || text=="-") {
+			if ((atof(text.c_str()) && text!="0") || text=="0" || text=="." || text=="-") {
 				Gtk::Entry::insert_text_vfunc(text, pos);
 				
 				// make sure to emit the signal _only_ when numbers are inserted
