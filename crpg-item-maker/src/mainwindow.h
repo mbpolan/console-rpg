@@ -81,7 +81,7 @@ class MainWindow: public Gtk::Window {
 				// columns
 				Gtk::TreeModelColumn<Glib::ustring> name;
 				Gtk::TreeModelColumn<Glib::ustring> id;
-				Gtk::TreeModelColumn<Glib::ustring> usable;
+				Gtk::TreeModelColumn<bool> usable;
 				Gtk::TreeModelColumn<Glib::ustring> luck;
 				Gtk::TreeModelColumn<Glib::ustring> defense;
 				Gtk::TreeModelColumn<Glib::ustring> power;

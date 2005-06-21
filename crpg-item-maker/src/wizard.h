@@ -58,6 +58,9 @@ class Wizard: public Gtk::Window {
 	private:
 		// signal handlers
 		void saveItem();
+		void validate();
+		void validateInsertText(const Glib::ustring&, int*);
+		void validateDeleteText(int, int);
 		
 		// containers
 		Gtk::ButtonBox *buttonBox;

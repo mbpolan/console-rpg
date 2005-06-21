@@ -20,6 +20,7 @@
 // mainwindow.cpp: implementations of MainWindow class
 
 #include <iostream>
+#include <gtkmm/cellrenderertoggle.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/messagedialog.h>
@@ -114,7 +115,7 @@ MainWindow::MainWindow(): Gtk::Window() {
 	// append columns
 	tview->append_column_editable("Name", colRec.name);
 	tview->append_column("ID", colRec.id);
-	tview->append_column("Usable", colRec.usable);
+	tview->append_column_editable("Usable", colRec.usable);
 	tview->append_column("Luck", colRec.luck);
 	tview->append_column("Defense", colRec.defense);
 	tview->append_column("Power", colRec.power);
@@ -213,7 +214,7 @@ void MainWindow::openDatabase() {
 				row=*(lstore->append());
 				row[colRec.name]=name;
 				row[colRec.id]=id;
-				row[colRec.usable]=usable;
+				usable=row[colRec.usable] ? "1" : "0";
 				row[colRec.luck]=luck;
 				row[colRec.defense]=def;
 				row[colRec.power]=pow;
@@ -403,7 +404,7 @@ void MainWindow::addItem() {
 
 	row[colRec.name]=wizard->nameEntry->get_text();
 	row[colRec.id]=wizard->idEntry->get_text();
-	row[colRec.usable]=wizard->usableCB->get_active_text();
+	row[colRec.usable]=wizard->usableCB->get_active_text()=="Yes" ? true : false;
 	row[colRec.luck]=wizard->luckEntry->get_text();
 	row[colRec.defense]=wizard->defEntry->get_text();
 	row[colRec.power]=wizard->powEntry->get_text();

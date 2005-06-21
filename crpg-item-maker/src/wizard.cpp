@@ -54,11 +54,28 @@ Wizard::Wizard(): Gtk::Window() {
 	
 	// create entries
 	nameEntry=new Gtk::Entry;
+	nameEntry->signal_insert_text().connect(sigc::mem_fun(*this, &Wizard::validateInsertText));
+	nameEntry->signal_delete_text().connect(sigc::mem_fun(*this, &Wizard::validateDeleteText));
+	
 	idEntry=new NumericEntry;
+	idEntry->sigTextInserted().connect(sigc::mem_fun(*this, &Wizard::validate));
+	idEntry->sigTextDeleted().connect(sigc::mem_fun(*this, &Wizard::validate));
+	
 	luckEntry=new NumericEntry;
+	luckEntry->sigTextInserted().connect(sigc::mem_fun(*this, &Wizard::validate));
+	luckEntry->sigTextDeleted().connect(sigc::mem_fun(*this, &Wizard::validate));
+	
 	defEntry=new NumericEntry;
+	defEntry->sigTextInserted().connect(sigc::mem_fun(*this, &Wizard::validate));
+	defEntry->sigTextDeleted().connect(sigc::mem_fun(*this, &Wizard::validate));
+	
 	powEntry=new NumericEntry;
+	powEntry->sigTextInserted().connect(sigc::mem_fun(*this, &Wizard::validate));
+	powEntry->sigTextDeleted().connect(sigc::mem_fun(*this, &Wizard::validate));
+	
 	strEntry=new NumericEntry;
+	strEntry->sigTextInserted().connect(sigc::mem_fun(*this, &Wizard::validate));
+	strEntry->sigTextDeleted().connect(sigc::mem_fun(*this, &Wizard::validate));
 	
 	// the usable combo box
 	usableCB=new Gtk::ComboBoxText();
@@ -69,6 +86,7 @@ Wizard::Wizard(): Gtk::Window() {
 	// buttons
 	buttonBox=new Gtk::HButtonBox;
 	okButton=new Gtk::Button("OK");
+	okButton->set_sensitive(false);
 	okButton->signal_clicked().connect(sigc::mem_fun(*this, &Wizard::saveItem));
 	
 	cancelButton=new Gtk::Button("Cancel");
@@ -118,4 +136,22 @@ Wizard::Wizard(): Gtk::Window() {
 void Wizard::saveItem() {
 	signalSaveItemRequest().emit();
 	hide();
+};
+
+// function to check if all required info was filled in
+void Wizard::validate() {
+	if (!nameEntry->get_text().empty() && !idEntry->get_text().empty() && !luckEntry->get_text().empty() &&
+	    !defEntry->get_text().empty() && !powEntry->get_text().empty() && !strEntry->get_text().empty())
+		okButton->set_sensitive();
+	
+	else
+		okButton->set_sensitive(false);
+};
+
+void Wizard::validateInsertText(const Glib::ustring&, int*) {
+	validate();
+};
+
+void Wizard::validateDeleteText(int, int) {
+	validate();
 };
