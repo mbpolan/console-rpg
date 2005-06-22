@@ -40,8 +40,8 @@ class ItemModel {
 		  * \param pow The item's power boost
 		  * \param str The item's strength boost
 		*/
-		ItemModel(std::string _name, int id, int luck, int def, int pow, int str):
-			name(_name), luckBoost(luck), defenseBoost(def), powerBoost(pow), strBoost(str) {};
+		ItemModel(std::string _name, int id, int luck, int def, int pow, int str, bool _usable):
+			name(_name), luckBoost(luck), defenseBoost(def), powerBoost(pow), strBoost(str), usable(_usable) {};
 			
 		/** Get the name of this item
 		  * \return The name of this item */
@@ -67,6 +67,10 @@ class ItemModel {
 		  * \return The strength boost this item provides */
 		int getStrength() const { return strBoost; };
 		
+		/** Check if this item is usable or not
+		  * \return true if usable, false otherwise */
+		bool isUsable() const { return usable; };  
+		
 	private:
 		/// Name of this model
 		std::string name;
@@ -76,6 +80,9 @@ class ItemModel {
 		
 		/// ID of this item
 		int id;
+		
+		/// Usable item
+		bool usable;
 };
 
 #endif

@@ -115,7 +115,7 @@ void Map::loadItemsFromXML(std::string file) {
 		root=xmlDocGetRootElement(doc);
 		
 		// check the root element
-		if (strcmp((const char*) root->name, "item-db")!=0) {
+		if (strcmp((const char*) root->name, "items-db")!=0) {
 			throw CLoadErrorEx();
 		}
 		
@@ -136,6 +136,7 @@ void Map::loadItemsFromXML(std::string file) {
 		for (int i=0; i<count; i++) {
 			std::string name=(std::string) ((const char*) xmlGetProp(item, (const xmlChar*) "name"));
 			int id=atoi((const char*) xmlGetProp(item, (const xmlChar*) "id"));
+			bool usable=atoi((const char*) xmlGetProp(item, (const xmlChar*) "usable"));
 			
 			// load attributes
 			attr=item->children;
@@ -145,7 +146,7 @@ void Map::loadItemsFromXML(std::string file) {
 			int def=atoi((const char*) xmlGetProp(attr, (const xmlChar*) "defense"));
 			
 			// create a model
-			imodel=new ItemModel(name, id, luck, def, pow, str);
+			imodel=new ItemModel(name, id, luck, def, pow, str, usable);
 			
 			// add it to the database
 			itemDB[id]=imodel;
@@ -167,3 +168,56 @@ void Map::loadItemsFromXML(std::string file) {
 	else
 		throw CLoadErrorEx();
 };
+
+// function to create a new item
+Item* Map::createItem(Map *map, int id, Position pos) {
+	Item *item=new Item;
+	
+	// get attributes from database
+	std::string name;
+	int luck, def, pow, str;
+	bool found=false;
+	for (MapItemIterator it=map->itemDB.begin(); it!=map->itemDB.end(); ++it) {
+		if ((*it).second && ((*it).second)->getID()==id) {
+			std::string name=((*it).second)->getName();
+			luck=((*it).second)->getLuck();
+			def=((*it).second)->getDefense();
+			pow=((*it).second)->getPower();
+			str=((*it).second)->getStrength();
+			found=true;
+			
+			break;
+		}
+	}
+	
+	// check if we found a match
+	if (found) {
+		item->setName(name);
+		item->setLuck(luck);
+		item->setDefense(def);
+		item->setPower(pow);
+		item->setStrength(str);
+		
+		return item;
+	}
+	
+	else
+		return NULL;
+};
+
+// function to spawn some items on the map
+void Map::spawnMapItems(int amount) {
+	srand(static_cast<unsigned> (time(NULL)));
+	
+	for (int i=0; i<amount; i++) {
+		int x=rand()%mapWidth;
+		int y=rand()%mapHeight;
+		//int z=rand()%5; // TODO: implement layers
+		int z=0;
+		int id=(rand()%5)-1;
+		
+		// place this item
+		placeObject(Map::createItem(this, id, Position(x, y, z)));
+	}
+};
+

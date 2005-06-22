@@ -26,6 +26,11 @@
 #include "object.h"
 #include "position.h"
 
+/// Enumerated types of items
+enum ITEM_TYPE { ITEM_NON_INT,	// not interactive
+		 ITEM_EQ	// equipment
+	       };
+
 /** Class that represents an item.
   * Item provides a fairly large API that allows the programmer to manipulate
   * various aspects of its usage. This class derives from Object, therefore
@@ -115,6 +120,16 @@ class Item: public Object {
 		  * \return The strength boost this item provides */
 		int getStrength() const { return strength; };
 		
+		/** Set the item's type
+		  * \param itemType The type of item
+		*/
+		void setType(ITEM_TYPE itemType) { type=itemType; };
+		
+		/** Get the type of item this is
+		  * \return This item's type
+		*/
+		ITEM_TYPE getType() const { return type; };
+		
 	protected:
 		/// The item's ID
 		int itemID;
@@ -127,6 +142,9 @@ class Item: public Object {
 		
 		/// Whether or not this item can be used
 		bool usable;
+		
+		/// The type of item
+		ITEM_TYPE type;
 };
 
 #endif

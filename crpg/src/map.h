@@ -24,11 +24,15 @@
 
 #include <list>
 #include <map>
+#include "item.h"
 #include "itemmodel.h"
 #include "object.h"
 
 /// Map Object iterator
 typedef std::list<Object*>::iterator MapObjectIterator;
+
+/// Map ItemModel iterator
+typedef std::map<int, ItemModel*>::iterator MapItemIterator;
 
 /** A class that contains data about the map.
   * This class controls and stores information about the various aspects
@@ -49,6 +53,9 @@ class Map {
 		
 		/// Destructor
 		virtual ~Map();
+		
+		/// Map of item database
+		std::map<int, ItemModel*> itemDB;
 		
 		/// Clear the entire map of any objects
 		void clear();
@@ -108,12 +115,19 @@ class Map {
 		*/
 		void loadItemsFromXML(std::string file);
 		
+		/** Creates a new item
+		  * Attempts to create an item based on ID, loading attributes
+		  * from the loaded database.
+		  * \return A pointer to a new Item
+		*/
+		static Item* createItem(Map*, int id, Position pos);
+		
 	protected:
+		/// Spawn initial items on map
+		void spawnMapItems(int amount);
+		
 		/// List of all objects on the map
 		std::list<Object*> objects;
-		
-		/// Map of item database
-		std::map<int, ItemModel*> itemDB;
 		
 		/// Width of the map
 		int mapWidth;
