@@ -22,8 +22,9 @@
 #include "wizard.h"
 
 // constructor
-Wizard::Wizard(): Gtk::Window() {
+Wizard::Wizard(bool editor): Gtk::Window(), originalItem("") {
 	set_title("Item Wizard");
+	set_modal(true);
 	set_border_width(4);
 	
 	// create the vbox
@@ -41,9 +42,14 @@ Wizard::Wizard(): Gtk::Window() {
 	table->set_spacings(3);
 	
 	// create labels
-	titleLabel=new Gtk::Label("You can use the Item Wizard to make a new item. Simply fill in the\n"
-				  "fields below and click OK. Your item will be added to the database.");
-				 
+	if (!editor)
+		titleLabel=new Gtk::Label("You can use the Item Wizard to make a new item. Simply fill in the\n"
+					  "fields below and click OK. Your item will be added to the database.");
+	
+	else
+		titleLabel=new Gtk::Label("You can edit the chosen item below by changing the values stored in the\n"
+					  "entries. Click OK once you are done to save the changes.");
+	
 	nameLabel=new Gtk::Label("Name");
 	idLabel=new Gtk::Label("ID");
 	usableLabel=new Gtk::Label("Usable");
@@ -134,7 +140,7 @@ Wizard::Wizard(): Gtk::Window() {
 
 // function to emit a save signal
 void Wizard::saveItem() {
-	signalSaveItemRequest().emit();
+	sigSaveItemRequest().emit();
 	hide();
 };
 

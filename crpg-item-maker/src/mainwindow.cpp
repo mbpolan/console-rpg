@@ -93,7 +93,7 @@ MainWindow::MainWindow(): Gtk::Window() {
 		 vb->pack_start(*manage(mBar), Gtk::PACK_SHRINK);
 		
 	// create main table
-	table=new Gtk::Table(4, 2, false);
+	table=new Gtk::Table(4, 3, false);
 	table->set_spacings(2);
 	
 	// create the label
@@ -106,6 +106,9 @@ MainWindow::MainWindow(): Gtk::Window() {
 	
 	rmItemButton=new Gtk::Button("Remove Item");
 	rmItemButton->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::startRmItemWizard));
+	
+	editItemButton=new Gtk::Button("Edit Item");
+	editItemButton->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::startEditItemWizard));
 	
 	// create the tree view
 	sWindow=new Gtk::ScrolledWindow;
@@ -129,11 +132,12 @@ MainWindow::MainWindow(): Gtk::Window() {
 	sWindow->set_size_request(400, 290);
 	
 	// attach widgets
-	table->attach(*manage(vb), 0, 2, 0, 1/*, Gtk::SHRINK*/);
-	table->attach(*manage(titleLabel), 0, 2, 1, 2, Gtk::SHRINK, Gtk::SHRINK);
+	table->attach(*manage(vb), 0, 3, 0, 1/*, Gtk::SHRINK*/);
+	table->attach(*manage(titleLabel), 0, 3, 1, 2, Gtk::SHRINK, Gtk::SHRINK);
 	table->attach(*manage(addItemButton), 0, 1, 2, 3, Gtk::SHRINK, Gtk::SHRINK);
-	table->attach(*manage(rmItemButton), 0, 2, 2, 3, Gtk::SHRINK, Gtk::SHRINK);
-	table->attach(*manage(sWindow), 0, 2, 3, 4);
+	table->attach(*manage(rmItemButton), 1, 2, 2, 3, Gtk::SHRINK, Gtk::SHRINK);
+	table->attach(*manage(editItemButton), 2, 3, 2, 3, Gtk::SHRINK, Gtk::SHRINK);
+	table->attach(*manage(sWindow), 0, 3, 3, 4);
 	
 	add(*manage(table));
 	
@@ -214,7 +218,7 @@ void MainWindow::openDatabase() {
 				row=*(lstore->append());
 				row[colRec.name]=name;
 				row[colRec.id]=id;
-				usable=row[colRec.usable] ? "1" : "0";
+				row[colRec.usable]=usable=="1" ? "1" : "0";
 				row[colRec.luck]=luck;
 				row[colRec.defense]=def;
 				row[colRec.power]=pow;
@@ -330,7 +334,7 @@ void MainWindow::startItemWizard() {
 	Wizard *w=new Wizard;
 	wizard=w;
 	w->present();
-	w->signalSaveItemRequest().connect(sigc::mem_fun(*this, &MainWindow::addItem));
+	w->sigSaveItemRequest().connect(sigc::mem_fun(*this, &MainWindow::addItem));
 	
 	// remember to destroy this
 	destroyQueue.push_back(w);
@@ -397,6 +401,87 @@ void MainWindow::startRmItemWizard() {
 	delete d;
 };
 
+// function to launch the item editor wizard
+void MainWindow::startEditItemWizard() {
+	// first check if there are any items at all
+	if (lstore->children().empty()) {
+		Gtk::MessageDialog md(*this, "There are no items in the database.", true);
+		md.run();
+		return;
+	}
+
+	Gtk::Dialog *d=new Gtk::Dialog("Edit Item", *this, true, true);
+	d->set_border_width(4);
+	
+	// format the dialog
+	Gtk::VBox *vbox=d->get_vbox();
+	
+	// add a text combo box 
+	Gtk::ComboBoxText *cb=new Gtk::ComboBoxText;
+	
+	// cycle through the items
+	for (Gtk::TreeModel::iterator it=lstore->children().begin(); it!=lstore->children().end(); ++it) {
+		if ((*it)) {
+			Glib::ustring text=(*it)[colRec.name];
+			
+			// append this item
+			cb->append_text(text);
+		}
+	}
+	if (!lstore->children().empty())
+		cb->set_active(0);
+	
+	// label
+	Gtk::Label *lab=new Gtk::Label("Select the item you want to edit.");
+	
+	// pack widgets
+	vbox->pack_start(*manage(lab), Gtk::PACK_SHRINK);
+	vbox->pack_start(*manage(cb), Gtk::PACK_SHRINK);
+	
+	// add buttons
+	d->add_button("OK", 0x00);
+	d->add_button("Cancel", 0x01);
+	d->show_all_children();
+	
+	// run the dialog
+	int id=d->run();
+	
+	// check the choice
+	if (id==0x00) {
+		Wizard *w=new Wizard(true);
+		w->setOriginalItem(cb->get_active_text());
+		
+		// update pointer to wizard
+		wizard=w;
+		
+		// iterate over the rows and find the target row. then preload the entries in the wizard with values
+		// stored in the model
+		for (Gtk::TreeModel::iterator it=lstore->children().begin(); it!=lstore->children().end(); ++it) {
+			if ((*it) && (*it)[colRec.name]==cb->get_active_text().c_str()) {
+				// preload entries
+				w->nameEntry->set_text((*it)[colRec.name]);
+				w->idEntry->set_text((*it)[colRec.id]);
+				w->luckEntry->set_text((*it)[colRec.luck]);
+				w->defEntry->set_text((*it)[colRec.defense]);
+				w->powEntry->set_text((*it)[colRec.power]);
+				w->strEntry->set_text((*it)[colRec.strength]);
+				w->usableCB->set_active((*it)[colRec.usable] ? 0 : 1);
+		
+				w->present();
+				w->sigSaveItemRequest().connect(sigc::mem_fun(*this, &MainWindow::editItem));
+		
+				// add to queue
+				this->destroyQueue.push_back(w);
+				
+				break;
+			}
+		}
+	}
+	
+	// free memory
+	delete d;
+};
+
 // function to add an item to the database
 void MainWindow::addItem() {
 	// append a row
@@ -419,5 +504,20 @@ void MainWindow::removeItem() {
 		
 		if ((*it) && it)
 			lstore->erase(it);
+	}
+};
+
+// function to edit an item
+void MainWindow::editItem() {
+	for (Gtk::TreeModel::iterator it=lstore->children().begin(); it!=lstore->children().end(); ++it) {
+		if ((*it) && (*it)[colRec.name]==wizard->getOriginalItem().c_str()) {
+			(*it)[colRec.name]=wizard->nameEntry->get_text();
+			(*it)[colRec.id]=wizard->idEntry->get_text();
+			(*it)[colRec.usable]=wizard->usableCB->get_active_text()=="Yes" ? true : false;
+			(*it)[colRec.luck]=wizard->luckEntry->get_text();
+			(*it)[colRec.defense]=wizard->defEntry->get_text();
+			(*it)[colRec.power]=wizard->powEntry->get_text();
+			(*it)[colRec.strength]=wizard->strEntry->get_text();
+		}
 	}
 };

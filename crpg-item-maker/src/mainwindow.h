@@ -50,8 +50,10 @@ class MainWindow: public Gtk::Window {
 		void aboutThis();
 		void startItemWizard();
 		void startRmItemWizard();
+		void startEditItemWizard();
 		void addItem();
 		void removeItem();
+		void editItem();
 		
 		// containers
 		Gtk::ScrolledWindow *sWindow;
@@ -61,6 +63,7 @@ class MainWindow: public Gtk::Window {
 		Gtk::Label *titleLabel;
 		Gtk::Button *addItemButton;
 		Gtk::Button *rmItemButton;
+		Gtk::Button *editItemButton;
 		
 		Gtk::TreeView *tview;
 		Glib::RefPtr<Gtk::ListStore> lstore;

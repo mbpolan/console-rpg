@@ -38,13 +38,17 @@
 class Wizard: public Gtk::Window {
 	public:
 		// constructor
-		Wizard();
+		Wizard(bool editor=false);
 		
 		// destructor
 		virtual ~Wizard() {};
 		
+		// functions
+		void setOriginalItem(Glib::ustring name) { originalItem=name; };
+		Glib::ustring getOriginalItem() const { return originalItem; };
+		
 		// signals
-		sigc::signal<void> signalSaveItemRequest() { return sig_saveItemRequest; };
+		sigc::signal<void> sigSaveItemRequest() { return sig_saveItemRequest; };
 		
 		// public widgets
 		Gtk::Entry *nameEntry;
@@ -84,6 +88,9 @@ class Wizard: public Gtk::Window {
 		
 		// signals
 		sigc::signal<void> sig_saveItemRequest;
+		
+		// other stuff
+		Glib::ustring originalItem;
 };
 
 #endif
