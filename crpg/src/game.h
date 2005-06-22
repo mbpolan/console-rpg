@@ -97,6 +97,7 @@ class Game {
 		int creatureMoveNortheast(Creature*);
 		int creatureMoveSouthwest(Creature*);
 		int creatureMoveSoutheast(Creature*);
+		void creatureLook(Creature*);
 		void printMovementMessage(int move_code, const Direction dir);
 		
 		/// Amount of actions before the turn ends

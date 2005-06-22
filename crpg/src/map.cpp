@@ -41,6 +41,9 @@ Map::Map(int width, int height): mapWidth(width), mapHeight(height) {
 	// everything else
 	catch (...) {
 	}
+	
+	// spawn items
+	spawnMapItems(3000);
 };
 
 // destructor
@@ -214,10 +217,14 @@ void Map::spawnMapItems(int amount) {
 		int y=rand()%mapHeight;
 		//int z=rand()%5; // TODO: implement layers
 		int z=0;
-		int id=(rand()%5)-1;
+		int id=(rand()%5)-1; // FIXME: these id's should not be hard coded!
 		
 		// place this item
-		placeObject(Map::createItem(this, id, Position(x, y, z)));
+		placeObject(Map::createItem(this, id, Position(x, y, z)) ? Map::createItem(this, id, Position(x, y, z)) : new Item);
+		
+		#ifdef DEBUG
+		std::cout << "DEBUG: Placed item (id: " << id << ") at Position(" << x << ", " << y << ", " << z << std::endl;
+		#endif
 	}
 };
 

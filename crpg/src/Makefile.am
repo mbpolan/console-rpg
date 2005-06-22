@@ -12,6 +12,7 @@ crpg2_SOURCES = creature.h \
 		map.cpp map.h \
 		object.h \
 		player.cpp player.h \
-		position.h
+		position.h \
+		utilities.cpp utilities.h
 
 CLEANFILES = *~ *.o

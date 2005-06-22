@@ -20,6 +20,8 @@
 // game.cpp: implementations of the Game class
 
 #include "game.h"
+#include "utilities.h"
+using namespace Utilities;
 
 // main game loop initiator
 void Game::init() {
@@ -204,6 +206,13 @@ void Game::initLoop() {
 						  << " | Y: " << players[p]->position.y 
 						  << " | Z: " << players[p]->position.z
 						  << "\n------------------\n";
+				}
+				
+				// look on the ground
+				else if (action=="look") {
+					std::cout << "------------------\n";
+					creatureLook(players[p]);
+					std::cout << "------------------\n";
 				}
 				
 				// quit the game
@@ -424,6 +433,34 @@ int Game::creatureMoveSoutheast(Creature *c) {
 	c->position.y+=1;
 	c->position.x-=1;
 	return GAME_MOVEMENT_OK;
+};
+
+// function that allows a creature to check the ground for items
+void Game::creatureLook(Creature *c) {
+	// check if an object is even here
+	if (gmap->getObject(c->position.x, c->position.y, c->position.z)) {
+		// is this an item?
+		Item *item=dynamic_cast<Item*> (gmap->getObject(c->position.x, c->position.y, c->position.z));
+		if (item) {
+			std::cout << "You see ";
+			
+			if (hasVowel(item->getName()))
+				std::cout << "a ";
+			
+			else
+				std::cout << "an ";
+			 
+			 std::cout << item->getName() << "." << std::endl;
+		}
+		
+		// check for other players
+		Player *p=dynamic_cast<Player*> (gmap->getObject(c->position.x, c->position.y, c->position.z));
+		if (p)
+			std::cout << "You see " << p->getName() << "." << std::endl;
+	}
+	
+	// print the ground type
+	std::cout << "You see grass." << std::endl; // TODO: different ground tiles
 };
 
 // function that displays an error message if needed about a move

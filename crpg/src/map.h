@@ -86,8 +86,8 @@ class Map {
 		*/
 		int getWidth() const { return mapWidth; };
 		
-		/// Get a pointer to an object on the map
-		/** \param x The x coordinate
+		/** Get a pointer to an object on the map
+		  * \param x The x coordinate
 		  * \param y The y coordinate
 		  * \param z The z coordinate
 		  * \return The requested object, or NULL if not found
