@@ -58,6 +58,7 @@ class Wizard: public Gtk::Window {
 		NumericEntry *powEntry;
 		NumericEntry *strEntry;
 		Gtk::ComboBoxText *usableCB;
+		Gtk::ComboBoxText *pluralCB;
 		
 	private:
 		// signal handlers
@@ -82,6 +83,7 @@ class Wizard: public Gtk::Window {
 		Gtk::Label *powLabel;
 		Gtk::Label *strLabel;
 		Gtk::Label *usableLabel;
+		Gtk::Label *pluralLabel;
 		
 		Gtk::Button *okButton;
 		Gtk::Button *cancelButton;

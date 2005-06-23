@@ -38,7 +38,7 @@ Wizard::Wizard(bool editor): Gtk::Window(), originalItem("") {
 	frame=new Gtk::Frame;
 	
 	// create the main table
-	table=new Gtk::Table(7, 2, false);
+	table=new Gtk::Table(8, 2, false);
 	table->set_spacings(3);
 	
 	// create labels
@@ -53,6 +53,7 @@ Wizard::Wizard(bool editor): Gtk::Window(), originalItem("") {
 	nameLabel=new Gtk::Label("Name");
 	idLabel=new Gtk::Label("ID");
 	usableLabel=new Gtk::Label("Usable");
+	pluralLabel=new Gtk::Label("Plural");
 	luckLabel=new Gtk::Label("Luck");
 	defLabel=new Gtk::Label("Defense");
 	powLabel=new Gtk::Label("Power");
@@ -89,6 +90,12 @@ Wizard::Wizard(bool editor): Gtk::Window(), originalItem("") {
 	usableCB->append_text("No");
 	usableCB->set_active(0);
 	
+	// plural combobox 
+	pluralCB=new Gtk::ComboBoxText();
+	pluralCB->append_text("Yes");
+	pluralCB->append_text("No");
+	pluralCB->set_active(0);
+	
 	// buttons
 	buttonBox=new Gtk::HButtonBox;
 	okButton=new Gtk::Button("OK");
@@ -103,19 +110,21 @@ Wizard::Wizard(bool editor): Gtk::Window(), originalItem("") {
 	table->attach(*manage(nameLabel), 0, 1, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	table->attach(*manage(idLabel), 0, 1, 1, 2, Gtk::SHRINK, Gtk::SHRINK);
 	table->attach(*manage(usableLabel), 0, 1, 2, 3, Gtk::SHRINK, Gtk::SHRINK);
-	table->attach(*manage(luckLabel), 0, 1, 3, 4, Gtk::SHRINK, Gtk::SHRINK);
-	table->attach(*manage(defLabel), 0, 1, 4, 5, Gtk::SHRINK, Gtk::SHRINK);
-	table->attach(*manage(powLabel), 0, 1, 5, 6, Gtk::SHRINK, Gtk::SHRINK);
-	table->attach(*manage(strLabel), 0, 1, 6, 7, Gtk::SHRINK, Gtk::SHRINK);
+	table->attach(*manage(pluralLabel), 0, 1, 3, 4, Gtk::SHRINK, Gtk::SHRINK);
+	table->attach(*manage(luckLabel), 0, 1, 4, 5, Gtk::SHRINK, Gtk::SHRINK);
+	table->attach(*manage(defLabel), 0, 1, 5, 6, Gtk::SHRINK, Gtk::SHRINK);
+	table->attach(*manage(powLabel), 0, 1, 6, 7, Gtk::SHRINK, Gtk::SHRINK);
+	table->attach(*manage(strLabel), 0, 1, 7, 8, Gtk::SHRINK, Gtk::SHRINK);
 	
 	// entries
 	table->attach(*manage(nameEntry), 1, 2, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	table->attach(*manage(idEntry), 1, 2, 1, 2, Gtk::SHRINK, Gtk::SHRINK);
 	table->attach(*manage(usableCB), 1, 2, 2, 3, Gtk::SHRINK, Gtk::SHRINK);
-	table->attach(*manage(luckEntry), 1, 2, 3, 4, Gtk::SHRINK, Gtk::SHRINK);
-	table->attach(*manage(defEntry), 1, 2, 4, 5, Gtk::SHRINK, Gtk::SHRINK);
-	table->attach(*manage(powEntry), 1, 2, 5, 6, Gtk::SHRINK, Gtk::SHRINK);
-	table->attach(*manage(strEntry), 1, 2, 6, 7, Gtk::SHRINK, Gtk::SHRINK);
+	table->attach(*manage(pluralCB), 1, 2, 3, 4, Gtk::SHRINK, Gtk::SHRINK);
+	table->attach(*manage(luckEntry), 1, 2, 4, 5, Gtk::SHRINK, Gtk::SHRINK);
+	table->attach(*manage(defEntry), 1, 2, 5, 6, Gtk::SHRINK, Gtk::SHRINK);
+	table->attach(*manage(powEntry), 1, 2, 6, 7, Gtk::SHRINK, Gtk::SHRINK);
+	table->attach(*manage(strEntry), 1, 2, 7, 8, Gtk::SHRINK, Gtk::SHRINK);
 	
 	// add into parent containers
 	sWindow->add(*manage(table));

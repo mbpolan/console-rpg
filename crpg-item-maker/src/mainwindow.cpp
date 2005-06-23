@@ -119,6 +119,7 @@ MainWindow::MainWindow(): Gtk::Window() {
 	tview->append_column_editable("Name", colRec.name);
 	tview->append_column("ID", colRec.id);
 	tview->append_column_editable("Usable", colRec.usable);
+	tview->append_column_editable("Plural", colRec.plural);
 	tview->append_column("Luck", colRec.luck);
 	tview->append_column("Defense", colRec.defense);
 	tview->append_column("Power", colRec.power);
@@ -205,6 +206,7 @@ void MainWindow::openDatabase() {
 				std::string name=(std::string) (const char*) xmlGetProp(item, (const xmlChar*) "name");
 				std::string id=(std::string) (const char*) xmlGetProp(item, (const xmlChar*) "id");
 				std::string usable=(std::string) (const char*) xmlGetProp(item, (const xmlChar*) "usable");
+				std::string plural=(std::string) (const char*) xmlGetProp(item, (const xmlChar*) "plural");
 				
 				// load skill attributes
 				attr=item->children;
@@ -218,7 +220,8 @@ void MainWindow::openDatabase() {
 				row=*(lstore->append());
 				row[colRec.name]=name;
 				row[colRec.id]=id;
-				row[colRec.usable]=usable=="1" ? "1" : "0";
+				row[colRec.usable]=usable=="1" ? true : false;
+				row[colRec.plural]=plural=="1" ? true : false;
 				row[colRec.luck]=luck;
 				row[colRec.defense]=def;
 				row[colRec.power]=pow;
@@ -277,6 +280,10 @@ void MainWindow::saveDatabase() {
 			
 			ss << (*it)[colRec.usable];
 			xmlSetProp(item, (const xmlChar*) "usable", (const xmlChar*) ss.str().c_str());
+			ss.str("");
+			
+			ss << (*it)[colRec.plural];
+			xmlSetProp(item, (const xmlChar*) "plural", (const xmlChar*) ss.str().c_str());
 			ss.str("");
 			
 			// set skill attributes
@@ -466,6 +473,7 @@ void MainWindow::startEditItemWizard() {
 				w->powEntry->set_text((*it)[colRec.power]);
 				w->strEntry->set_text((*it)[colRec.strength]);
 				w->usableCB->set_active((*it)[colRec.usable] ? 0 : 1);
+				w->pluralCB->set_active((*it)[colRec.plural] ? 0 : 1);
 		
 				w->present();
 				w->sigSaveItemRequest().connect(sigc::mem_fun(*this, &MainWindow::editItem));
@@ -490,6 +498,7 @@ void MainWindow::addItem() {
 	row[colRec.name]=wizard->nameEntry->get_text();
 	row[colRec.id]=wizard->idEntry->get_text();
 	row[colRec.usable]=wizard->usableCB->get_active_text()=="Yes" ? true : false;
+	row[colRec.plural]=wizard->pluralCB->get_active_text()=="Yes" ? true : false;
 	row[colRec.luck]=wizard->luckEntry->get_text();
 	row[colRec.defense]=wizard->defEntry->get_text();
 	row[colRec.power]=wizard->powEntry->get_text();
@@ -514,6 +523,7 @@ void MainWindow::editItem() {
 			(*it)[colRec.name]=wizard->nameEntry->get_text();
 			(*it)[colRec.id]=wizard->idEntry->get_text();
 			(*it)[colRec.usable]=wizard->usableCB->get_active_text()=="Yes" ? true : false;
+			(*it)[colRec.plural]=wizard->pluralCB->get_active_text()=="Yes" ? true : false;
 			(*it)[colRec.luck]=wizard->luckEntry->get_text();
 			(*it)[colRec.defense]=wizard->defEntry->get_text();
 			(*it)[colRec.power]=wizard->powEntry->get_text();
