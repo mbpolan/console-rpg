@@ -40,8 +40,8 @@ class ItemModel {
 		  * \param pow The item's power boost
 		  * \param str The item's strength boost
 		*/
-		ItemModel(std::string _name, int _id, int luck, int def, int pow, int str, bool _usable):
-			name(_name), id(_id), luckBoost(luck), defenseBoost(def), powerBoost(pow), strBoost(str), usable(_usable) {};
+		ItemModel(std::string _name, int _id, int luck, int def, int pow, int str, bool pl, bool _usable):
+			name(_name), id(_id), luckBoost(luck), defenseBoost(def), powerBoost(pow), strBoost(str), plural(pl), usable(_usable) {};
 			
 		/** Get the name of this item
 		  * \return The name of this item */
@@ -71,6 +71,11 @@ class ItemModel {
 		  * \return true if usable, false otherwise */
 		bool isUsable() const { return usable; };  
 		
+		/** Check if this item is plural or not
+		  * \return true if plural, otherwise false
+		*/
+		bool isPlural() const { return plural; }
+		
 	private:
 		/// Name of this model
 		std::string name;
@@ -83,6 +88,9 @@ class ItemModel {
 		
 		/// Usable item
 		bool usable;
+		
+		/// Plural
+		bool plural;
 };
 
 #endif

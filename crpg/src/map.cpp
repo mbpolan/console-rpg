@@ -140,6 +140,7 @@ void Map::loadItemsFromXML(std::string file) {
 			std::string name=(std::string) ((const char*) xmlGetProp(item, (const xmlChar*) "name"));
 			int id=atoi((const char*) xmlGetProp(item, (const xmlChar*) "id"));
 			bool usable=atoi((const char*) xmlGetProp(item, (const xmlChar*) "usable"));
+			bool plural=atoi((const char*) xmlGetProp(item, (const xmlChar*) "plural"));
 			
 			// load attributes
 			attr=item->children;
@@ -149,7 +150,7 @@ void Map::loadItemsFromXML(std::string file) {
 			int def=atoi((const char*) xmlGetProp(attr, (const xmlChar*) "defense"));
 			
 			// create a model
-			imodel=new ItemModel(name, id, luck, def, pow, str, usable);
+			imodel=new ItemModel(name, id, luck, def, pow, str, plural, usable);
 			
 			// add it to the database
 			itemDB[id]=imodel;
@@ -179,7 +180,7 @@ Item* Map::createItem(Map *map, int id, Position pos) {
 	// get attributes from database
 	std::string name;
 	int luck, def, pow, str;
-	bool found=false;
+	bool found=false, plural, use;
 	for (MapItemIterator it=map->itemDB.begin(); it!=map->itemDB.end(); ++it) {
 		if ((*it).second && ((*it).second)->getID()==id) {
 			name=((*it).second)->getName();
@@ -187,6 +188,8 @@ Item* Map::createItem(Map *map, int id, Position pos) {
 			def=((*it).second)->getDefense();
 			pow=((*it).second)->getPower();
 			str=((*it).second)->getStrength();
+			use=((*it).second)->isUsable();
+			plural=((*it).second)->isPlural();
 			found=true;
 			
 			break;
@@ -200,6 +203,8 @@ Item* Map::createItem(Map *map, int id, Position pos) {
 		item->setDefense(def);
 		item->setPower(pow);
 		item->setStrength(str);
+		item->setPlural(plural);
+		item->setUsable(use);
 		item->position=pos;
 		
 		return item;

@@ -130,6 +130,26 @@ class Item: public Object {
 		*/
 		ITEM_TYPE getType() const { return type; };
 		
+		/** Set whether or not this item can be used
+		  * \param use true if usable, otherwise false
+		*/
+		void setUsable(bool use) { usable=use; }
+		
+		/** Check if this item is usable
+		  * \return true if usable, otherwise false
+		*/
+		bool isUsable() const { return usable; }
+		
+		/** Set whether or not this item is plural
+		  * \param pl true if yes, otherwise false
+		*/
+		void setPlural(bool pl) { plural=pl; }
+		
+		/** Check if this item is plural or not
+		  * \return true if plural, otherwise false
+		*/
+		bool isPlural() const { return plural; }
+		
 	protected:
 		/// The item's ID
 		int itemID;
@@ -145,6 +165,9 @@ class Item: public Object {
 		
 		/// The type of item
 		ITEM_TYPE type;
+		
+		/// Multiple amounts of this item
+		bool plural;
 };
 
 #endif

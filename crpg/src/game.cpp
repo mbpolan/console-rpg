@@ -445,13 +445,17 @@ void Game::creatureLook(Creature *c) {
 		if (item) {
 			std::cout << "You see ";
 			
-			if (hasVowel(item->getName()))
-				std::cout << "an ";
+			// make sure to use proper grammar
+			// (my english teacher would be strict as hell about this ;P)
+			if (!item->isPlural()) {
+				if (hasVowel(item->getName()))
+					std::cout << "an ";
 			
-			else
-				std::cout << "a ";
+				else
+					std::cout << "a ";
+			}
 			 
-			 std::cout << item->getName() << "." << std::endl;
+			std::cout << item->getName() << "." << std::endl;
 		}
 		
 		// check for other players
