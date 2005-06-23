@@ -32,5 +32,5 @@ Item::Item(int id, std::string name, Position pos, bool use):
 
 // constructor taking eight parameters
 Item::Item(int id, std::string name, Position pos, bool use, int _luck, int def, int pow, int str):
-	Object(pos.x, pos.y, pos.z), itemID(id), luck(_luck), defense(def), power(pow), strength(str) {
+	Object(pos.x, pos.y, pos.z), itemName(name), itemID(id), luck(_luck), defense(def), power(pow), strength(str) {
 };

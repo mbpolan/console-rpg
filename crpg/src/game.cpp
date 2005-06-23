@@ -439,16 +439,17 @@ int Game::creatureMoveSoutheast(Creature *c) {
 void Game::creatureLook(Creature *c) {
 	// check if an object is even here
 	if (gmap->getObject(c->position.x, c->position.y, c->position.z)) {
+		std::cout << "found object\n";
 		// is this an item?
 		Item *item=dynamic_cast<Item*> (gmap->getObject(c->position.x, c->position.y, c->position.z));
 		if (item) {
 			std::cout << "You see ";
 			
 			if (hasVowel(item->getName()))
-				std::cout << "a ";
+				std::cout << "an ";
 			
 			else
-				std::cout << "an ";
+				std::cout << "a ";
 			 
 			 std::cout << item->getName() << "." << std::endl;
 		}

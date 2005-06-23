@@ -54,7 +54,7 @@ class Map {
 		/// Destructor
 		virtual ~Map();
 		
-		/// Map of item database
+		/// List of item database
 		std::map<int, ItemModel*> itemDB;
 		
 		/// Clear the entire map of any objects

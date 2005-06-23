@@ -84,7 +84,7 @@ void Map::setWidth(int width) {
 // function to return a pointer to an object on the map
 Object* Map::getObject(int x, int y, int z) {
 	for (MapObjectIterator it=objects.begin(); it!=objects.end(); ++it) {
-		if ((*it) && (*it)->position.y==x && (*it)->position.y==y && (*it)->position.z==z)
+		if ((*it) && (*it)->position.x==x && (*it)->position.y==y && (*it)->position.z==z)
 			return (*it);
 	}
 	
@@ -182,7 +182,7 @@ Item* Map::createItem(Map *map, int id, Position pos) {
 	bool found=false;
 	for (MapItemIterator it=map->itemDB.begin(); it!=map->itemDB.end(); ++it) {
 		if ((*it).second && ((*it).second)->getID()==id) {
-			std::string name=((*it).second)->getName();
+			name=((*it).second)->getName();
 			luck=((*it).second)->getLuck();
 			def=((*it).second)->getDefense();
 			pow=((*it).second)->getPower();
@@ -200,12 +200,15 @@ Item* Map::createItem(Map *map, int id, Position pos) {
 		item->setDefense(def);
 		item->setPower(pow);
 		item->setStrength(str);
+		item->position=pos;
 		
 		return item;
 	}
 	
-	else
+	else {
+		delete item;
 		return NULL;
+	}
 };
 
 // function to spawn some items on the map
@@ -217,13 +220,20 @@ void Map::spawnMapItems(int amount) {
 		int y=rand()%mapHeight;
 		//int z=rand()%5; // TODO: implement layers
 		int z=0;
-		int id=(rand()%5)-1; // FIXME: these id's should not be hard coded!
+		int id=(rand()%5)+1; // FIXME: these id's should not be hard coded!
 		
 		// place this item
 		placeObject(Map::createItem(this, id, Position(x, y, z)) ? Map::createItem(this, id, Position(x, y, z)) : new Item);
 		
 		#ifdef DEBUG
-		std::cout << "DEBUG: Placed item (id: " << id << ") at Position(" << x << ", " << y << ", " << z << std::endl;
+		std::cout << "DEBUG: Placed item (id: " << id << ") at Position(" << x << ", " << y << ", " << z << ")";
+		if (Map::createItem(this, id, Position(x, y, z)))
+			std::cout << " - Valid";
+		
+		else
+			std::cout << " - Invalid";
+		
+		std::cout << std::endl;
 		#endif
 	}
 };
