@@ -36,7 +36,7 @@ class Event {
 		  * \param name A name for this event
 		  * \param _routine The function to be executed
 		  * \param data Data passed to the routine function
-		  * \param time The amount of time in milliseconds that needs to pass for this event to take place
+		  * \param time The amount of time in microseconds that needs to pass for this event to take place
 		*/
 		static Event* create(std::string name, void* (*_routine)(void*), void *data, double _time) {
 			Event *e=new Event;
