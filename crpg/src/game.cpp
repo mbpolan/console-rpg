@@ -20,6 +20,7 @@
 // game.cpp: implementations of the Game class
 
 #include "event.h"
+#include "events.h"
 #include "exception.h"
 #include "game.h"
 #include "timer.h"
@@ -311,7 +312,7 @@ void Game::startNewGame() {
 	createGameThread();
 	
 	// add some initial event functions
-	this->appendEvent(Event::create("TIME_CONTROL_EVENT", &controlTime, this, MICROSEC));
+	this->appendEvent(Event::create("TIME_CONTROL_EVENT", &Events::controlTime, this, MICROSEC));
 	
 	// lock the user until he enters a valid amount of players
 	while(1) {
@@ -510,32 +511,4 @@ void Game::printMovementMessage(int move_code, Direction dir) {
 		case GAME_MOVEMENT_BLOCKING_SPACE: std::cout << "\nThat space is blocked!\n"; break;
 		default: return;
 	}
-};
-
-// event function to control the time of day
-// TODO: move this over to another file
-void* controlTime(void *data) {
-	Game *game=(Game*) data;
-	
-	// initial timer
-	Timer timer;
-	timer.init();
-	
-	// change the day every set amount of time
-	while(1) {
-		// FIXME: get a more realistic time value here
-		if (timer.time()==10*MICROSEC) {
-/*			if (game->isDay())
-				game->setDay(false);
-			
-			else
-				game->setDay(true);*/
-			break;
-		}
-	}
-	timer.halt();
-	
-	// keep this event in the queue
-	game->appendEvent(Event::create("TIME_CONTROL_EVENT", &controlTime, game, MICROSEC));
-	pthread_exit(NULL);
 };
