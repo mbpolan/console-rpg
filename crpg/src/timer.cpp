@@ -17,53 +17,43 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/ 
-// event.h: Event class
+// timer.cpp: implementations of Timer class
 
-#ifndef EVENT_H
-#define EVENT_H
+#include "timer.h"
 
-#include <iostream>
-
-/** Class that prepares an event for execution.
-  * Event is a class that stores two members: a pointer to a routine
-  * function and the arguments for that function. An instance of Event
-  * should be made avaiable to the Game event thread where it will be
-  * processed and executed.
-*/
-class Event {
-	public:
-		/** Factory function to create an event
-		  * \param name A name for this event
-		  * \param _routine The function to be executed
-		  * \param data Data passed to the routine function
-		  * \param time The amount of time in milliseconds that needs to pass for this event to take place
-		*/
-		static Event* create(std::string name, void* (*_routine)(void*), void *data, double _time) {
-			Event *e=new Event;
-			e->eventName=name;
-			e->routine=_routine;
-			e->eventData=data;
-			e->time=_time;
-			
-			return e;
-			
-		};
-		
-		/// Name for this event
-		std::string eventName;
-		
-		/// Data for this event
-		void *eventData;
-		
-		/// Routine to do
-		void* (*routine)(void*);
-		
-		/// Expire time
-		double time;
-		
-	private:
-		/// Hidden constructor
-		Event() {};
+// function to initialize the timer
+void Timer::init() {
+	if (running)
+		throw CTimerRunningEx();
+	
+	else {
+		running=true;
+		initTime=clock();
+	}
 };
 
-#endif
+// function to stop the timer
+void Timer::halt() {
+	if (!running)
+		throw CTimerStoppedEx();
+	
+	else
+		running=false;
+};
+
+// function to reset the timer
+void Timer::reset() {
+	if (!running)
+		throw CTimerStoppedEx();
+	
+	else
+		initTime=0;
+};
+
+// function to get the time in microseconds that passed
+double Timer::time() const {
+	if (!running)
+		throw CTimerStoppedEx();
+	
+	return (double) (clock()-initTime/CLOCKS_PER_SEC);
+};

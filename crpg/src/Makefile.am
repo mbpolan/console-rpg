@@ -1,7 +1,7 @@
 bin_PROGRAMS = crpg2
 
 AM_CXXFLAGS = -DDEBUG
-crpg2_LDFLAGS =  -lxml2
+crpg2_LDFLAGS =  -lxml2 
 
 crpg2_SOURCES = creature.h \
                 crpg.cpp \
@@ -14,6 +14,7 @@ crpg2_SOURCES = creature.h \
 		object.h \
 		player.cpp player.h \
 		position.h \
+		timer.cpp timer.h \
 		utilities.cpp utilities.h
 
 CLEANFILES = *~ *.o

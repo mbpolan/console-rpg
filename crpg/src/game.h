@@ -47,13 +47,18 @@
 */
 class Game {
 	public:
-		/// Constructor
-		/** \param map An instance of a Map class to be used in the game
+		/** Constructor
+		  * \param map An instance of a Map class to be used in the game
 		*/
 		Game(Map *map): gmap(map) {};
 		
 		/// Destructor
 		virtual ~Game() {};
+		
+		/** Function that adds an event to the queue
+		  * \param e The event to be added to the event queue
+		*/
+		void appendEvent(Event *e) { eventQueue.push(e); };
 		
 		/** Function that prepares and starts the game */
 		void init();

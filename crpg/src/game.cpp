@@ -19,9 +19,17 @@
  ***************************************************************************/ 
 // game.cpp: implementations of the Game class
 
+#include "event.h"
+#include "exception.h"
 #include "game.h"
+#include "timer.h"
 #include "utilities.h"
 using namespace Utilities;
+
+const int MICROSEC=1000000;
+
+// prototypes
+void* controlTime(void*);
 
 // main game loop initiator
 void Game::init() {
@@ -39,9 +47,6 @@ void Game::init() {
 	// run the options menu
 	else if (op==GAME_MENU_OPTIONS)
 		runOptionsMenu();
-	
-	// create an thread to run in the background and process events
-	createGameThread();
 };
 
 // function that initializes the internal thread
@@ -50,7 +55,7 @@ void Game::createGameThread() {
 	pthread_attr_t attr;
 	
 	pthread_attr_init(&attr);
-	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 	
 	pthread_create(&thread, &attr, initThread, this);
 };
@@ -60,6 +65,7 @@ void Game::initLoop() {
 	// the player vector should be full, but let's check to be sure :)
 	if (players.empty()) {
 		// throw an exception
+		throw CNoPlayersEx();
 	}
 	
 	// cycle through each player keeping the turn count in mind
@@ -270,14 +276,29 @@ void* Game::initThread(void *data) {
 		// check for events
 		if (!game->eventQueue.empty()) {
 			Event *e=game->eventQueue.top();
-			//std::cout << "Found event: " << e->eventName << std::endl;
 			
-			// create a thread to handle this
-			pthread_t thread;
-			pthread_create(&thread, NULL, e->routine, e->eventData);
+			// check if this event exists
+			if (e) {
+				// wait for this event
+				// TODO: separate threads for each timed event
+				clock_t wait;
+				wait=clock()+e->time*CLOCKS_PER_SEC;
+				while (clock() < wait) {};
 			
-			// remove this event
-			game->eventQueue.pop();
+				// create a thread to handle this
+				pthread_t thread;
+				pthread_attr_t attr;
+				pthread_attr_init(&attr);
+				
+				pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+				
+				// create a thread to handle this event's routine
+				pthread_create(&thread, &attr, e->routine, e->eventData);
+			
+				// remove this event
+				game->eventQueue.pop();
+				delete e;
+			}
 		}
 	}
 };
@@ -286,12 +307,27 @@ void* Game::initThread(void *data) {
 void Game::startNewGame() {
 	std::string buffer;
 	
-	// ask for the amount of players
-	std::cout << "\nEnter amount of players: ";
-	std::getline(std::cin, buffer);
+	// create an thread to run in the background and process events
+	createGameThread();
 	
-	playerCount=atoi(buffer.c_str());
-	buffer.clear();
+	// add some initial event functions
+	this->appendEvent(Event::create("TIME_CONTROL_EVENT", &controlTime, this, MICROSEC));
+	
+	// lock the user until he enters a valid amount of players
+	while(1) {
+		// ask for the amount of players
+		std::cout << "\nEnter amount of players: ";
+		std::getline(std::cin, buffer);
+	
+		playerCount=atoi(buffer.c_str());
+		buffer.clear();
+		
+		if (playerCount > 0)
+			break;
+		
+		else
+			std::cout << "\nYou must enter at least 1 player!";
+	}
 	
 	// allocate new players
 	for (int i=0; i<playerCount; i++) {
@@ -439,7 +475,6 @@ int Game::creatureMoveSoutheast(Creature *c) {
 void Game::creatureLook(Creature *c) {
 	// check if an object is even here
 	if (gmap->getObject(c->position.x, c->position.y, c->position.z)) {
-		std::cout << "found object\n";
 		// is this an item?
 		Item *item=dynamic_cast<Item*> (gmap->getObject(c->position.x, c->position.y, c->position.z));
 		if (item) {
@@ -475,4 +510,32 @@ void Game::printMovementMessage(int move_code, Direction dir) {
 		case GAME_MOVEMENT_BLOCKING_SPACE: std::cout << "\nThat space is blocked!\n"; break;
 		default: return;
 	}
+};
+
+// event function to control the time of day
+// TODO: move this over to another file
+void* controlTime(void *data) {
+	Game *game=(Game*) data;
+	
+	// initial timer
+	Timer timer;
+	timer.init();
+	
+	// change the day every set amount of time
+	while(1) {
+		// FIXME: get a more realistic time value here
+		if (timer.time()==10*MICROSEC) {
+/*			if (game->isDay())
+				game->setDay(false);
+			
+			else
+				game->setDay(true);*/
+			break;
+		}
+	}
+	timer.halt();
+	
+	// keep this event in the queue
+	game->appendEvent(Event::create("TIME_CONTROL_EVENT", &controlTime, game, MICROSEC));
+	pthread_exit(NULL);
 };

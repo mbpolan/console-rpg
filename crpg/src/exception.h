@@ -60,4 +60,33 @@ class CLoadErrorEx: public CException {
 		CLoadErrorEx(): CException("Unable to load file!", true) {};
 };
 
+/** Player check exception.
+  * Exception thrown when there are no players in the game list.
+*/
+class CNoPlayersEx: public CException {
+	public:
+		/// Constructor
+		CNoPlayersEx(): CException("There are no players in the game!", true) {};
+};
+
+/** Timer initialized exception.
+  * Exception thrown when a Timer object is already running and a member function
+  * that requires a stopped Timer is called.
+*/
+class CTimerRunningEx: public CException {
+	public:
+		/// Constructor
+		CTimerRunningEx(): CException("Timer is already initialized when the target function was called.", false) {};
+};
+
+/** Timer stopped exception.
+  * Exception thrown when a Timer object is stopped and a member function
+  * that requires a running Timer is called.
+*/
+class CTimerStoppedEx: public CException {
+	public:
+		/// Constructor
+		CTimerStoppedEx(): CException("Timer is stopped when the target function was called.", false) {};
+};
+
 #endif

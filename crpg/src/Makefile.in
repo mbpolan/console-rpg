@@ -49,7 +49,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_crpg2_OBJECTS = crpg.$(OBJEXT) game.$(OBJEXT) item.$(OBJEXT) \
-	map.$(OBJEXT) player.$(OBJEXT) utilities.$(OBJEXT)
+	map.$(OBJEXT) player.$(OBJEXT) timer.$(OBJEXT) \
+	utilities.$(OBJEXT)
 crpg2_OBJECTS = $(am_crpg2_OBJECTS)
 crpg2_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -57,7 +58,8 @@ depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/crpg.Po ./$(DEPDIR)/game.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/item.Po ./$(DEPDIR)/map.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/player.Po ./$(DEPDIR)/utilities.Po
+@AMDEP_TRUE@	./$(DEPDIR)/player.Po ./$(DEPDIR)/timer.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/utilities.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -146,7 +148,7 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AM_CXXFLAGS = -DDEBUG
-crpg2_LDFLAGS = -lxml2
+crpg2_LDFLAGS = -lxml2 
 crpg2_SOURCES = creature.h \
                 crpg.cpp \
 		event.h \
@@ -158,6 +160,7 @@ crpg2_SOURCES = creature.h \
 		object.h \
 		player.cpp player.h \
 		position.h \
+		timer.cpp timer.h \
 		utilities.cpp utilities.h
 
 CLEANFILES = *~ *.o
@@ -232,6 +235,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/item.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/map.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/player.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utilities.Po@am__quote@
 
 .cpp.o:
