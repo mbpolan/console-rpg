@@ -129,7 +129,7 @@ MainWindow::MainWindow(): Gtk::Window() {
 	for (int i=0; i<7; i++)
 		tview->get_column(i)->set_resizable(true);
 	
-	// reorderable rows
+	// make sure rows are reorderable
 	tview->set_reorderable(true);
 	
 	sWindow->add(*manage(tview));
