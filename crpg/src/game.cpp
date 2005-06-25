@@ -27,10 +27,17 @@
 #include "utilities.h"
 using namespace Utilities;
 
-const int MICROSEC=1000000;
-
-// prototypes
-void* controlTime(void*);
+// destructor
+Game::~Game() {
+	// clear the eventQueue
+	for (int i=0; i<eventQueue.size(); i++) {
+		Event *e=eventQueue.front();
+		if (e) {
+			eventQueue.pop();
+			delete e;
+		}
+	}
+};
 
 // main game loop initiator
 void Game::init() {
@@ -52,13 +59,7 @@ void Game::init() {
 
 // function that initializes the internal thread
 void Game::createGameThread() {
-	pthread_t thread;
-	pthread_attr_t attr;
-	
-	pthread_attr_init(&attr);
-	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-	
-	pthread_create(&thread, &attr, initThread, this);
+	CreateThread(initThread, this);
 };
 
 // function that starts the internal game loop
@@ -275,31 +276,20 @@ void* Game::initThread(void *data) {
 	// event loop
 	while(1) {
 		// check for events
-		if (!game->eventQueue.empty()) {
-			Event *e=game->eventQueue.top();
+		if (game->eventQueue.size()!=0) {
+			Event *e=game->eventQueue.front();
 			
-			// check if this event exists
-			if (e) {
-				// wait for this event
-				// TODO: separate threads for each timed event
-				clock_t wait;
-				wait=clock()+e->time*CLOCKS_PER_SEC;
-				while (clock() < wait) {};
+			//std::cout << "DEBUG: found event: " << e->eventName << std::endl;
 			
-				// create a thread to handle this
-				pthread_t thread;
-				pthread_attr_t attr;
-				pthread_attr_init(&attr);
-				
-				pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-				
-				// create a thread to handle this event's routine
-				pthread_create(&thread, &attr, e->routine, e->eventData);
+			// wait for this event
+			// TODO: separate threads for each timed event
+			clock_t wait;
+			wait=clock()+e->time*CLOCKS_PER_SEC;
+			while(clock() < wait) {};
 			
-				// remove this event
-				game->eventQueue.pop();
-				delete e;
-			}
+			// create a thread to handle this event's routine
+			CreateThread(e->routine, e->eventData);
+			game->eventQueue.pop();
 		}
 	}
 };
@@ -312,7 +302,8 @@ void Game::startNewGame() {
 	createGameThread();
 	
 	// add some initial event functions
-	this->appendEvent(Event::create("TIME_CONTROL_EVENT", &Events::controlTime, this, MICROSEC));
+	this->appendEvent(Event::create("TIME_CONTROL_EVENT", &Events::controlTime, this, 5));
+	this->appendEvent(Event::create("SPAWN_MANAGE_EVENT", &Events::spawnManage, this, 3));
 	
 	// lock the user until he enters a valid amount of players
 	while(1) {

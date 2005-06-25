@@ -19,34 +19,61 @@
  ***************************************************************************/ 
 // events.cpp: implementations of Events namespace functions
 
+#include "enemy.h"
 #include "event.h"
 #include "events.h"
 #include "game.h"
+#include "map.h"
 #include "timer.h"
 
 // function to control time of day/night
 void* Events::controlTime(void *data) {
 	Game *game=(Game*) data;
 	
-	// initial timer
-	Timer timer;
-	timer.init();
-	
-	// change the day every set amount of time
-	while(1) {
-		// FIXME: get a more realistic time value here
-		if (timer.time()==10*1000000) {
-/*			if (game->isDay())
-				game->setDay(false);
-			
-			else
-				game->setDay(true);*/
-			break;
-		}
-	}
-	timer.halt();
+	// make sure to lock and unlock the mutex
+	game->lock();
+	game->setTimeTicks(game->getTimeTicks()+1);
+	game->unlock();
 	
 	// keep this event in the queue
-	game->appendEvent(Event::create("TIME_CONTROL_EVENT", &controlTime, game, 1000000));
+	game->appendEvent(Event::create("TIME_CONTROL_EVENT", &controlTime, game, 3));
+	pthread_exit(NULL);
+};
+
+// function to manage spawning of enemies on the map
+void* Events::spawnManage(void *data) {
+	Game *game=(Game*) data;
+	game->lock();
+		
+	Map *map=game->map();
+	map->lock();
+			
+	// get a count of enemies
+	int count=0;
+	for (MapObjectIterator it=map->objects.begin(); it!=map->objects.end(); ++it) {
+		if ((*it) && dynamic_cast<Enemy*> ((*it)))
+			count+=1;
+	}
+		
+	// maintain a minimum of 50 enemies
+	if (count < 50) {
+		int req=50-count;
+				// respawn these enemies
+		for (int i=0; i<req; i++) {
+			srand(static_cast<unsigned> (time(NULL)));
+			int x=rand()%map->getWidth();
+			int y=rand()%map->getHeight();
+			int z=0; // FIXME: correct this once layers are in
+				
+			// place the new enemy
+			// TODO: enemy names and attributes
+			map->placeObject(new Enemy("Enemy", 100, 50, Position(x, y, z)));
+		}
+	}
+	map->unlock();
+	game->unlock();
+	
+	// keep this event in the queue
+	game->appendEvent(Event::create("SPAWN_MANAGE_EVENT", &spawnManage, game, 5)); // execute every 5 seconds
 	pthread_exit(NULL);
 };

@@ -21,11 +21,14 @@
 
 #include <fstream>
 #include <libxml/parser.h>
+#include "enemy.h"
 #include "exception.h"
 #include "map.h"
 
 // constructor 
 Map::Map(int width, int height): mapWidth(width), mapHeight(height) {
+	MutexInit(mutex);
+
 	try {
 		loadItemsFromXML("itemdb.xml");
 	}
@@ -44,6 +47,9 @@ Map::Map(int width, int height): mapWidth(width), mapHeight(height) {
 	
 	// spawn items
 	spawnMapItems(3000);
+	
+	// spawn enemies
+	spawnEnemies(50);
 };
 
 // destructor
@@ -243,3 +249,17 @@ void Map::spawnMapItems(int amount) {
 	}
 };
 
+// function to spawn some enemies on the map
+void Map::spawnEnemies(int amount) {
+	srand(static_cast<unsigned> (time(NULL)));
+	
+	for (int i=0; i<amount; i++) {
+		int x=rand()%mapWidth;
+		int y=rand()%mapHeight;
+		int z=0;
+		
+		// place this enemy
+		placeObject(new Enemy("Enemy", 100, 100, Position(x, y, z)));
+		
+	}
+};

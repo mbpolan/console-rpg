@@ -29,6 +29,8 @@
 #include "map.h"
 #include "player.h"
 #include "position.h"
+#include "threads.h"
+using namespace Threads;
 
 // define's for menu
 #define GAME_MENU_NEW_GAME	1
@@ -50,10 +52,10 @@ class Game {
 		/** Constructor
 		  * \param map An instance of a Map class to be used in the game
 		*/
-		Game(Map *map): gmap(map) {};
+		Game(Map *map): gmap(map), timeTicks(0) { MutexInit(mutex); };
 		
 		/// Destructor
-		virtual ~Game() {};
+		virtual ~Game();
 		
 		/** Function that adds an event to the queue
 		  * \param e The event to be added to the event queue
@@ -67,6 +69,22 @@ class Game {
 		  * \return A pointer to this map
 		*/
 		Map* map() const { return gmap; };
+		
+		/** Set the amount of time ticks
+		  * \param ticks The amount of ticks
+		*/
+		void setTimeTicks(int ticks) { timeTicks=ticks; };
+		
+		/** Get the amount of time ticks
+		  * \return Time ticks
+		*/
+		int getTimeTicks() const { return timeTicks; };
+		
+		/// Lock the Game mutex
+		void lock() { LockMutex(mutex); };
+		
+		/// Unlock the Game mutex
+		void unlock() { UnlockMutex(mutex); };
 		
 	protected:
 		/// Game map
@@ -114,11 +132,17 @@ class Game {
 		/// Amount of turns maximum before the game ends
 		int turnCount;
 		
+		/// Time ticks
+		int timeTicks;
+		
 		/// Vector of players
 		std::vector<Player*> players;
 		
 		/// Event queue
-		std::priority_queue<Event*> eventQueue;
+		std::queue<Event*> eventQueue;
+		
+		/// Mutex
+		TMutex mutex;
 };
 
 #endif

@@ -17,53 +17,31 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/ 
-// event.h: Event class
+// enemy.h: the Enemy class 
 
-#ifndef EVENT_H
-#define EVENT_H
+#ifndef ENEMY_H
+#define ENEMY_H
 
 #include <iostream>
+#include "creature.h"
+#include "position.h"
 
-/** Class that prepares an event for execution.
-  * Event is a class that stores two members: a pointer to a routine
-  * function and the arguments for that function. An instance of Event
-  * should be made available to the Game event thread where it will be
-  * processed and executed.
+/** Creature that is attackable by players.
+  * The Enemy class is a derived Creature that can be attacked and battled
+  * by the user.
 */
-class Event {
+class Enemy: public Creature {
 	public:
-		/** Factory function to create an event
-		  * \param name A name for this event
-		  * \param _routine The function to be executed
-		  * \param data Data passed to the routine function
-		  * \param time The amount of time in seconds that needs to pass for this event to take place
+		/** Constructor
+		  * \param name The name of this Enemy
+		  * \param hpNow Initial hitpoints
+		  * \param hpMax Maximum hitpoints
+		  * \param pos The position of this object
 		*/
-		static Event* create(std::string name, void* (*_routine)(void*), void *data, double _time) {
-			Event *e=new Event;
-			e->eventName=name;
-			e->routine=_routine;
-			e->eventData=data;
-			e->time=_time;
-			
-			return e;
-			
-		};
+		Enemy(std::string name, int hpNow, int hpMax, Position pos);
 		
-		/// Name for this event
-		std::string eventName;
-		
-		/// Data for this event
-		void *eventData;
-		
-		/// Routine to do
-		void* (*routine)(void*);
-		
-		/// Expire time
-		double time;
-		
-	private:
-		/// Hidden constructor
-		Event() {};
+		/// Destructor
+		virtual ~Enemy();
 };
 
 #endif

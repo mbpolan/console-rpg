@@ -27,6 +27,8 @@
 #include "item.h"
 #include "itemmodel.h"
 #include "object.h"
+#include "threads.h"
+using namespace Threads;
 
 /// Map Object iterator
 typedef std::list<Object*>::iterator MapObjectIterator;
@@ -122,18 +124,30 @@ class Map {
 		*/
 		static Item* createItem(Map*, int id, Position pos);
 		
+		/// List of all objects on the map
+		std::list<Object*> objects;
+		
+		/// Lock the Map mutex
+		void lock() { LockMutex(mutex); };
+		
+		/// Unlock the Map mutex
+		void unlock() { UnlockMutex(mutex); };
+		
 	protected:
 		/// Spawn initial items on map
 		void spawnMapItems(int amount);
 		
-		/// List of all objects on the map
-		std::list<Object*> objects;
+		/// Spawn initial enemies on map
+		void spawnEnemies(int amount);
 		
 		/// Width of the map
 		int mapWidth;
 		
 		/// Height of the map
 		int mapHeight;
+		
+		/// Mutex
+		TMutex mutex;
 };
 
 #endif

@@ -24,8 +24,16 @@
 
 /// Event namespace
 namespace Events {
-	/// Event function to control day/night time
+	/** Event function to control day/night time
+	  * \param data An instance of the Game class
+	*/
 	void* controlTime(void *data);
+	
+	/** Event function to manage the existance of
+	  * Enemy objects on the map
+	  * \param data An instance of the Game class
+	*/
+	void* spawnManage(void *data);
 };
 
 #endif
