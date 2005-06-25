@@ -206,6 +206,20 @@ void Game::initLoop() {
 					std::cout << "------------------\n";
 				}
 				
+				// check the time
+				else if (action=="time") {
+					std::cout << "------------------\n";
+					std::cout << "It is";
+					if (day)
+						std::cout << " daytime ";
+					
+					else
+						std::cout << " nighttime ";
+					
+					std::cout << "now.\n";
+					std::cout << "------------------\n";
+				}
+				
 				// quit the game
 				else if (action=="quit") {
 					std::string q;
@@ -257,8 +271,8 @@ void Game::startNewGame() {
 	std::string buffer;
 	
 	// add some initial event functions
-	ep.appendEvent(Event::create("TIME_CONTROL_EVENT", &Events::controlTime, this, 5));
-	ep.appendEvent(Event::create("SPAWN_MANAGE_EVENT", &Events::spawnManage, this, 3));
+	ep.appendEvent(Event::create("TIME_CONTROL_EVENT", &Events::controlTime, this, 1));
+	ep.appendEvent(Event::create("SPAWN_MANAGE_EVENT", &Events::spawnManage, this, 5));
 	
 	// lock the user until he enters a valid amount of players
 	while(1) {

@@ -32,11 +32,21 @@ void* Events::controlTime(void *data) {
 	
 	// make sure to lock and unlock the mutex
 	game->lock();
-	game->setTimeTicks(game->getTimeTicks()+1);
+	
+	// a day lasts 20 minutes
+	if (game->getTimeTicks()==60*20) {
+		game->setTimeTicks(0);
+		game->changeDay();
+	}
+	
+	// increment the ticks
+	else
+		game->setTimeTicks(game->getTimeTicks()+1);
+	
 	game->unlock();
 	
 	// keep this event in the queue
-	game->appendEvent(Event::create("TIME_CONTROL_EVENT", &controlTime, game, 3));
+	game->appendEvent(Event::create("TIME_CONTROL_EVENT", &controlTime, game, 1));
 	pthread_exit(NULL);
 };
 

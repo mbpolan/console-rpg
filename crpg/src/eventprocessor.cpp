@@ -50,22 +50,41 @@ void* EventProcessor::initThread(void *data) {
 		// check for events
 		if (ep->eventQueue.size()!=0) {
 			Event *e=ep->eventQueue.front();
-			
 			//std::cout << "DEBUG: found event: " << e->eventName << std::endl;
 			
-			// wait for this event
-			// TODO: separate threads for each timed event
-			clock_t wait;
-			wait=clock()+e->time*CLOCKS_PER_SEC;
-			while(clock() < wait) {};
+			// allocate memory for an EventData struct
+			struct EventData *eData=(struct EventData*) malloc(sizeof(struct EventData));
+			eData->ep=ep;
+			eData->e=e;
 			
-			// create a thread to handle this event's routine
-			CreateThread(e->routine, e->eventData);
+			// create a thread to handle this event
+			CreateThread(eventHandler, (void*) eData);
+			
 			ep->eventQueue.pop();
 		}
 	}
 };
 
+// function to add an event to the queue
 void EventProcessor::appendEvent(Event *e) {
 	eventQueue.push(e);
+};
+
+// function to handle event execution and wait times
+void* EventProcessor::eventHandler(void *data) {
+	// cast the void pointer to a struct
+	struct EventData *eData=(struct EventData*) data;
+	EventProcessor *ep=eData->ep;
+	Event *e=eData->e;
+	
+	// wait for this event
+	clock_t wait;
+	wait=clock()+e->time*CLOCKS_PER_SEC;
+	while(clock() < wait) {};
+	
+	// create a thread to handle this event's routine
+	CreateThread(e->routine, e->eventData);
+	
+	delete eData;
+	pthread_exit(NULL);
 };

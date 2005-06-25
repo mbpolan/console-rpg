@@ -51,7 +51,7 @@ class Game {
 		/** Constructor
 		  * \param map An instance of a Map class to be used in the game
 		*/
-		Game(Map *map): gmap(map), ep(), timeTicks(0) { MutexInit(mutex); };
+		Game(Map *map): gmap(map), ep(), timeTicks(0), day(true) { MutexInit(mutex); };
 		
 		/// Destructor
 		virtual ~Game() {};
@@ -84,6 +84,9 @@ class Game {
 		  * \param e The event to be added to the event queue
 		*/
 		void appendEvent(Event *e) { ep.appendEvent(e); };
+		
+		/** Function to change the time of day */
+		void changeDay() { day=day ? false : true; };
 		
 	protected:
 		/// Game map
@@ -137,11 +140,11 @@ class Game {
 		/// Time ticks
 		int timeTicks;
 		
+		/// Time of day
+		bool day;
+		
 		/// Vector of players
 		std::vector<Player*> players;
-		
-		/// Event queue
-		std::queue<Event*> eventQueue;
 		
 		/// Mutex
 		TMutex mutex;

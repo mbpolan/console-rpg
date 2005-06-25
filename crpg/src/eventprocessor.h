@@ -25,6 +25,17 @@
 #include <queue>
 #include "event.h"
 
+class EventProcessor;
+
+/** Struct that holds two members for execution of events. */
+struct EventData {
+	/// The EventProcessor
+	EventProcessor *ep;
+	
+	/// Event to be carried out
+	Event *e;
+};
+
 /** Class that manages the execution of events.
   * EventProcessor is a convenience class that helps to manage to processing
   * and execution of Event objects. Events can be added to the queue by calling
@@ -48,6 +59,9 @@ class EventProcessor {
 	protected:
 		/// Function to initialize the internal event thread
 		static void* initThread(void*);
+		
+		/// Function to handle an event
+		static void* eventHandler(void*);
 		
 		/// The event queue
 		std::queue<Event*> eventQueue;
