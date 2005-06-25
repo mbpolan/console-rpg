@@ -319,7 +319,7 @@ void Game::startNewGame() {
 			// parse the vocation
 			voc=atoi(buffer.c_str());
 			
-			if (voc<=0 || voc > 4) {
+			if (voc<=0 || voc > 3) {
 				std::cout << "Invalid vocation.\n";
 				continue;
 			}
