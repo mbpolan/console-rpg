@@ -26,11 +26,10 @@
 #include <queue>
 #include <vector>
 #include "event.h"
+#include "eventprocessor.h"
 #include "map.h"
 #include "player.h"
 #include "position.h"
-#include "threads.h"
-using namespace Threads;
 
 // define's for menu
 #define GAME_MENU_NEW_GAME	1
@@ -52,15 +51,10 @@ class Game {
 		/** Constructor
 		  * \param map An instance of a Map class to be used in the game
 		*/
-		Game(Map *map): gmap(map), timeTicks(0) { MutexInit(mutex); };
+		Game(Map *map): gmap(map), ep(), timeTicks(0) { MutexInit(mutex); };
 		
 		/// Destructor
-		virtual ~Game();
-		
-		/** Function that adds an event to the queue
-		  * \param e The event to be added to the event queue
-		*/
-		void appendEvent(Event *e) { eventQueue.push(e); };
+		virtual ~Game() {};
 		
 		/** Function that prepares and starts the game */
 		void init();
@@ -86,9 +80,17 @@ class Game {
 		/// Unlock the Game mutex
 		void unlock() { UnlockMutex(mutex); };
 		
+		/** Function that adds an event to the internal EventProcessor's queue
+		  * \param e The event to be added to the event queue
+		*/
+		void appendEvent(Event *e) { ep.appendEvent(e); };
+		
 	protected:
 		/// Game map
 		Map *gmap;
+		
+		/// Event processor
+		EventProcessor ep;
 		
 		/// Function that starts the internal thread
 		void createGameThread();

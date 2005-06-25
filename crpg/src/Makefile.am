@@ -8,6 +8,7 @@ crpg2_SOURCES = creature.h \
 		enemy.cpp enemy.h \
 		event.h \
 		events.cpp events.h \
+		eventprocessor.cpp eventprocessor.h \
 		exception.h \
 		game.cpp game.h \
 		item.cpp item.h \

@@ -49,14 +49,16 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_crpg2_OBJECTS = crpg.$(OBJEXT) enemy.$(OBJEXT) events.$(OBJEXT) \
-	game.$(OBJEXT) item.$(OBJEXT) map.$(OBJEXT) player.$(OBJEXT) \
-	threads.$(OBJEXT) timer.$(OBJEXT) utilities.$(OBJEXT)
+	eventprocessor.$(OBJEXT) game.$(OBJEXT) item.$(OBJEXT) \
+	map.$(OBJEXT) player.$(OBJEXT) threads.$(OBJEXT) \
+	timer.$(OBJEXT) utilities.$(OBJEXT)
 crpg2_OBJECTS = $(am_crpg2_OBJECTS)
 crpg2_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/crpg.Po ./$(DEPDIR)/enemy.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/eventprocessor.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/events.Po ./$(DEPDIR)/game.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/item.Po ./$(DEPDIR)/map.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/player.Po ./$(DEPDIR)/threads.Po \
@@ -155,6 +157,7 @@ crpg2_SOURCES = creature.h \
 		enemy.cpp enemy.h \
 		event.h \
 		events.cpp events.h \
+		eventprocessor.cpp eventprocessor.h \
 		exception.h \
 		game.cpp game.h \
 		item.cpp item.h \
@@ -236,6 +239,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/crpg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/enemy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eventprocessor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/events.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/game.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/item.Po@am__quote@

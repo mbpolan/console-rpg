@@ -27,18 +27,6 @@
 #include "utilities.h"
 using namespace Utilities;
 
-// destructor
-Game::~Game() {
-	// clear the eventQueue
-	for (int i=0; i<eventQueue.size(); i++) {
-		Event *e=eventQueue.front();
-		if (e) {
-			eventQueue.pop();
-			delete e;
-		}
-	}
-};
-
 // main game loop initiator
 void Game::init() {
 	// see what the user wants to do
@@ -55,11 +43,6 @@ void Game::init() {
 	// run the options menu
 	else if (op==GAME_MENU_OPTIONS)
 		runOptionsMenu();
-};
-
-// function that initializes the internal thread
-void Game::createGameThread() {
-	CreateThread(initThread, this);
 };
 
 // function that starts the internal game loop
@@ -269,41 +252,13 @@ void Game::initLoop() {
 	}
 };
 
-// function to start the internal thread
-void* Game::initThread(void *data) {
-	Game *game=(Game*) data;
-	
-	// event loop
-	while(1) {
-		// check for events
-		if (game->eventQueue.size()!=0) {
-			Event *e=game->eventQueue.front();
-			
-			//std::cout << "DEBUG: found event: " << e->eventName << std::endl;
-			
-			// wait for this event
-			// TODO: separate threads for each timed event
-			clock_t wait;
-			wait=clock()+e->time*CLOCKS_PER_SEC;
-			while(clock() < wait) {};
-			
-			// create a thread to handle this event's routine
-			CreateThread(e->routine, e->eventData);
-			game->eventQueue.pop();
-		}
-	}
-};
-
 // function that starts a new game
 void Game::startNewGame() {
 	std::string buffer;
 	
-	// create an thread to run in the background and process events
-	createGameThread();
-	
 	// add some initial event functions
-	this->appendEvent(Event::create("TIME_CONTROL_EVENT", &Events::controlTime, this, 5));
-	this->appendEvent(Event::create("SPAWN_MANAGE_EVENT", &Events::spawnManage, this, 3));
+	ep.appendEvent(Event::create("TIME_CONTROL_EVENT", &Events::controlTime, this, 5));
+	ep.appendEvent(Event::create("SPAWN_MANAGE_EVENT", &Events::spawnManage, this, 3));
 	
 	// lock the user until he enters a valid amount of players
 	while(1) {
