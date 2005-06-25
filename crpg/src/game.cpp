@@ -19,6 +19,7 @@
  ***************************************************************************/ 
 // game.cpp: implementations of the Game class
 
+#include "definitions.h"
 #include "event.h"
 #include "events.h"
 #include "exception.h"
@@ -52,6 +53,7 @@ void Game::initLoop() {
 		// throw an exception
 		throw CNoPlayersEx();
 	}
+	CRPG_CLEAR_SCREEN;
 	
 	// cycle through each player keeping the turn count in mind
 	std::string buffer;
@@ -262,12 +264,16 @@ void Game::initLoop() {
 			 
 			std::cin.ignore();
 			std::cin.get();
+			
+			// clear the screen
+			CRPG_CLEAR_SCREEN;
 		}
 	}
 };
 
 // function that starts a new game
 void Game::startNewGame() {
+	CRPG_CLEAR_SCREEN;
 	std::string buffer;
 	
 	// add some initial event functions
@@ -292,17 +298,73 @@ void Game::startNewGame() {
 	
 	// allocate new players
 	for (int i=0; i<playerCount; i++) {
+		CRPG_CLEAR_SCREEN;
+		std::cout << "\n---------------------------------------\n"
+			  << "Player 1 Configuration"
+			  << "\n---------------------------------------";
+		
 		std::cout << "\nEnter name for Player " << i+1 << ": ";
 		std::getline(std::cin, buffer);
-		
-		// add this player
-		players.push_back(new Player(buffer, Position(0, 0, 0), PlayerTraits(10, 10, 10, 10), 100, 100, 20, 20));
+		std::string name=buffer;
 		
 		// clean the buffer
 		buffer.clear();
+		
+		// ask for vocation
+		int voc=0;
+		while(1) {
+			std::cout << "\nSelect vocation:\n~~~~~~~~~~~\n1) Knight\n2) Paladin\n3) Mage\n~~~~~~~~~~~\n> ";
+			std::getline(std::cin, buffer);
+			
+			// parse the vocation
+			voc=atoi(buffer.c_str());
+			
+			if (voc<=0 || voc > 4) {
+				std::cout << "Invalid vocation.\n";
+				continue;
+			}
+			
+			else
+				break;
+		}
+		
+		// create a player with specific attributes that relate to the vocation
+		switch(voc) {
+			case VOCATION_KNIGHT: {
+				players.push_back(new Player(name, Position(0, 0, 0), PlayerTraits(10, 15, 15, 20), 150, 150, 5, 5));
+				players[i]->setVocation(VOCATION_KNIGHT);
+			}
+			break;
+			
+			case VOCATION_PALADIN: {
+				players.push_back(new Player(name, Position(0, 0, 0), PlayerTraits(10, 15, 25, 10), 130, 130, 10, 10));
+				players[i]->setVocation(VOCATION_PALADIN);
+			}
+			break;
+			
+			case VOCATION_MAGE: {
+				players.push_back(new Player(name, Position(0, 0, 0), PlayerTraits(10, 5, 10, 5), 100, 100, 100, 100));
+				players[i]->setVocation(VOCATION_MAGE);
+			}
+			break;
+		}
+		
+		// done with this player
+		std::cout << "\n//////////////////////////\n"
+			  << "Player " << name << " (" << capFirst(vocToString(players[i]->getVocation())) << ") created.\n"
+			  << "Press any key to continue player configuration."
+			  << "\n//////////////////////////\n>";
+		
+		std::getline(std::cin, buffer);
 	}
 	
+	CRPG_CLEAR_SCREEN;
+	
 	// configure options
+	std::cout << "\n---------------------------------------\n"
+		  << "Global Game Configuration"
+		  << "\n---------------------------------------";
+		  
 	std::cout << "\nEnter amount of turns: ";
 	std::cin >> turnCount;
 	

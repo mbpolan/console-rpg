@@ -26,6 +26,9 @@
 #include "creature.h"
 #include "position.h"
 
+/// Vocations for players
+enum VOCATION { VOCATION_KNIGHT=0x01, VOCATION_PALADIN=0x02, VOCATION_MAGE=0x03 };
+
 /** Class that holds some player attributes and traits.
   * An instance of this class is used as a member of the Player class for
   * storage of traits and skill levels.
@@ -85,6 +88,16 @@ class Player: public Creature {
 		*/
 		PlayerTraits getTraits() const { return traits; };
 		
+		/** Set this player's vocation
+		  * \param voc The vocation for this player
+		*/
+		void setVocation(VOCATION voc) { VOC=voc; };
+		
+		/** Get this player's vocation
+		  * \return This player's vocation
+		*/
+		VOCATION getVocation() const { return VOC; };
+		
 	protected:
 		/// Magic points
 		int maxMagicPts;
@@ -92,6 +105,9 @@ class Player: public Creature {
 		
 		/// Traits for this player
 		PlayerTraits traits;
+		
+		/// Player vocation
+		VOCATION VOC;
 };
 
 #endif

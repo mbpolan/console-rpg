@@ -23,11 +23,18 @@
 #define UTILITIES_H
 
 #include <iostream>
+#include "player.h"
 
 /// The Utility namespace
 namespace Utilities {
 	/// Checks to see if this word starts with a vowel
 	bool hasVowel(std::string str);
+	
+	/// Convert a player's vocation to a string
+	std::string vocToString(VOCATION voc);
+	
+	/// Capitalize the first letter of a string
+	std::string capFirst(std::string str);
 };
 
 #endif

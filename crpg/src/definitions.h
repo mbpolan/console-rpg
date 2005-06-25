@@ -17,39 +17,23 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/ 
-// utilities.h: implementations of Utilities namespace functions
+// definitions.h: various definitions
 
-#include "utilities.h" 
- 
-// check to see if this word has a vowel in the beginning
-bool Utilities::hasVowel(std::string str) {
-	char a=str[0];
-	if (a=='a' || a=='e' || a=='i' || a=='o' || a=='u' ||
-	    a=='A' || a=='E' || a=='I' || a=='O' || a=='U')
-		return true;
-	
-	else
-		return false;
-};
+#ifndef DEFINITIONS_H
+#define DEFINITIONS_H 
 
-// convert a vocation to string
-std::string Utilities::vocToString(VOCATION VOC) {
-	std::string str;
-	switch(VOC) {
-		case VOCATION_KNIGHT: str="knight"; break;
-		case VOCATION_PALADIN: str="paladin"; break;
-		case VOCATION_MAGE: str="mage"; break;
-	}
-	
-	return str;
-};
+// clear screen macro
+#define CRPG_CLEAR_SCREEN system("clear")
 
-// capitalize the first letter of a word
-std::string Utilities::capFirst(std::string str) {
-	std::string s;
-	s+=toupper(str.c_str()[0]);
-	str.erase(0,1);
-	s+=str;
-	
-	return s;
-};
+// game class defines
+// define's for menu
+#define GAME_MENU_NEW_GAME	1
+#define GAME_MENU_LOAD_GAME	2
+#define GAME_MENU_OPTIONS	3
+
+// different types of situations that could result from movement
+#define GAME_MOVEMENT_OUT_OF_BOUNDS	0
+#define GAME_MOVEMENT_OK		1
+#define GAME_MOVEMENT_BLOCKING_SPACE	2
+
+#endif
