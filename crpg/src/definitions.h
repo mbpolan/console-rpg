@@ -36,4 +36,12 @@
 #define GAME_MOVEMENT_OK		1
 #define GAME_MOVEMENT_BLOCKING_SPACE	2
 
+// player equipment slots
+#define PLAYER_SLOT_HEAD	0
+#define PLAYER_SLOT_TORSO	1
+#define PLAYER_SLOT_LEFT_ARM	2
+#define PLAYER_SLOT_RIGHT_ARM	3
+#define PLAYER_SLOT_LEGS	4
+#define PLAYER_SLOT_BOOTS	5
+
 #endif

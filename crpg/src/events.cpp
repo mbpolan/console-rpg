@@ -60,8 +60,8 @@ void* Events::spawnManage(void *data) {
 			
 	// get a count of enemies
 	int count=0;
-	for (MapObjectIterator it=map->objects.begin(); it!=map->objects.end(); ++it) {
-		if ((*it) && dynamic_cast<Enemy*> ((*it)))
+	for (MapEnemyIterator it=map->enemies.begin(); it!=map->enemies.end(); ++it) {
+		if ((*it))
 			count+=1;
 	}
 		
@@ -77,7 +77,7 @@ void* Events::spawnManage(void *data) {
 				
 			// place the new enemy
 			// TODO: enemy names and attributes
-			map->placeObject(new Enemy("Enemy", 100, 50, Position(x, y, z)));
+			map->placeEnemy(new Enemy("Enemy", 100, 50, Position(x, y, z)));
 		}
 	}
 	map->unlock();

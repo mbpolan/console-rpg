@@ -24,6 +24,7 @@
 
 #include <list>
 #include <map>
+#include "enemy.h"
 #include "item.h"
 #include "itemmodel.h"
 #include "object.h"
@@ -31,7 +32,10 @@
 using namespace Threads;
 
 /// Map Object iterator
-typedef std::list<Object*>::iterator MapObjectIterator;
+typedef std::list<Item*>::iterator MapObjectIterator;
+
+/// Map Enemy iterator
+typedef std::list<Enemy*>::iterator MapEnemyIterator;
 
 /// Map ItemModel iterator
 typedef std::map<int, ItemModel*>::iterator MapItemIterator;
@@ -88,28 +92,41 @@ class Map {
 		*/
 		int getWidth() const { return mapWidth; };
 		
-		/** Get a pointer to an object on the map
-		  * \param x The x coordinate
-		  * \param y The y coordinate
-		  * \param z The z coordinate
+		/** Get a pointer to an item on the map
+		  * \param pos The target position
 		  * \return The requested object, or NULL if not found
 		*/
-		Object* getObject(int x, int y, int z);
+		Item* getItem(Position pos);
 		
-		/** Place an object on the map
-		  * Note: The object's coordinates should already be changed to the
+		/** Place an item on the map
+		  * Note: The item's coordinates should already be changed to the
 		  * ones that it should be on.
-		  * \param obj The target object
+		  * \param item The target item
 		*/
-		void placeObject(Object *obj);
+		void placeItem(Item *item);
 		
-		/** Remove an object from the map
-		  * \param x The x coordinate
-		  * \param y The y coordinate
-		  * \param z The z coordinate
-		  * \return true if the object was removed, otherwise false if not
+		/** Remove an item from the map
+		  * \param pos The item's position
+		  * \return true if the item was removed, otherwise false if not
 		*/
-		bool removeObject(int x, int y, int z);
+		bool removeItem(Position pos);
+		
+		/** Get a pointer to an Enemy object on the map
+		  * \param pos The target position
+		  * \return The requested Enemy object, NULL if not found
+		*/
+		Enemy* getEnemy(Position pos);
+		
+		/** Place an Enemy on the map
+		  * \param enemy The Enemy to place
+		*/
+		void placeEnemy(Enemy *enemy);
+		
+		/** Remove an Enemy from the map
+		  * \param pos The target position
+		  * \return true if removed, false otherwise
+		*/
+		bool removeEnemy(Position pos);
 		
 		/** Load an item database from XML file
 		  * \param file The path to the target file
@@ -124,8 +141,11 @@ class Map {
 		*/
 		static Item* createItem(Map*, int id, Position pos);
 		
-		/// List of all objects on the map
-		std::list<Object*> objects;
+		/// List of all items on the map
+		std::list<Item*> items;
+		
+		/// List of all enemies on the map
+		std::list<Enemy*> enemies;
 		
 		/// Lock the Map mutex
 		void lock() { LockMutex(mutex); };

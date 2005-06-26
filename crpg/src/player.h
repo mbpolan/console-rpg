@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include "creature.h"
+#include "item.h"
 #include "position.h"
 
 /// Vocations for players
@@ -68,6 +69,9 @@ class Player: public Creature {
 		*/
 		Player(std::string _name, Position pos, PlayerTraits ptraits, int hp, int hpNow, int mp, int mpNow);
 		
+		/// Destructor
+		virtual ~Player();
+		
 		/** Set the maximum magic points
 		  * \param mp The amount of magic points
 		*/
@@ -98,6 +102,31 @@ class Player: public Creature {
 		*/
 		VOCATION getVocation() const { return VOC; };
 		
+				/** Equip an item onto a specific slot
+		  * \param slot The target slot
+		  * \param item The item to equip
+		  * \return The item previously equipped on the target slot, NULL if none
+		*/ 
+		Item* equip(int slot, Item *item);
+		
+		/** Unequip an item at a specific slot
+		  * \param slot The target slot
+		  * \return The item previously equipped on the target slot, NULL if none
+		*/
+		Item* unequip(int slot);
+		
+		/** Check if a slot is already occupied
+		  * \param slot The target slot
+		  * \return true if the slot is occupied, false otherwise
+		*/
+		bool isEquipped(int slot);
+		
+		/** Get a pointer to the item stored at this slot
+		  * \param slot The target slot
+		  * \return A pointer to the requested item
+		*/
+		Item *itemAt(int slot) { return equipment[slot]; };
+		
 	protected:
 		/// Magic points
 		int maxMagicPts;
@@ -108,6 +137,9 @@ class Player: public Creature {
 		
 		/// Player vocation
 		VOCATION VOC;
+		
+		/// Equipment
+		Item *equipment[6];
 };
 
 #endif

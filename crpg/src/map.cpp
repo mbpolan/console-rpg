@@ -55,20 +55,28 @@ Map::Map(int width, int height): mapWidth(width), mapHeight(height) {
 // destructor
 Map::~Map() {
 	// clear out the object list
-	for (MapObjectIterator it=objects.begin(); it!=objects.end(); ++it) {
+	for (MapObjectIterator it=items.begin(); it!=items.end(); ++it) {
 		if ((*it)) {
 			delete (*it);
-			it=objects.erase(it);
+			it=items.erase(it);
+		}
+	}
+	
+	// clear out the enemy list
+	for (MapEnemyIterator it=enemies.begin(); it!=enemies.end(); ++it) {
+		if ((*it)) {
+			delete (*it);
+			it=enemies.erase(it);
 		}
 	}
 };
 
-// function to clear the entire map of objects
+// function to clear the entire map of items
 void Map::clear() {
-	for (MapObjectIterator it=objects.begin(); it!=objects.end(); ++it) {
+	for (MapObjectIterator it=items.begin(); it!=items.end(); ++it) {
 		if ((*it)) {
 			delete (*it);
-			it=objects.erase(it);
+			it=items.erase(it);
 		}
 	}
 };
@@ -88,10 +96,15 @@ void Map::setWidth(int width) {
 };
 
 // function to return a pointer to an object on the map
-Object* Map::getObject(int x, int y, int z) {
-	for (MapObjectIterator it=objects.begin(); it!=objects.end(); ++it) {
-		if ((*it) && (*it)->position.x==x && (*it)->position.y==y && (*it)->position.z==z)
+Item* Map::getItem(Position pos) {
+	MapObjectIterator it=items.begin();
+	 
+	 while(it!=items.end()) {
+		if ((*it) && (*it)->position.x==pos.x && (*it)->position.y==pos.y && (*it)->position.z==pos.z)
 			return (*it);
+		
+		else
+			++it;
 	}
 	
 	// just in case we didn't find the object
@@ -99,20 +112,60 @@ Object* Map::getObject(int x, int y, int z) {
 };
 
 // function to place a new object on the map
-void Map::placeObject(Object *obj) {
-	objects.push_back(obj);
+void Map::placeItem(Item *item) {
+	items.push_back(item);
 };
 
 // function to remove an object
-bool Map::removeObject(int x, int y, int z) {
+bool Map::removeItem(Position pos) {
 	// find the first object and remove it
-	for (MapObjectIterator it=objects.begin(); it!=objects.end(); ++it) {
-		if ((*it) && (*it)->position.x==x && (*it)->position.y==y && (*it)->position.z==z) {
-			delete (*it);
-			it=objects.erase(it);
-			break;
-		}
+	MapObjectIterator it=items.begin();
+	
+	while(it!=items.end()) {
+		if ((*it) && (*it)->position.x==pos.x && (*it)->position.y==pos.y && (*it)->position.z==pos.z)
+			it=items.erase(it);
+		
+		else
+			++it;
 	}
+	
+	return true;
+};
+
+// function to return a pointer to an enemy on the map
+Enemy* Map::getEnemy(Position pos) {
+	MapEnemyIterator it=enemies.begin();
+	 
+	 while(it!=enemies.end()) {
+		if ((*it) && (*it)->position.x==pos.x && (*it)->position.y==pos.y && (*it)->position.z==pos.z)
+			return (*it);
+		
+		else
+			++it;
+	}
+	
+	return NULL;
+};
+
+// function to place a new enemy on the map
+void Map::placeEnemy(Enemy *enemy) {
+	enemies.push_back(enemy);
+};
+
+// function to remove an enemy
+bool Map::removeEnemy(Position pos) {
+	// find the first enemy and remove it
+	MapEnemyIterator it=enemies.begin();
+	 
+	 while(it!=enemies.end()) {
+		if ((*it) && (*it)->position.x==pos.x && (*it)->position.y==pos.y && (*it)->position.z==pos.z)
+			it=enemies.erase(it);
+		
+		else
+			++it;
+	}
+	
+	return true;
 };
 
 // function that loads an item database from file
@@ -233,8 +286,10 @@ void Map::spawnMapItems(int amount) {
 		int z=0;
 		int id=(rand()%5)+1; // FIXME: these id's should not be hard coded!
 		
-		// place this item
-		placeObject(Map::createItem(this, id, Position(x, y, z)) ? Map::createItem(this, id, Position(x, y, z)) : new Item);
+		if (!this->getItem(Position(x, y, z)) && x!=0 && y!=0) {
+			// place this item
+			placeItem(Map::createItem(this, id, Position(x, y, z)) ? Map::createItem(this, id, Position(x, y, z)) : new Item);
+		}
 		
 		#ifdef DEBUG
 		std::cout << "DEBUG: Placed item (id: " << id << ") at Position(" << x << ", " << y << ", " << z << ")";
@@ -245,6 +300,10 @@ void Map::spawnMapItems(int amount) {
 			std::cout << " - Invalid";
 		
 		std::cout << std::endl;
+		
+		// sword and shield debug items
+		placeItem(Map::createItem(this, 100, Position(1, 1, 0)));
+		placeItem(Map::createItem(this, 110, Position(1, 2, 0)));
 		#endif
 	}
 };
@@ -259,7 +318,7 @@ void Map::spawnEnemies(int amount) {
 		int z=0;
 		
 		// place this enemy
-		placeObject(new Enemy("Enemy", 100, 100, Position(x, y, z)));
+		placeEnemy(new Enemy("Enemy", 100, 100, Position(x, y, z)));
 		
 	}
 };

@@ -115,6 +115,9 @@ class Game {
 		int creatureMoveNortheast(Creature*);
 		int creatureMoveSouthwest(Creature*);
 		int creatureMoveSoutheast(Creature*);
+		void creatureDisplayInventory(Creature*);
+		void creatureEquipItem(Creature*);
+		void creatureUnequipItem(Creature*);
 		void creatureLook(Creature*);
 		void printMovementMessage(int move_code, const Direction dir);
 		

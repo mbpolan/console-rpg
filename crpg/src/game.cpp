@@ -222,6 +222,27 @@ void Game::initLoop() {
 					std::cout << "------------------\n";
 				}
 				
+				// look at inventory
+				else if (action=="inv") {
+					std::cout << "------------------\n";
+					creatureDisplayInventory(players[p]);
+					std::cout << "------------------\n";
+				}
+				
+				// equip an item
+				else if (action=="equip") {
+					std::cout << "------------------\n";
+					creatureEquipItem(players[p]);
+					std::cout << "------------------\n";
+				}
+				
+				// unequip an item
+				else if (action=="unequip") {
+					std::cout << "------------------\n";
+					creatureUnequipItem(players[p]);
+					std::cout << "------------------\n";
+				}
+				
 				// quit the game
 				else if (action=="quit") {
 					std::string q;
@@ -353,7 +374,7 @@ void Game::startNewGame() {
 		std::cout << "\n//////////////////////////\n"
 			  << "Player " << name << " (" << capFirst(vocToString(players[i]->getVocation())) << ") created.\n"
 			  << "Press any key to continue player configuration."
-			  << "\n//////////////////////////\n>";
+			  << "\n//////////////////////////\n> ";
 		
 		std::getline(std::cin, buffer);
 	}
@@ -494,12 +515,206 @@ int Game::creatureMoveSoutheast(Creature *c) {
 	return GAME_MOVEMENT_OK;
 };
 
+// function to show a creature's inventory
+void Game::creatureDisplayInventory(Creature *c) {
+	Player *p=dynamic_cast<Player*> (c);
+	if (p) {
+		std::cout << p->getName() << "'s Inventory"
+			  << "\n~~~~~~~~~~~~~~~~~~\n";
+		// head equipment
+		std::cout << "1) Head (";
+		if (p->isEquipped(PLAYER_SLOT_HEAD))
+			std::cout << p->itemAt(PLAYER_SLOT_HEAD)->getName();
+		 
+		else
+			std::cout << "empty";
+		std::cout << ")\n";
+		
+		// torso equipment
+		std::cout << "2) Torso ("; 
+		if (p->isEquipped(PLAYER_SLOT_TORSO))
+			std::cout << p->itemAt(PLAYER_SLOT_TORSO)->getName();
+		 
+		else
+			std::cout << "empty";
+		std::cout << ")\n";
+		
+		// left hand equipment
+		std::cout << "3) Left Hand (";
+		if (p->isEquipped(PLAYER_SLOT_LEFT_ARM))
+			std::cout << p->itemAt(PLAYER_SLOT_LEFT_ARM)->getName();
+		 
+		else
+			std::cout << "empty"; 
+		std::cout << ")\n";
+		
+		// right hand equipment
+		std::cout << "4) Right Hand (";
+		if (p->isEquipped(PLAYER_SLOT_RIGHT_ARM))
+			std::cout << p->itemAt(PLAYER_SLOT_RIGHT_ARM)->getName();
+		 
+		else 
+			std::cout << "empty";
+		std::cout << ")\n";
+		
+		// leg equipment
+		std::cout << "5) Legs (";
+		if (p->isEquipped(PLAYER_SLOT_LEGS))
+			std::cout << p->itemAt(PLAYER_SLOT_LEGS)->getName();
+		 
+		else
+			std::cout << "empty";
+		std::cout << ")\n";
+					
+		// boot equipment
+		std::cout << "6) Boots (";
+		if (p->isEquipped(PLAYER_SLOT_BOOTS))
+			std::cout << p->itemAt(PLAYER_SLOT_BOOTS)->getName();
+		
+		else 
+			std::cout << "empty";
+		std::cout << ")\n";
+		
+		std::cout << "~~~~~~~~~~~~~~~~~~\n";
+	}
+};
+
+// function that handles a creature equipping an item
+void Game::creatureEquipItem(Creature *c) {
+	std::string buffer;
+	Player *p=dynamic_cast<Player*> (c);
+	if (p) {
+		// check if this item exists
+		if (gmap->getItem(c->position)) {
+			Item *item=dynamic_cast<Item*> (gmap->getItem(c->position));
+			if (item && item->isUsable()) {
+				// ask which slot to equip to
+				int act=0;
+				while(1) {
+					creatureDisplayInventory(p);
+					
+					std::cout << "Equip to slot (0 to abort): > ";
+					// get the user's choice
+					std::cin.ignore();
+					std::getline(std::cin, buffer);
+					
+					act=atoi(buffer.c_str());
+					buffer.clear();
+					
+					if (act<0 || act>6) {
+						std::cout << "\nInvalid slot.\n";
+						continue;
+					}
+					
+					else if (act==0) {
+						std::cout << "\nNothing was equipped.\n";
+						return;
+					}
+					
+					else
+						break;
+				}
+				
+				// sync this up with the equipment array
+				act-=1;
+				
+				// check if there are any equipped items at this slot
+				Item *fcon;
+				bool unequip=false;
+				if (p->isEquipped(act)) {
+					fcon=p->unequip(act);
+					unequip=true;
+				}
+				
+				// equip to slot
+				p->equip(act, item);
+				
+				// remove this item off the ground
+				gmap->removeItem(p->position);
+				
+				// place old item on ground
+				if (unequip) {
+					// modify position
+					fcon->position=c->position;
+					gmap->placeItem(fcon);
+					
+					// confirmation messages
+					std::cout << "\nYou unequipped " << fcon->getName() << " and ";
+					std::cout << "you equipped " << item->getName() << ".\n";
+				}
+				
+				else
+					std::cout << "\nYou equipped " << item->getName() << ".\n";
+				
+				return;
+			}
+			
+			// not equipable
+			std::cout << "This item can't be equipped.\n";
+			return;
+		}
+		
+		// no item
+		std::cout << "There is no item here that can be equipped.\n";
+		return;
+	}
+};
+
+// function to unequip an item
+void Game::creatureUnequipItem(Creature *c) {
+	std::string buffer;
+	Player *p=dynamic_cast<Player*> (c);
+	if (p) {
+		// show the inventory first
+		creatureDisplayInventory(p);
+		std::cin.ignore();
+		
+		// lock the user until a valid choice is made
+		int slot=0;
+		while(1) {
+			std::cout << "Unequip from slot (0 to abort): > ";
+			std::getline(std::cin, buffer);
+			
+			// get the slot number
+			slot=atoi(buffer.c_str());
+			slot-=1;
+			buffer.clear();
+			
+			// abort the unequip
+			if (slot==-1) {
+				std::cout << "\nNothing was unequipped.\n";
+				return;
+			}
+			
+			// make sure this slot is valid
+			else if (!p->isEquipped(slot) || slot<0 || slot>6) {
+				std::cout << "\nInvalid or empty slot.\n";
+				continue;
+			}
+			
+			// everything seems ok
+			else
+				break;
+		}
+		
+		// unequip and get the item
+		Item *fcon=p->unequip(slot);
+		fcon->position=p->position;
+		
+		// place this item on the ground
+		gmap->placeItem(fcon);
+		
+		// confirmation message
+		std::cout << "\nYou unequipped " << fcon->getName() << ".\n";
+	}
+};
+
 // function that allows a creature to check the ground for items
 void Game::creatureLook(Creature *c) {
 	// check if an object is even here
-	if (gmap->getObject(c->position.x, c->position.y, c->position.z)) {
+	if (gmap->getItem(c->position)) {
 		// is this an item?
-		Item *item=dynamic_cast<Item*> (gmap->getObject(c->position.x, c->position.y, c->position.z));
+		Item *item=gmap->getItem(c->position);
 		if (item) {
 			std::cout << "You see ";
 			
@@ -516,10 +731,11 @@ void Game::creatureLook(Creature *c) {
 			std::cout << item->getName() << "." << std::endl;
 		}
 		
+		/*
 		// check for other players
 		Player *p=dynamic_cast<Player*> (gmap->getObject(c->position.x, c->position.y, c->position.z));
 		if (p)
-			std::cout << "You see " << p->getName() << "." << std::endl;
+			std::cout << "You see " << p->getName() << "." << std::endl;*/
 	}
 	
 	// print the ground type
