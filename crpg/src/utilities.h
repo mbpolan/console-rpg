@@ -35,6 +35,9 @@ namespace Utilities {
 	
 	/// Capitalize the first letter of a string
 	std::string capFirst(std::string str);
+	
+	/// Convert an int to VOCATION
+	VOCATION itov(int num);
 };
 
 #endif

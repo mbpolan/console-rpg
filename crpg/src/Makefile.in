@@ -150,7 +150,7 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-AM_CXXFLAGS = -DDEBUG
+AM_CXXFLAGS = 
 crpg2_LDFLAGS = -lxml2 
 crpg2_SOURCES = creature.h \
                 crpg.cpp \

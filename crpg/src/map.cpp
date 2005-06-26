@@ -238,10 +238,11 @@ Item* Map::createItem(Map *map, int id, Position pos) {
 	
 	// get attributes from database
 	std::string name;
-	int luck, def, pow, str;
+	int luck, def, pow, str, _id;
 	bool found=false, plural, use;
 	for (MapItemIterator it=map->itemDB.begin(); it!=map->itemDB.end(); ++it) {
 		if ((*it).second && ((*it).second)->getID()==id) {
+			_id=((*it).second)->getID();
 			name=((*it).second)->getName();
 			luck=((*it).second)->getLuck();
 			def=((*it).second)->getDefense();
@@ -257,6 +258,7 @@ Item* Map::createItem(Map *map, int id, Position pos) {
 	
 	// check if we found a match
 	if (found) {
+		item->setID(_id);
 		item->setName(name);
 		item->setLuck(luck);
 		item->setDefense(def);

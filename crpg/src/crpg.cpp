@@ -20,11 +20,9 @@
 // crpg.cpp: main file
 
 #include <iostream>
+#include "definitions.h"
 #include "game.h"
 #include "map.h"
-
-// version
-const std::string version="0.3.0";
 
 // main
 int main(int argc, char *argv[]) {

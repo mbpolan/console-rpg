@@ -28,6 +28,218 @@
 #include "utilities.h"
 using namespace Utilities;
 
+// function to save the game to file
+void Game::saveGame(std::string path) {
+	FILE *f=fopen(path.c_str(), "w");
+	if (f) {
+		this->lock();
+		
+		// version of Console RPG
+		fputc(version.size(), f);
+		for (int i=0; i<version.size(); i++)
+			fputc(version[i], f);
+		
+		// game attributes
+		// TODO: current turn/action/player
+		fputc(turnCount, f);
+		fputc(actionCount, f);
+		fputc(timeTicks, f);
+		
+		// save players first
+		// count
+		fputc(players.size(), f);
+		
+		Player *p;
+		std::cout << "Saving players...";
+		for (int i=0; i<players.size(); i++) {
+			if (players[i]) {
+				p=players[i];
+				// name
+				fputc(p->getName().size(), f);
+				for (int j=0; j<p->getName().size(); j++)
+					fputc(p->getName()[j], f);
+				
+				// position
+				fputc(p->position.x, f);
+				fputc(p->position.y, f);
+				fputc(p->position.z, f);
+				
+				// current hp
+				fputc(p->getHP(), f);
+				
+				// max hp
+				fputc(p->getMaxHP(), f);
+				
+				// current mp
+				fputc(p->getMP(), f);
+				
+				// max mp
+				fputc(p->getMaxMP(), f);
+				
+				// attributes
+				PlayerTraits tr=p->getTraits();
+				fputc(tr.defense, f);
+				fputc(tr.luck, f);
+				fputc(tr.power, f);
+				fputc(tr.strength, f);
+				
+				// vocation
+				fputc(p->getVocation(), f);
+				
+				// save equipment by id
+				for (int j=0; j<6; j++)
+					fputc(p->isEquipped(j) ? p->itemAt(j)->getID() : 0x00, f);
+			}
+		}
+		std::cout << " done\nSaving map...";
+		
+		// map data
+		gmap->lock();
+		
+		// dimensions
+		fputc(gmap->getWidth(), f);
+		fputc(gmap->getHeight(), f);
+		
+		// save item vector
+		// count
+		fputc(gmap->items.size(), f);
+		
+		Item *item;
+		for (MapObjectIterator it=gmap->items.begin(); it!=gmap->items.end(); ++it) {
+			if ((*it)) {
+				item=(*it);
+				
+				// id and location
+				fputc(item->getID(), f);
+				fputc(item->position.x, f);
+				fputc(item->position.y, f);
+				fputc(item->position.z, f);
+			}
+		}
+		std::cout << " done\n";
+		
+		gmap->unlock();
+		this->unlock();
+		
+		// close the file
+		fclose(f);
+		std::cout << "Your game was saved.\n";
+		return;
+	}
+};
+
+// function to load a saved game
+void Game::loadGame(std::string path) {
+	std::string buffer;
+	FILE *f=fopen(path.c_str(), "r");
+	if (f) {
+		// version
+		std::string sver;
+		int count=fgetc(f);
+		for (int i=0; i<count; i++)
+			sver+=(char) fgetc(f);
+		
+		// check the version before going on
+		if (sver!=version) {
+			std::cout << "The version of the savefile (" << sver << ") doesn't match that of this release of Console RPG "
+				  << "(" << version << ").\n";
+			return;
+		}
+	
+		turnCount=fgetc(f);
+		actionCount=fgetc(f);
+		timeTicks=fgetc(f);
+		
+		// load players
+		std::cout << "Loading players...";
+		
+		count=fgetc(f);
+		Player *p;
+		for (int i=0; i<count; i++) {
+			p=new Player;
+			
+			// size of name
+			int length=fgetc(f);
+			for (int j=0; j<length; j++)
+				buffer+=(char) fgetc(f);
+			
+			// set the name
+			p->setName(buffer);
+			buffer.clear();
+			
+			// position
+			int x=fgetc(f);
+			int y=fgetc(f);
+			int z=fgetc(f);
+			p->position=Position(x, y, z);
+			
+			// hp/maxhp/mp/maxmp
+			p->setHP(fgetc(f));
+			p->setMaxHP(fgetc(f));
+			p->setMP(fgetc(f));
+			p->setMaxMP(fgetc(f));
+			
+			// attributes
+			int def=fgetc(f);
+			int luck=fgetc(f);
+			int pow=fgetc(f);
+			int str=fgetc(f);
+			PlayerTraits tr(luck, str, pow, def);
+			p->setTraits(tr);
+			
+			// vocation
+			p->setVocation(itov(fgetc(f)));
+			
+			// equipment
+			for (int j=0; j<6; j++) {
+				int id=fgetc(f);
+				if (id!=0x00) {
+					if (Map::createItem(gmap, id, Position(0xFFFF, 0xFFFF, 0x00)))
+						p->equip(j, Map::createItem(gmap, id, Position(0xFFFF, 0xFFFF, 0x00)));
+				}
+			}
+			
+			// store the player
+			players.push_back(p);
+		}
+		std::cout << "done\nLoading map...";
+		
+		// map data
+		gmap->setWidth(fgetc(f));
+		gmap->setHeight(fgetc(f));
+		
+		// items
+		count=fgetc(f);
+		for (int i=0; i<count; i++) {
+			Position pos(0, 0, 0);
+			
+			// item stuff
+			int id=fgetc(f);
+			pos.x=fgetc(f);
+			pos.y=fgetc(f);
+			pos.z=fgetc(f);
+			
+			// add the item to the list
+			if (Map::createItem(gmap, id, pos))
+				gmap->items.push_back(Map::createItem(gmap, id, pos));
+		}
+		
+		// clean up
+		fclose(f);
+		std::cout << "done\n";
+		
+		// add some initial event functions
+		ep.appendEvent(Event::create("TIME_CONTROL_EVENT", &Events::controlTime, this, 1));
+		ep.appendEvent(Event::create("SPAWN_MANAGE_EVENT", &Events::spawnManage, this, 5));
+		
+		// start the loop
+		initLoop();
+		return;
+	}
+	
+	std::cout << "Error: unable to open savefile (" << path << ")!\n";
+};
+
 // main game loop initiator
 void Game::init() {
 	// see what the user wants to do
@@ -39,7 +251,7 @@ void Game::init() {
 	
 	// load a saved game
 	else if (op==GAME_MENU_LOAD_GAME)
-		loadGame();
+		loadGame("savefile.crpgsf");
 	
 	// run the options menu
 	else if (op==GAME_MENU_OPTIONS)
@@ -243,6 +455,20 @@ void Game::initLoop() {
 					std::cout << "------------------\n";
 				}
 				
+				// save game
+				else if (action=="save") {
+					std::cout << "------------------\n";
+					this->saveGame("savefile.crpgsf");
+					std::cout << "------------------\n";
+				}
+				
+				// display stats
+				else if (action=="stats") {
+					std::cout << "------------------\n";
+					creatureDisplayStats(players[p]);
+					std::cout << "------------------\n";
+				}
+				
 				// quit the game
 				else if (action=="quit") {
 					std::string q;
@@ -394,10 +620,6 @@ void Game::startNewGame() {
 	
 	// start the game loop
 	initLoop();
-};
-
-// TODO: function that loads a saved game
-void Game::loadGame() {
 };
 
 // TODO: function that runs the options menu
@@ -576,6 +798,22 @@ void Game::creatureDisplayInventory(Creature *c) {
 		std::cout << ")\n";
 		
 		std::cout << "~~~~~~~~~~~~~~~~~~\n";
+	}
+};
+
+// function to display stats
+void Game::creatureDisplayStats(Creature *c) {
+	Player *p=dynamic_cast<Player*> (c);
+	if (p) {
+		std::cout << p->getName() << "'s Stats\n~~~~~~~~~~~~~~~\n";
+		std::cout << "HP: " << p->getHP() << "/" << p->getMaxHP() << std::endl
+			  << "MP: " << p->getMP() << "/" << p->getMaxMP() << std::endl
+			  << "Defense: " << p->getTraits().defense << std::endl
+			  << "Luck: " << p->getTraits().luck << std::endl
+			  << "Power: " << p->getTraits().power << std::endl
+			  << "Strength: " << p->getTraits().strength << std::endl
+			  << "\nVocation: " << capFirst(vocToString(p->getVocation())) << std::endl;
+		std::cout << "~~~~~~~~~~~~~~~\n";
 	}
 };
 

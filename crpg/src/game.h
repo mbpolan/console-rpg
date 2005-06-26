@@ -78,6 +78,12 @@ class Game {
 		/** Function to change the time of day */
 		void changeDay() { day=day ? false : true; };
 		
+		/// Function that saves a game to file
+		void saveGame(std::string path);
+		
+		/// Function that loads a game
+		void loadGame(std::string path);
+		
 	protected:
 		/// Game map
 		Map *gmap;
@@ -97,9 +103,6 @@ class Game {
 		/// Function that starts a new game
 		void startNewGame();
 		
-		/// Function that loads a game
-		void loadGame();
-		
 		/// Function that presents the options menu
 		void runOptionsMenu();
 		
@@ -116,6 +119,7 @@ class Game {
 		int creatureMoveSouthwest(Creature*);
 		int creatureMoveSoutheast(Creature*);
 		void creatureDisplayInventory(Creature*);
+		void creatureDisplayStats(Creature*);
 		void creatureEquipItem(Creature*);
 		void creatureUnequipItem(Creature*);
 		void creatureLook(Creature*);

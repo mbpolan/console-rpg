@@ -22,6 +22,11 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H 
 
+#include <iostream>
+
+// version
+const std::string version="0.3.0";
+
 // clear screen macro
 #define CRPG_CLEAR_SCREEN system("clear")
 

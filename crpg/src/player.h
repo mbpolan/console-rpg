@@ -72,6 +72,16 @@ class Player: public Creature {
 		/// Destructor
 		virtual ~Player();
 		
+		/** Set the current magic points
+		  * \param mp Amount of magic points
+		*/
+		void setMP(int mp) { magicPts=mp; };
+		
+		/** Get the current magic points
+		  * \return The current amount of magic points
+		*/
+		int getMP() const { return magicPts; };
+		
 		/** Set the maximum magic points
 		  * \param mp The amount of magic points
 		*/

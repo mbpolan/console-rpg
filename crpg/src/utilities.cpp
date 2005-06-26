@@ -53,3 +53,12 @@ std::string Utilities::capFirst(std::string str) {
 	
 	return s;
 };
+
+// convert an int to player vocation
+VOCATION Utilities::itov(int num) {
+	switch(num) {
+		case VOCATION_KNIGHT: return VOCATION_KNIGHT;
+		case VOCATION_PALADIN: return VOCATION_PALADIN;
+		case VOCATION_MAGE: return VOCATION_MAGE;
+	}
+};
