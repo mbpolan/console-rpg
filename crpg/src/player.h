@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include "creature.h"
+#include "definitions.h"
 #include "item.h"
 #include "position.h"
 
@@ -41,12 +42,31 @@ class PlayerTraits {
 		  * \param _strength The strength skill level
 		  * \param _power The power skill level
 		  * \param _defense The defense skill level
+		  * \param _luckBoost Luck skill boost
+		  * \param _strBoost Strength skill boost
+		  * \param _powBoost Power skill boost
+		  * \param _defBoost Defense skill boost
 		*/
-		PlayerTraits(int _luck, int _strength, int _power, int _defense):
-			     luck(_luck), strength(_strength), power(_power), defense(_defense) {};
+		PlayerTraits(int _luck, int _strength, int _power, int _defense,
+			     int _luckBoost=0, int _strBoost=0, int _powBoost=0, int _defBoost=0):
+			     luck(_luck), strength(_strength), power(_power), defense(_defense),
+			     luckBoost(_luckBoost), strengthBoost(_strBoost), powerBoost(_powBoost), defenseBoost(_defBoost) {};
 		
 		/// Skill levels
 		int luck, strength, power, defense;
+		
+		/// Skill boosts
+		int luckBoost, strengthBoost, powerBoost, defenseBoost;
+		
+		/// Get the total skill level including boosts for that skill
+		int getTotal(int skill) {
+			switch(skill) {
+				case SKILL_DEFENSE: return defense+defenseBoost;
+				case SKILL_LUCK: return luck+luckBoost;
+				case SKILL_POWER: return power+powerBoost;
+				case SKILL_STRENGTH: return strength+strengthBoost;
+			}
+		};
 };
 
 /** Class that represents a human player.

@@ -805,13 +805,14 @@ void Game::creatureDisplayInventory(Creature *c) {
 void Game::creatureDisplayStats(Creature *c) {
 	Player *p=dynamic_cast<Player*> (c);
 	if (p) {
+		PlayerTraits tr=p->getTraits();
 		std::cout << p->getName() << "'s Stats\n~~~~~~~~~~~~~~~\n";
 		std::cout << "HP: " << p->getHP() << "/" << p->getMaxHP() << std::endl
 			  << "MP: " << p->getMP() << "/" << p->getMaxMP() << std::endl
-			  << "Defense: " << p->getTraits().defense << std::endl
-			  << "Luck: " << p->getTraits().luck << std::endl
-			  << "Power: " << p->getTraits().power << std::endl
-			  << "Strength: " << p->getTraits().strength << std::endl
+			  << "Defense: " << tr.defense << " (" << (tr.defenseBoost < 0 ? "-" : "+") << tr.defenseBoost << ")\n"
+			  << "Luck: " << tr.luck << " (" << (tr.luckBoost < 0 ? "-" : "+") << tr.luckBoost << ")\n"
+			  << "Power: " << tr.power  << " (" << (tr.powerBoost < 0 ? "-" : "+") << tr.powerBoost << ")\n"
+			  << "Strength: " << tr.strength << " (" << (tr.strengthBoost < 0 ? "-" : "+") << tr.strengthBoost << ")\n"
 			  << "\nVocation: " << capFirst(vocToString(p->getVocation())) << std::endl;
 		std::cout << "~~~~~~~~~~~~~~~\n";
 	}

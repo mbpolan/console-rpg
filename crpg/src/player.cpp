@@ -38,9 +38,22 @@ Player::~Player() {
 
 // function to equip an item
 Item* Player::equip(int slot, Item *item) {
+	// apply skill boosts
+	traits.luckBoost+=item->getLuck();
+	traits.defenseBoost+=item->getDefense();
+	traits.strengthBoost+=item->getStrength();
+	traits.powerBoost+=item->getPower();
+	
 	if (isEquipped(slot)) {
 		Item *prev=equipment[slot];
 		equipment[slot]=item;
+		
+		// reduce skill boosts
+			// apply skill boosts
+		traits.luckBoost-=prev->getLuck();
+		traits.defenseBoost-=prev->getDefense();
+		traits.strengthBoost-=prev->getStrength();
+		traits.powerBoost-=prev->getPower();
 		
 		// return the previously equipped item
 		return prev;
@@ -54,9 +67,16 @@ Item* Player::equip(int slot, Item *item) {
 
 // function to unequip an item
 Item* Player::unequip(int slot) {
+	int luck=0, def=0, str=0, pow=0;
 	if (isEquipped(slot)) {
 		Item *item=equipment[slot];
 		equipment[slot]=0;
+		
+		// reset skill boosts
+		traits.luckBoost-=item->getLuck();
+		traits.defenseBoost-=item->getDefense();
+		traits.strengthBoost-=item->getStrength();
+		traits.powerBoost-=item->getPower();
 		
 		return item;
 	}

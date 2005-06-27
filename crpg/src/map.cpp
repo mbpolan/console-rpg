@@ -302,11 +302,11 @@ void Map::spawnMapItems(int amount) {
 			std::cout << " - Invalid";
 		
 		std::cout << std::endl;
-		
+		#endif
 		// sword and shield debug items
 		placeItem(Map::createItem(this, 100, Position(1, 1, 0)));
 		placeItem(Map::createItem(this, 110, Position(1, 2, 0)));
-		#endif
+		//#endif
 	}
 };
 
