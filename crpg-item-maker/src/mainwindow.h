@@ -45,8 +45,10 @@ class MainWindow: public Gtk::Window {
 	private:
 		// signal handlers
 		void newDatabase();
-		void openDatabase();
-		void saveDatabase();
+		void openDatabaseXML();
+		void saveDatabaseXML();
+		void openDatabaseBin();
+		void saveDatabaseBin();
 		void aboutThis();
 		void startItemWizard();
 		void startRmItemWizard();

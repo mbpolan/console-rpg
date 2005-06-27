@@ -40,11 +40,17 @@ MainWindow::MainWindow(): Gtk::Window() {
 	actionGroup->add(Gtk::Action::create("FileNew", Gtk::Stock::NEW, "_New", "Create a new database"),
 			 sigc::mem_fun(*this, &MainWindow::newDatabase));
 			 
-	actionGroup->add(Gtk::Action::create("FileOpen", Gtk::Stock::OPEN, "_Open", "Open a database"),
-			 sigc::mem_fun(*this, &MainWindow::openDatabase));
+	actionGroup->add(Gtk::Action::create("FileOpenXML", "_XML"),
+			 sigc::mem_fun(*this, &MainWindow::openDatabaseXML));
 			
-	actionGroup->add(Gtk::Action::create("FileSave", Gtk::Stock::SAVE, "_Save", "Save this database"),
-			 sigc::mem_fun(*this, &MainWindow::saveDatabase));
+	actionGroup->add(Gtk::Action::create("FileSaveXML", "_XML"),
+			 sigc::mem_fun(*this, &MainWindow::saveDatabaseXML));
+			
+	actionGroup->add(Gtk::Action::create("FileOpenBin", "_Binary"),
+			 sigc::mem_fun(*this, &MainWindow::openDatabaseBin));
+		
+	actionGroup->add(Gtk::Action::create("FileSaveBin", "_Binary"),
+			 sigc::mem_fun(*this, &MainWindow::saveDatabaseBin));
 			
 	actionGroup->add(Gtk::Action::create("FileQuit", Gtk::Stock::QUIT, "_Quit", "Quit CRPG Item Maker"),
 			 sigc::mem_fun(*this, &MainWindow::hide));
@@ -53,6 +59,8 @@ MainWindow::MainWindow(): Gtk::Window() {
 			 sigc::mem_fun(*this, &MainWindow::aboutThis));
 			
 	actionGroup->add(Gtk::Action::create("FileMenu", "File"));
+	actionGroup->add(Gtk::Action::create("FileMenuOpen", Gtk::Stock::OPEN, "Open", "Open a database"));
+	actionGroup->add(Gtk::Action::create("FileMenuSave", Gtk::Stock::SAVE, "Save", "Save this database"));
 	actionGroup->add(Gtk::Action::create("HelpMenu", "Help"));
 	
 	// create the ui manager
@@ -66,8 +74,14 @@ MainWindow::MainWindow(): Gtk::Window() {
 		"	<menubar name='MainMenuBar'>"
 		"		<menu action='FileMenu'>"
 		"			<menuitem action='FileNew'/>"
-		"			<menuitem action='FileOpen'/>"
-		"			<menuitem action='FileSave'/>"
+		"			<menu action='FileMenuOpen'>"
+		"				<menuitem action='FileOpenBin'/>"
+		"				<menuitem action='FileOpenXML'/>"
+		"			</menu>"
+		"			<menu action='FileMenuSave'>"
+		"				<menuitem action='FileSaveBin'/>"
+		"				<menuitem action='FileSaveXML'/>"
+		"			</menu>"
 		"			<menuitem action='FileQuit'/>"
 		"		</menu>"
 		"		<menu action='HelpMenu'>"
@@ -167,14 +181,14 @@ void MainWindow::newDatabase() {
 		
 		// should we save?
 		if (id==(-8))
-			saveDatabase();
+			saveDatabaseXML();
 	}
 	
 	// make a new database
 	lstore->clear();
 };
 
-void MainWindow::openDatabase() {
+void MainWindow::openDatabaseXML() {
 	// open an xml doc
 	Gtk::FileChooserDialog fcd(*this, "Open");
 	fcd.add_button("Open", 0x00);
@@ -247,7 +261,7 @@ void MainWindow::openDatabase() {
 	}
 };
 
-void MainWindow::saveDatabase() {
+void MainWindow::saveDatabaseXML() {
 	// save in XML format
 	xmlDocPtr doc=xmlNewDoc((const xmlChar*) "1.0");
 	xmlNodePtr root, ptr;
@@ -333,6 +347,166 @@ void MainWindow::saveDatabase() {
 		// present a message dialog
 		Gtk::MessageDialog md(*this, "Your database was saved successfully.", true);
 		md.run();
+	}
+};
+
+// open a binary database file
+void MainWindow::openDatabaseBin() {
+	Gtk::FileChooserDialog fcd(*this, "Open");
+	fcd.add_button("Open", 0x00);
+	fcd.add_button("Cancel", 0x01);
+	
+	if (fcd.run()==0x00) {
+		FILE *f=fopen(fcd.get_filename().c_str(), "r");
+		std::stringstream ss;
+		if (f) {
+			// first 4 bytes are the header
+			if (!(fgetc(f)=='C' && fgetc(f)=='R' &&
+			      fgetc(f)=='P' && fgetc(f)=='G')) {
+			      	Gtk::MessageDialog md(*this, "This is not a CRPG item database file!", true);
+				md.run();
+				return;
+			}
+			
+			// get a count
+			int count=fgetc(f);
+			Gtk::TreeModel::Row row;
+			for (int i=0; i<count; i++) {
+				// id
+				int id=fgetc(f);
+				
+				// name
+				int length=fgetc(f);
+				std::string name;
+				for (int j=0; j<length; j++)
+					name+=(char) fgetc(f);
+				
+				// usable/plural
+				bool usable=fgetc(f);
+				bool plural=fgetc(f);
+				
+				// attributes
+				int def=fgetc(f);
+				int luck=fgetc(f);
+				int pow=fgetc(f);
+				int str=fgetc(f);
+				
+				// end byte
+				fgetc(f);
+				
+				// save this item
+				row=*(lstore->append());
+				row[colRec.name]=name;
+				
+				ss << id;
+				row[colRec.id]=ss.str();
+				ss.str("");
+				
+				ss << def;
+				row[colRec.defense]=ss.str();
+				ss.str("");
+				
+				ss << luck;
+				row[colRec.luck]=ss.str();
+				ss.str("");
+				
+				ss << pow;
+				row[colRec.power]=ss.str();
+				ss.str("");
+				
+				ss << str;
+				row[colRec.strength]=ss.str();
+				ss.str("");
+				
+				row[colRec.usable]=usable;
+				row[colRec.plural]=plural;
+			}
+			fclose(f);
+			
+			// message
+			Gtk::MessageDialog md(*this, "Your database was loaded successfully.", true);
+			md.run();
+			return;
+		}
+		
+		Gtk::MessageDialog md(*this, "Unable to open selected file.", true);
+		md.run();
+	}
+};
+
+// function to save the database to binary
+void MainWindow::saveDatabaseBin() {
+	Gtk::FileChooserDialog fcd(*this, "Save", Gtk::FILE_CHOOSER_ACTION_SAVE);
+	fcd.add_button("Save", 0x00);
+	fcd.add_button("Cancel", 0x01);
+	
+	if (fcd.run()==0x00) {
+		FILE *f=fopen(fcd.get_filename().c_str(), "w");
+		std::stringstream ss;
+		if (f) {
+			// save the header first
+			fputc('C', f);
+			fputc('R', f);
+			fputc('P', f);
+			fputc('G', f);
+			
+			// count
+			fputc(lstore->children().size(), f);
+			
+			// save each item
+			for (Gtk::TreeModel::iterator it=lstore->children().begin(); it!=lstore->children().end(); ++it) {
+				if ((*it)) {
+					// id
+					ss << (*it)[colRec.id];
+					fputc(atoi(ss.str().c_str()), f);
+					ss.str("");
+					
+					// name
+					ss << (*it)[colRec.name];
+					std::string name=ss.str();
+					fputc(name.size(), f);
+					for (int j=0; j<name.size(); j++)
+						fputc(name[j], f);
+					ss.str("");
+					
+					// attributes
+					ss << (*it)[colRec.usable];
+					fputc(atoi(ss.str().c_str()), f);
+					ss.str("");
+					
+					ss << (*it)[colRec.plural];
+					fputc(atoi(ss.str().c_str()), f);
+					ss.str("");
+					
+					ss << (*it)[colRec.defense];
+					fputc(atoi(ss.str().c_str()), f);
+					ss.str("");
+					
+					ss << (*it)[colRec.luck];
+					fputc(atoi(ss.str().c_str()), f);
+					ss.str("");
+					
+					ss << (*it)[colRec.power];
+					fputc(atoi(ss.str().c_str()), f);
+					ss.str("");
+					
+					ss << (*it)[colRec.strength];
+					fputc(atoi(ss.str().c_str()), f);
+					ss.str("");
+					
+					// end byte
+					fputc(0x00, f);
+				}
+			}
+			fclose(f);
+			
+			// message
+			Gtk::MessageDialog md(*this, "Your database was saved successfully.", true);
+			md.run();
+			return;
+		}
+		
+		Gtk::MessageDialog md(*this, "Unable to save file.", true);
 	}
 };
 
