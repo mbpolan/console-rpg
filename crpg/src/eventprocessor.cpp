@@ -42,7 +42,7 @@ EventProcessor::~EventProcessor() {
 };
 
 // function to initialize the main thread for events
-void* EventProcessor::initThread(void *data) {
+TVoid EventProcessor::initThread(void *data) {
 	EventProcessor *ep=(EventProcessor*) data;
 	
 	// event loop
@@ -71,7 +71,7 @@ void EventProcessor::appendEvent(Event *e) {
 };
 
 // function to handle event execution and wait times
-void* EventProcessor::eventHandler(void *data) {
+TVoid EventProcessor::eventHandler(void *data) {
 	// cast the void pointer to a struct
 	struct EventData *eData=(struct EventData*) data;
 	EventProcessor *ep=eData->ep;
@@ -86,5 +86,4 @@ void* EventProcessor::eventHandler(void *data) {
 	CreateThread(e->routine, e->eventData);
 	
 	delete eData;
-	pthread_exit(NULL);
 };

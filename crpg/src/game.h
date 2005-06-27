@@ -124,9 +124,6 @@ class Game {
 		/// Function that initializes the main game loop
 		void initLoop();
 		
-		// Function that initializes the main thread
-		static void* initThread(void *data);
-		
 		/// Function that starts a new game
 		void startNewGame();
 		

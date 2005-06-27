@@ -27,8 +27,15 @@
 // version
 const std::string version="0.3.0";
 
-// clear screen macro
+// clear screen macro for linux
+#ifdef __LINUX__
 #define CRPG_CLEAR_SCREEN system("clear")
+#endif
+
+// clear screen macro for win32
+#ifdef __WIN32__
+#define CRPG_CLEAR_SCREEN system("cls")
+#endif
 
 // game class defines
 // define's for menu

@@ -30,7 +30,8 @@ Map::Map(int width, int height): mapWidth(width), mapHeight(height) {
 	MutexInit(mutex);
 
 	try {
-		loadItemsFromXML("itemdb.xml");
+		//loadItemsFromXML("itemdb.xml");
+		loadItemsFromBinary("items.db");
 	}
 	
 	// catch exceptions
@@ -226,6 +227,60 @@ void Map::loadItemsFromXML(std::string file) {
 		
 		// free the document
 		xmlFreeDoc(doc);
+	}
+	
+	else
+		throw CLoadErrorEx();
+}
+
+// function to load items from a binary file
+void Map::loadItemsFromBinary(std::string file) {
+	FILE *f=fopen(file.c_str(), "r");
+	if (f) {
+		// first 4 bytes are the header
+		if (!(fgetc(f)=='C' && fgetc(f)=='R' && 
+		     (fgetc(f)=='P' && fgetc(f)=='G'))) {
+		     	std::cout << "This is not a CRPG item database file!\n";
+			throw CLoadErrorEx();
+		}
+		
+		// count of items
+		int count=fgetc(f), counter=0;
+		for (int i=0; i<count; i++) {
+			// id
+			int id=fgetc(f);
+			
+			// name
+			int length=fgetc(f);
+			std::string name;
+			for (int j=0; j<length; j++)
+				name+=(char) fgetc(f);
+			
+			// usable
+			bool usable=fgetc(f);
+			
+			// plural
+			bool plural=fgetc(f);
+			
+			// attributes
+			int def=fgetc(f);
+			int luck=fgetc(f);
+			int pow=fgetc(f);
+			int str=fgetc(f);
+			
+			// end byte
+			fgetc(f);
+			
+			// place the new item into the database
+			itemDB[id]=new ItemModel(name, id, luck, def, pow, str, plural, usable);
+			counter+=1;
+		}
+		
+		#ifdef DEBUG
+		std::cout << "DEBUG: Loaded " << counter << " out of " << count << " items.\n";
+		#endif
+		
+		return;
 	}
 	
 	else

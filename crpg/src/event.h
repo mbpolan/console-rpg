@@ -23,6 +23,7 @@
 #define EVENT_H
 
 #include <iostream>
+#include "threads.h"
 
 /** Class that prepares an event for execution.
   * Event is a class that stores two members: a pointer to a routine
@@ -38,7 +39,7 @@ class Event {
 		  * \param data Data passed to the routine function
 		  * \param time The amount of time in seconds that needs to pass for this event to take place
 		*/
-		static Event* create(std::string name, void* (*_routine)(void*), void *data, double _time) {
+		static Event* create(std::string name, TVoid (*_routine)(void*), void *data, double _time) {
 			Event *e=new Event;
 			e->eventName=name;
 			e->routine=_routine;
@@ -56,7 +57,7 @@ class Event {
 		void *eventData;
 		
 		/// Routine to do
-		void* (*routine)(void*);
+		TVoid (*routine)(void*);
 		
 		/// Expire time
 		double time;

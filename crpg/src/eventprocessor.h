@@ -24,6 +24,7 @@
 
 #include <queue>
 #include "event.h"
+#include "threads.h"
 
 class EventProcessor;
 
@@ -58,10 +59,10 @@ class EventProcessor {
 		
 	protected:
 		/// Function to initialize the internal event thread
-		static void* initThread(void*);
+		static TVoid initThread(void*);
 		
 		/// Function to handle an event
-		static void* eventHandler(void*);
+		static TVoid eventHandler(void*);
 		
 		/// The event queue
 		std::queue<Event*> eventQueue;

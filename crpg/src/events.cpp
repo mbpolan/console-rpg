@@ -27,7 +27,7 @@
 #include "timer.h"
 
 // function to control time of day/night
-void* Events::controlTime(void *data) {
+TVoid Events::controlTime(void *data) {
 	Game *game=(Game*) data;
 	
 	// make sure to lock and unlock the mutex
@@ -47,11 +47,10 @@ void* Events::controlTime(void *data) {
 	
 	// keep this event in the queue
 	game->appendEvent(Event::create("TIME_CONTROL_EVENT", &controlTime, game, 1));
-	pthread_exit(NULL);
 };
 
 // function to manage spawning of enemies on the map
-void* Events::spawnManage(void *data) {
+TVoid Events::spawnManage(void *data) {
 	Game *game=(Game*) data;
 	game->lock();
 		
@@ -85,5 +84,4 @@ void* Events::spawnManage(void *data) {
 	
 	// keep this event in the queue
 	game->appendEvent(Event::create("SPAWN_MANAGE_EVENT", &spawnManage, game, 5)); // execute every 5 seconds
-	pthread_exit(NULL);
 };

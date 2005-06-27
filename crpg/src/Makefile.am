@@ -1,6 +1,7 @@
 bin_PROGRAMS = crpg2
 
-AM_CXXFLAGS = 
+AM_CXXFLAGS = -D__LINUX__ 
+#AM_CXX_FLAGS = -D__LINUX__ -DDEBUG
 crpg2_LDFLAGS =  -lxml2 
 
 crpg2_SOURCES = creature.h \

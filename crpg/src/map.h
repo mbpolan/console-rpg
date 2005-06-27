@@ -130,9 +130,13 @@ class Map {
 		
 		/** Load an item database from XML file
 		  * \param file The path to the target file
-		  * \return true if the database was loaded, false otherwise
 		*/
 		void loadItemsFromXML(std::string file);
+		
+		/** Load an item database from binary file
+		  * \param file The path to the target file
+		*/
+		void loadItemsFromBinary(std::string file);
 		
 		/** Creates a new item
 		  * Attempts to create an item based on ID, loading attributes

@@ -23,10 +23,18 @@
 #ifndef THREADS_H
 #define THREADS_H
 
+#ifdef __LINUX__
 #include <pthread.h>
+#endif
+
+#ifdef __WIN32__
+#include <process.h>
+#include <windows.h>
+#endif
 
 // Threads namespace
 namespace Threads {
+	#ifdef __LINUX__
 	/// typedef'd pthread_mutex_t variable
 	typedef pthread_mutex_t TMutex;
 	
@@ -35,12 +43,21 @@ namespace Threads {
 	
 	/// typedef'd pthread_once_t variable
 	typedef pthread_once_t TOnceThread;
+	
+	/// #define'd void* for Linux compilation
+	#define TVoid void*
+	#endif
+	
+	#ifdef __WIN32__
+	/// typedef'd CRITICAL_SECTION variable
+	typedef CRITICAL_SECTION TMutex;
+	
+	/// #define'd void for Win32 compilation
+	#define TVoid void
+	#endif
 
 	/// Function to create a thread
-	int CreateThread(void *(*function) (void*), void *data);
-	
-	/// Check threads for equality of ID's
-	int ThreadsEqual(TThread &thread1, TThread &thread2);
+	int CreateThread(TVoid (*function) (void*), void *data);
 	
 	/// Function to initialze a mutex
 	void MutexInit(TMutex &m);
@@ -51,8 +68,13 @@ namespace Threads {
 	/// Unlock a mutex
 	void UnlockMutex(TMutex &m);
 	
+	#ifdef __LINUX__
+	/// Check threads for equality of ID's
+	int ThreadsEqual(TThread &thread1, TThread &thread2);
+	
 	/// Join threads
 	int JoinThreads(TThread &t, void** status);
+	#endif
 };
 
 #endif

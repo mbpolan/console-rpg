@@ -22,7 +22,8 @@
 #include "threads.h"
 
 // function to create a thread
-int Threads::CreateThread(void *(*function) (void*), void *data) {
+int Threads::CreateThread(TVoid (*function) (void*), void *data) {
+	#ifdef __LINUX__
 	// our thread
 	pthread_t thread;
 
@@ -37,16 +38,25 @@ int Threads::CreateThread(void *(*function) (void*), void *data) {
 	
 	// create the thread and return the ID
 	return (pthread_create(&thread, &attr, function, (void*) data));
+	#endif
+	
+	#ifdef __WIN32__
+	// create a thread
+	return (_beginthread(function, 0, data));
+	#endif
 }; 
 
 // check threads for equality of ID's
 int Threads::ThreadsEqual(TThread &thread1, TThread &thread2) {
+	#ifdef __LINUX__
 	// check if both thread id's are the same
 	return (pthread_equal(thread1, thread2));
+	#endif
 };
 
 // function to initialze a mutex
 void Threads::MutexInit(TMutex &m) {
+	#ifdef __LINUX__
 	// create a mutex attribute
 	pthread_mutexattr_t attr;
 	
@@ -58,22 +68,44 @@ void Threads::MutexInit(TMutex &m) {
 	
 	// initialize the mutex and its attribute
 	pthread_mutex_init(&m, &attr);
+	#endif
+	
+	#ifdef __WIN32__
+	// initialize the mutex
+	InitializeCriticalSection(&m);
+	#endif
 };
 
 // lock a thread
 void Threads::LockMutex(TMutex &m) {
+	#ifdef __LINUX__
 	// lock this mutex
 	pthread_mutex_lock(&m);
+	#endif
+	
+	#ifdef __WIN32__
+	// lock this mutex
+	EnterCriticalSection(&m);
+	#endif
 };
 
 // unlock a mutex
 void Threads::UnlockMutex(TMutex &m) {
+	#ifdef __LINUX__
 	// unlock this mutex
 	pthread_mutex_unlock(&m);
+	#endif
+	
+	#ifdef __WIN32__
+	// unlock this mutex
+	LeaveCriticalSection(&m);
+	#endif
 };
 
 // join two threads
 int Threads::JoinThreads(TThread &t, void** status) {
+	#ifdef __LINUX__
 	// join threads
 	return (pthread_join(t, status));
+	#endif
 };

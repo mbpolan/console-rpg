@@ -22,18 +22,20 @@
 #ifndef EVENTS_H
 #define EVENTS_H
 
+#include "threads.h"
+
 /// Event namespace
 namespace Events {
 	/** Event function to control day/night time
 	  * \param data An instance of the Game class
 	*/
-	void* controlTime(void *data);
+	TVoid controlTime(void *data);
 	
 	/** Event function to manage the existance of
 	  * Enemy objects on the map
 	  * \param data An instance of the Game class
 	*/
-	void* spawnManage(void *data);
+	TVoid spawnManage(void *data);
 };
 
 #endif
