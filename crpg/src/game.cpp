@@ -28,6 +28,22 @@
 #include "utilities.h"
 using namespace Utilities;
 
+// constructor
+Game::Game(Map *map): gmap(map), ep(), gdata() {
+	// initialize members of struct GameData
+	gdata.actionCount=0;
+	gdata.currentAction=0;
+	gdata.currentPlayer=0;
+	gdata.currentTurn=0;
+	gdata.day=true;
+	gdata.playerCount=0;
+	gdata.timeTicks=0;
+	gdata.turnCount=0;
+	
+	// create the mutex
+	MutexInit(mutex);
+};
+
 // function to save the game to file
 void Game::saveGame(std::string path) {
 	FILE *f=fopen(path.c_str(), "w");
@@ -40,15 +56,16 @@ void Game::saveGame(std::string path) {
 			fputc(version[i], f);
 		
 		// game attributes
-		// TODO: current turn/action/player
-		fputc(turnCount, f);
-		fputc(actionCount, f);
-		fputc(timeTicks, f);
+		fputc(gdata.turnCount, f);
+		fputc(gdata.currentTurn, f);
+		fputc(gdata.actionCount, f);
+		fputc(gdata.currentAction, f);
+		fputc(gdata.playerCount, f);
+		fputc(gdata.currentPlayer, f);
+		fputc(gdata.timeTicks, f);
+		fputc(gdata.day, f);
 		
 		// save players first
-		// count
-		fputc(players.size(), f);
-		
 		Player *p;
 		std::cout << "Saving players...";
 		for (int i=0; i<players.size(); i++) {
@@ -146,14 +163,19 @@ void Game::loadGame(std::string path) {
 			return;
 		}
 	
-		turnCount=fgetc(f);
-		actionCount=fgetc(f);
-		timeTicks=fgetc(f);
+		gdata.turnCount=fgetc(f);
+		gdata.currentTurn=fgetc(f);
+		gdata.actionCount=fgetc(f);
+		gdata.currentAction=fgetc(f);
+		gdata.playerCount=fgetc(f);
+		gdata.currentPlayer=fgetc(f);
+		gdata.timeTicks=fgetc(f);
+		gdata.day=fgetc(f);
 		
 		// load players
 		std::cout << "Loading players...";
 		
-		count=fgetc(f);
+		count=gdata.playerCount;
 		Player *p;
 		for (int i=0; i<count; i++) {
 			p=new Player;
@@ -269,25 +291,26 @@ void Game::initLoop() {
 	
 	// cycle through each player keeping the turn count in mind
 	std::string buffer;
-	for (int t=0; t<turnCount; t++) {
-		std::cout << "\n<-> Turn " << t+1 << " <->";
+	for (int t=gdata.currentTurn; t<gdata.turnCount; t++) {
+		std::cout << "\n<-> Turn " << (t==0 ? t+1 : t) << " <->";
+		gdata.currentTurn+=1;
 		
-		for (int p=0; p<players.size(); p++) {
+		for (int p=gdata.currentPlayer; p<players.size(); p++) {
 			std::cout << "\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n"
 				  << players[p]->getName() << "'s turn\n"
 				  << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=";
 		
 			// action loop
-			int act=0;
+			gdata.currentPlayer=p;
 			while(1) {
 				std::string action;
 				
 				// check if we need to break out
-				if (act==actionCount)
+				if (gdata.currentAction==gdata.actionCount)
 					break;
 				
 				// action message
-				std::cout << std::endl << players[p]->getName() << "'s Action > ";
+				std::cout << std::endl << players[p]->getName() << "'s Action [" << gdata.currentAction+1 << "] > ";
 			
 				std::cin >> action;
 				
@@ -299,7 +322,7 @@ void Game::initLoop() {
 						std::cout << "------------------\n"
 							  << "Moved north\n"
 							  << "------------------\n";
-						act+=1;
+						gdata.currentAction+=1;
 					}
 					
 					else
@@ -313,7 +336,7 @@ void Game::initLoop() {
 						std::cout << "------------------\n"
 							  << "Moved south\n"
 							  << "------------------\n";
-						act+=1;
+						gdata.currentAction+=1;
 					}
 					
 					else
@@ -327,7 +350,7 @@ void Game::initLoop() {
 						std::cout << "------------------\n"
 							  << "Moved east\n"
 						  	<< "------------------\n";
-						act+=1;
+						gdata.currentAction+=1;
 					}
 					
 					else
@@ -341,7 +364,7 @@ void Game::initLoop() {
 						std::cout << "------------------\n"
 						  	<< "Moved west\n"
 							  << "------------------\n";
-						act+=1;
+						gdata.currentAction+=1;
 					}
 					
 					else
@@ -355,7 +378,7 @@ void Game::initLoop() {
 						std::cout << "------------------\n"
 						  	<< "Moved northwest\n"
 							  << "------------------\n";
-						act+=1;
+						gdata.currentAction+=1;
 					}
 					
 					else
@@ -369,7 +392,7 @@ void Game::initLoop() {
 						std::cout << "------------------\n"
 						  	<< "Moved northeast\n"
 							  << "------------------\n";
-						act+=1;
+						gdata.currentAction+=1;
 					}
 					
 					else
@@ -383,7 +406,7 @@ void Game::initLoop() {
 						std::cout << "------------------\n"
 						  	<< "Moved southwest\n"
 							  << "------------------\n";
-						act+=1;
+						gdata.currentAction+=1;
 					}
 					
 					else
@@ -397,7 +420,7 @@ void Game::initLoop() {
 						std::cout << "------------------\n"
 						  	<< "Moved southeast\n"
 							  << "------------------\n";
-						act+=1;
+						gdata.currentAction+=1;
 					}
 					
 					else
@@ -424,7 +447,7 @@ void Game::initLoop() {
 				else if (action=="time") {
 					std::cout << "------------------\n";
 					std::cout << "It is";
-					if (day)
+					if (gdata.day)
 						std::cout << " daytime ";
 					
 					else
@@ -512,6 +535,16 @@ void Game::initLoop() {
 			std::cin.ignore();
 			std::cin.get();
 			
+			// update current player data
+			if (p+1 >= gdata.playerCount)
+				gdata.currentPlayer=0;
+			
+			else if (p+1 < gdata.playerCount)
+				gdata.currentPlayer+=1;
+			
+			// reset action count
+			gdata.currentAction=0;
+			
 			// clear the screen
 			CRPG_CLEAR_SCREEN;
 		}
@@ -533,10 +566,10 @@ void Game::startNewGame() {
 		std::cout << "\nEnter amount of players: ";
 		std::getline(std::cin, buffer);
 	
-		playerCount=atoi(buffer.c_str());
+		gdata.playerCount=atoi(buffer.c_str());
 		buffer.clear();
 		
-		if (playerCount > 0)
+		if (gdata.playerCount > 0)
 			break;
 		
 		else
@@ -544,7 +577,7 @@ void Game::startNewGame() {
 	}
 	
 	// allocate new players
-	for (int i=0; i<playerCount; i++) {
+	for (int i=0; i<gdata.playerCount; i++) {
 		CRPG_CLEAR_SCREEN;
 		std::cout << "\n---------------------------------------\n"
 			  << "Player 1 Configuration"
@@ -613,10 +646,10 @@ void Game::startNewGame() {
 		  << "\n---------------------------------------";
 		  
 	std::cout << "\nEnter amount of turns: ";
-	std::cin >> turnCount;
+	std::cin >> gdata.turnCount;
 	
 	std::cout << "\nEnter amount of actions allowed per turn: ";
-	std::cin >> actionCount;
+	std::cin >> gdata.actionCount;
 	
 	// start the game loop
 	initLoop();

@@ -31,6 +31,33 @@
 #include "player.h"
 #include "position.h"
 
+/// Struct that stores critical Game class data
+struct GameData {
+	/// Amount of turns total
+	int turnCount;
+	
+	/// The current turn
+	int currentTurn;
+	
+	/// Amount of actions total
+	int actionCount;
+	
+	/// The current action for active player
+	int currentAction;
+	
+	/// Amount of players
+	int playerCount;
+	
+	/// The active player that saved the game last
+	int currentPlayer;
+	
+	/// The amount of timeTicks that passed
+	int timeTicks;
+	
+	/// Time of day
+	bool day;
+};
+
 /** Class that controls all aspects of the game.
   * This is an important class that pretty much serves as the "core" of
   * Console RPG. All events, such as battles, are handled through this
@@ -41,7 +68,7 @@ class Game {
 		/** Constructor
 		  * \param map An instance of a Map class to be used in the game
 		*/
-		Game(Map *map): gmap(map), ep(), timeTicks(0), day(true) { MutexInit(mutex); };
+		Game(Map *map);
 		
 		/// Destructor
 		virtual ~Game() {};
@@ -57,12 +84,12 @@ class Game {
 		/** Set the amount of time ticks
 		  * \param ticks The amount of ticks
 		*/
-		void setTimeTicks(int ticks) { timeTicks=ticks; };
+		void setTimeTicks(int ticks) { gdata.timeTicks=ticks; };
 		
 		/** Get the amount of time ticks
 		  * \return Time ticks
 		*/
-		int getTimeTicks() const { return timeTicks; };
+		int getTimeTicks() const { return gdata.timeTicks; };
 		
 		/// Lock the Game mutex
 		void lock() { LockMutex(mutex); };
@@ -76,7 +103,7 @@ class Game {
 		void appendEvent(Event *e) { ep.appendEvent(e); };
 		
 		/** Function to change the time of day */
-		void changeDay() { day=day ? false : true; };
+		void changeDay() { gdata.day=gdata.day ? false : true; };
 		
 		/// Function that saves a game to file
 		void saveGame(std::string path);
@@ -125,20 +152,8 @@ class Game {
 		void creatureLook(Creature*);
 		void printMovementMessage(int move_code, const Direction dir);
 		
-		/// Amount of actions before the turn ends
-		int actionCount;
-		
-		/// Amount of players
-		int playerCount;
-		
-		/// Amount of turns maximum before the game ends
-		int turnCount;
-		
-		/// Time ticks
-		int timeTicks;
-		
-		/// Time of day
-		bool day;
+		/// Game data struct
+		struct GameData gdata;
 		
 		/// Vector of players
 		std::vector<Player*> players;
