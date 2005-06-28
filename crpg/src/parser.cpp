@@ -16,54 +16,54 @@
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/ 
-// definitions.h: various definitions
+ ***************************************************************************/
+// parser.cpp: implementations of Parser class
 
-#ifndef DEFINITIONS_H
-#define DEFINITIONS_H 
+#include "exception.h"
+#include "parser.h"
 
-#include <iostream>
+// constructor
+Parser::Parser(std::string path): filePath(path) {
+	lState=lua_open();
+	
+	// try to load the file
+	if (lua_dofile(lState, path.c_str()))
+		throw CLoadErrorEx();
+};
 
-// version
-const std::string version="0.3.0";
+// destructor
+Parser::~Parser() {
+	if (lState)
+		lua_close(lState);
+};
+ 
+// function to get a string value from the lua state
+std::string Parser::getStringValue(std::string variable) {
+	lua_getglobal(lState, variable.c_str());
+	
+	// get the string length
+	int length=(int) lua_strlen(lState, -1);
+	
+	// create a new std::string
+	std::string s(lua_tostring(lState, -1), length);
+	
+	// remove this from the stack
+	lua_pop(lState, 1);
+	
+	// return this string
+	return s;
+};
 
-// clear screen macro for linux
-#ifdef __LINUX__
-#define CRPG_CLEAR_SCREEN system("clear")
-#endif
-
-// clear screen macro for win32
-#ifdef __WIN32__
-#define CRPG_CLEAR_SCREEN system("cls")
-#endif
-
-// game class defines
-// define's for menu
-#define GAME_MENU_NEW_GAME	1
-#define GAME_MENU_LOAD_GAME	2
-#define GAME_MENU_OPTIONS	3
-
-// different types of situations that could result from movement
-#define GAME_MOVEMENT_OUT_OF_BOUNDS	0
-#define GAME_MOVEMENT_OK		1
-#define GAME_MOVEMENT_BLOCKING_SPACE	2
-
-// map load methods
-#define MAP_LOAD_METHOD_BINARY	0
-#define MAP_LOAD_METHOD_XML	1
-
-// skills
-#define SKILL_DEFENSE	0
-#define SKILL_LUCK	1
-#define SKILL_POWER	2
-#define SKILL_STRENGTH	3
-
-// player equipment slots
-#define PLAYER_SLOT_HEAD	0
-#define PLAYER_SLOT_TORSO	1
-#define PLAYER_SLOT_LEFT_ARM	2
-#define PLAYER_SLOT_RIGHT_ARM	3
-#define PLAYER_SLOT_LEGS	4
-#define PLAYER_SLOT_BOOTS	5
-
-#endif
+// function to get an int value from the lua state
+int Parser::getIntegralValue(std::string variable) {
+	lua_getglobal(lState, variable.c_str());
+	
+	// get this value via lua_tonumber()
+	int val=(int) lua_tonumber(lState, -1);
+	
+	// remove this from the stack
+	lua_pop(lState, 1);
+	
+	// return the value
+	return val;
+};

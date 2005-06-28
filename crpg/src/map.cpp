@@ -26,12 +26,15 @@
 #include "map.h"
 
 // constructor 
-Map::Map(int width, int height): mapWidth(width), mapHeight(height) {
+Map::Map(int width, int height, int loadMethod, std::string path): mapWidth(width), mapHeight(height) {
 	MutexInit(mutex);
 
 	try {
-		//loadItemsFromXML("itemdb.xml");
-		loadItemsFromBinary("items.db");
+		if (loadMethod==MAP_LOAD_METHOD_XML)
+			loadItemsFromXML(path);
+		
+		else if (loadMethod==MAP_LOAD_METHOD_BINARY)
+			loadItemsFromBinary(path);
 	}
 	
 	// catch exceptions
@@ -171,6 +174,10 @@ bool Map::removeEnemy(Position pos) {
 
 // function that loads an item database from file
 void Map::loadItemsFromXML(std::string file) {
+	#ifdef DEBUG
+	std::cout << "Loading items from XML...\n";
+	#endif
+	
 	xmlDocPtr doc=xmlParseFile(file.c_str());
 	
 	if (doc) {
@@ -235,6 +242,10 @@ void Map::loadItemsFromXML(std::string file) {
 
 // function to load items from a binary file
 void Map::loadItemsFromBinary(std::string file) {
+	#ifdef DEBUG
+	std::cout << "Loading items from binary file...\n";
+	#endif
+	
 	FILE *f=fopen(file.c_str(), "r");
 	if (f) {
 		// first 4 bytes are the header

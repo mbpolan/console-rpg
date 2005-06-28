@@ -50,8 +50,8 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_crpg2_OBJECTS = crpg.$(OBJEXT) enemy.$(OBJEXT) events.$(OBJEXT) \
 	eventprocessor.$(OBJEXT) game.$(OBJEXT) item.$(OBJEXT) \
-	map.$(OBJEXT) player.$(OBJEXT) threads.$(OBJEXT) \
-	timer.$(OBJEXT) utilities.$(OBJEXT)
+	map.$(OBJEXT) parser.$(OBJEXT) player.$(OBJEXT) \
+	threads.$(OBJEXT) timer.$(OBJEXT) utilities.$(OBJEXT)
 crpg2_OBJECTS = $(am_crpg2_OBJECTS)
 crpg2_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -61,8 +61,9 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/eventprocessor.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/events.Po ./$(DEPDIR)/game.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/item.Po ./$(DEPDIR)/map.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/player.Po ./$(DEPDIR)/threads.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/timer.Po ./$(DEPDIR)/utilities.Po
+@AMDEP_TRUE@	./$(DEPDIR)/parser.Po ./$(DEPDIR)/player.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/threads.Po ./$(DEPDIR)/timer.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/utilities.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -150,7 +151,7 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-AM_CXXFLAGS = -D__LINUX__ 
+AM_CXXFLAGS = -D__LINUX__ -llua -llualib -ldl
 #AM_CXX_FLAGS = -D__LINUX__ -DDEBUG
 crpg2_LDFLAGS = -lxml2 
 crpg2_SOURCES = creature.h \
@@ -166,6 +167,7 @@ crpg2_SOURCES = creature.h \
 		itemmodel.h \
 		map.cpp map.h \
 		object.h \
+		parser.cpp parser.h \
 		player.cpp player.h \
 		position.h \
 		threads.cpp threads.h \
@@ -246,6 +248,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/game.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/item.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/map.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/player.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/threads.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timer.Po@am__quote@

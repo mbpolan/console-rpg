@@ -38,6 +38,9 @@ namespace Utilities {
 	
 	/// Convert an int to VOCATION
 	VOCATION itov(int num);
+	
+	/// Convert a map load method to int
+	int mtoi(std::string method);
 };
 
 #endif

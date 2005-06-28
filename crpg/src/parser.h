@@ -16,54 +16,55 @@
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/ 
-// definitions.h: various definitions
+ ***************************************************************************/
+// parser.h: the Parser class
 
-#ifndef DEFINITIONS_H
-#define DEFINITIONS_H 
+#ifndef PARSER_H
+#define PARSER_H
 
 #include <iostream>
 
-// version
-const std::string version="0.3.0";
+extern "C" {
+#include <lualib.h>
+#include <lauxlib.h> 
+#include <lua.h>
+};
 
-// clear screen macro for linux
-#ifdef __LINUX__
-#define CRPG_CLEAR_SCREEN system("clear")
-#endif
-
-// clear screen macro for win32
-#ifdef __WIN32__
-#define CRPG_CLEAR_SCREEN system("cls")
-#endif
-
-// game class defines
-// define's for menu
-#define GAME_MENU_NEW_GAME	1
-#define GAME_MENU_LOAD_GAME	2
-#define GAME_MENU_OPTIONS	3
-
-// different types of situations that could result from movement
-#define GAME_MOVEMENT_OUT_OF_BOUNDS	0
-#define GAME_MOVEMENT_OK		1
-#define GAME_MOVEMENT_BLOCKING_SPACE	2
-
-// map load methods
-#define MAP_LOAD_METHOD_BINARY	0
-#define MAP_LOAD_METHOD_XML	1
-
-// skills
-#define SKILL_DEFENSE	0
-#define SKILL_LUCK	1
-#define SKILL_POWER	2
-#define SKILL_STRENGTH	3
-
-// player equipment slots
-#define PLAYER_SLOT_HEAD	0
-#define PLAYER_SLOT_TORSO	1
-#define PLAYER_SLOT_LEFT_ARM	2
-#define PLAYER_SLOT_RIGHT_ARM	3
-#define PLAYER_SLOT_LEGS	4
-#define PLAYER_SLOT_BOOTS	5
+/** A simple Lua file parser.
+  * The Parser class does the job of loading and getting
+  * attributes from Lua files. When you call Parser's constructor,
+  * make sure to specify the path to a file that you wish to load.
+  * If the path points to an invalid file, an instance of CLoadErrorEx
+  * will be thrown.
+*/
+class Parser {
+	public:
+		/** Constructor
+		  * \param path The path to the target file
+		*/
+		Parser(std::string path);
+		
+		/// Destructor
+		virtual ~Parser();
+		
+		/** Get a string value from the file
+		  * \param variable The variable to lookup
+		  * \return The string attribute associated with the target variable
+		*/
+		std::string getStringValue(std::string variable);
+		
+		/** Get an integral value from the file
+		  * \param variable The variable to lookup
+		  * \return The integral attribute associated with the target variable
+		*/
+		int getIntegralValue(std::string variable);
+		
+	protected:
+		/// Instance of lua_State
+		lua_State *lState;
+		
+		/// The path to the loaded file
+		std::string filePath;
+};
 
 #endif

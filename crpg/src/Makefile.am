@@ -1,6 +1,6 @@
 bin_PROGRAMS = crpg2
 
-AM_CXXFLAGS = -D__LINUX__ 
+AM_CXXFLAGS = -D__LINUX__ -llua -llualib -ldl
 #AM_CXX_FLAGS = -D__LINUX__ -DDEBUG
 crpg2_LDFLAGS =  -lxml2 
 
@@ -17,6 +17,7 @@ crpg2_SOURCES = creature.h \
 		itemmodel.h \
 		map.cpp map.h \
 		object.h \
+		parser.cpp parser.h \
 		player.cpp player.h \
 		position.h \
 		threads.cpp threads.h \

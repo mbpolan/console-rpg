@@ -21,8 +21,12 @@
 
 #include <iostream>
 #include "definitions.h"
+#include "exception.h"
 #include "game.h"
 #include "map.h"
+#include "parser.h"
+#include "utilities.h"
+using namespace Utilities;
 
 // main
 int main(int argc, char *argv[]) {
@@ -31,8 +35,30 @@ int main(int argc, char *argv[]) {
 		  << "   Console RPG version " << version << "\n"
 		  << "~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=\n\n";
 	
+	// create a lua parser
+	std::string path, method;
+	try {
+		Parser p("crpg.cfg");
+		
+		method=p.getStringValue("itemdb_type");
+		path=p.getStringValue("itemdb_path");
+	}
+	
+	// catch exceptions
+	catch (const CLoadErrorEx &e) {
+		std::cout << "Exception caught: " << e.what() << std::endl;
+		exit(1);
+	}
+	
+	// check the method
+	int loadMethod=mtoi(method);
+	if (loadMethod < 0 || loadMethod > 1) {
+		std::cout << "Invalid item database load method!\n";
+		exit(1);
+	}
+	
 	// create a 50x50 map
-	Map *map=new Map(50, 50);
+	Map *map=new Map(50, 50, loadMethod, path);
 	
 	// create a new game object
 	Game *game=new Game(map);

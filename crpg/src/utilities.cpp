@@ -19,6 +19,7 @@
  ***************************************************************************/ 
 // utilities.h: implementations of Utilities namespace functions
 
+#include "definitions.h"
 #include "utilities.h" 
  
 // check to see if this word has a vowel in the beginning
@@ -61,4 +62,17 @@ VOCATION Utilities::itov(int num) {
 		case VOCATION_PALADIN: return VOCATION_PALADIN;
 		case VOCATION_MAGE: return VOCATION_MAGE;
 	}
+};
+
+// convert a load method to int
+int Utilities::mtoi(std::string method) {
+	std::transform(method.begin(), method.end(), method.begin(), tolower);
+	if (method=="binary")
+		return MAP_LOAD_METHOD_BINARY;
+	
+	else if (method=="xml")
+		return MAP_LOAD_METHOD_XML;
+	
+	else
+		return -1;
 };

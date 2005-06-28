@@ -24,6 +24,7 @@
 
 #include <list>
 #include <map>
+#include "definitions.h"
 #include "enemy.h"
 #include "item.h"
 #include "itemmodel.h"
@@ -54,8 +55,10 @@ class Map {
 		  * <i>height</i> tiles high.
 		  * \param width The width in tiles
 		  * \param height The height in tiles
+		  * \param loadMethod The method used to load the item database
+		  * \param path Path to the item database file
 		*/
-		Map(int width, int height);
+		Map(int width, int height, int loadMethod, std::string path);
 		
 		/// Destructor
 		virtual ~Map();
