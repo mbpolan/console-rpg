@@ -47,12 +47,12 @@ int Threads::CreateThread(TVoid (*function) (void*), void *data) {
 }; 
 
 // check threads for equality of ID's
+#ifdef __LINUX__
 int Threads::ThreadsEqual(TThread &thread1, TThread &thread2) {
-	#ifdef __LINUX__
 	// check if both thread id's are the same
 	return (pthread_equal(thread1, thread2));
-	#endif
 };
+#endif
 
 // function to initialze a mutex
 void Threads::MutexInit(TMutex &m) {
@@ -102,10 +102,10 @@ void Threads::UnlockMutex(TMutex &m) {
 	#endif
 };
 
+#ifdef __LINUX__
 // join two threads
 int Threads::JoinThreads(TThread &t, void** status) {
-	#ifdef __LINUX__
 	// join threads
 	return (pthread_join(t, status));
-	#endif
 };
+#endif
