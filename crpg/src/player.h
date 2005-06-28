@@ -23,6 +23,7 @@
 #define PLAYER_H
 
 #include <iostream>
+#include "container.h"
 #include "creature.h"
 #include "definitions.h"
 #include "item.h"
@@ -156,6 +157,9 @@ class Player: public Creature {
 		  * \return A pointer to the requested item
 		*/
 		Item *itemAt(int slot) { return equipment[slot]; };
+		
+		/// Backpack
+		Container *bp;
 		
 	protected:
 		/// Magic points

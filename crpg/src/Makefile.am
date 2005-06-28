@@ -4,7 +4,8 @@ AM_CXXFLAGS = -D__LINUX__ -llua -llualib -ldl
 #AM_CXX_FLAGS = -D__LINUX__ -DDEBUG
 crpg2_LDFLAGS =  -lxml2 
 
-crpg2_SOURCES = creature.h \
+crpg2_SOURCES = container.cpp container.h \
+		creature.h \
                 crpg.cpp \
 		definitions.h \
 		enemy.cpp enemy.h \

@@ -48,17 +48,17 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_crpg2_OBJECTS = crpg.$(OBJEXT) enemy.$(OBJEXT) events.$(OBJEXT) \
-	eventprocessor.$(OBJEXT) game.$(OBJEXT) item.$(OBJEXT) \
-	map.$(OBJEXT) parser.$(OBJEXT) player.$(OBJEXT) \
+am_crpg2_OBJECTS = container.$(OBJEXT) crpg.$(OBJEXT) enemy.$(OBJEXT) \
+	events.$(OBJEXT) eventprocessor.$(OBJEXT) game.$(OBJEXT) \
+	item.$(OBJEXT) map.$(OBJEXT) parser.$(OBJEXT) player.$(OBJEXT) \
 	threads.$(OBJEXT) timer.$(OBJEXT) utilities.$(OBJEXT)
 crpg2_OBJECTS = $(am_crpg2_OBJECTS)
 crpg2_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/crpg.Po ./$(DEPDIR)/enemy.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/eventprocessor.Po \
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/container.Po ./$(DEPDIR)/crpg.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/enemy.Po ./$(DEPDIR)/eventprocessor.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/events.Po ./$(DEPDIR)/game.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/item.Po ./$(DEPDIR)/map.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/parser.Po ./$(DEPDIR)/player.Po \
@@ -154,7 +154,8 @@ target_alias = @target_alias@
 AM_CXXFLAGS = -D__LINUX__ -llua -llualib -ldl
 #AM_CXX_FLAGS = -D__LINUX__ -DDEBUG
 crpg2_LDFLAGS = -lxml2 
-crpg2_SOURCES = creature.h \
+crpg2_SOURCES = container.cpp container.h \
+		creature.h \
                 crpg.cpp \
 		definitions.h \
 		enemy.cpp enemy.h \
@@ -241,6 +242,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/container.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/crpg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/enemy.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eventprocessor.Po@am__quote@

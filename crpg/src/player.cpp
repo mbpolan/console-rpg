@@ -24,16 +24,19 @@
 
 // default constructor for Player
 Player::Player(): Creature(), traits(0, 0, 0, 0) {
+	bp=new Container(PLAYER_BACKPACK_SIZE);
 };
 
 // constructor taking various parameters
 Player::Player(std::string _name, Position pos, PlayerTraits ptraits, int hp, int hpNow, int mp, int mpNow): 
 		Creature(_name, pos, hp, hpNow), traits(ptraits), maxMagicPts(mp), magicPts(mpNow) {
+	bp=new Container(PLAYER_BACKPACK_SIZE);
 };
 
 // destructor
 Player::~Player() {
 	delete [] equipment;
+	delete bp;
 };
 
 // function to equip an item

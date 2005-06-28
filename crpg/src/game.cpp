@@ -106,6 +106,13 @@ void Game::saveGame(std::string path) {
 				// save equipment by id
 				for (int j=0; j<6; j++)
 					fputc(p->isEquipped(j) ? p->itemAt(j)->getID() : 0x00, f);
+				
+				// save backpack by id
+				fputc(p->bp->size(), f);
+				for (int j=0; j<p->bp->size(); j++)
+					fputc(p->bp->getItemByPos(j)->getID(), f);
+				
+				fputc(0x00, f);
 			}
 		}
 		std::cout << " done\nSaving map...";
@@ -220,6 +227,17 @@ void Game::loadGame(std::string path) {
 						p->equip(j, Map::createItem(gmap, id, Position(0xFFFF, 0xFFFF, 0x00)));
 				}
 			}
+			
+			// backpack
+			length=fgetc(f);
+			for (int j=0; j<length; j++) {
+				int id=fgetc(f);
+				if (Map::createItem(gmap, id, Position(0xFFFF, 0xFFFF, 0x00)))
+					p->bp->addItem(Map::createItem(gmap, id, Position(0xFFFF, 0xFFFF, 0x00)));
+			}
+			
+			// end byte
+			fgetc(f);
 			
 			// store the player
 			players.push_back(p);
@@ -489,6 +507,27 @@ void Game::initLoop() {
 				else if (action=="stats") {
 					std::cout << "------------------\n";
 					creatureDisplayStats(players[p]);
+					std::cout << "------------------\n";
+				}
+				
+				// display contents of backpack
+				else if (action=="bp") {
+					std::cout << "------------------\n";
+					players[p]->bp->displayContents();
+					std::cout << "------------------\n";
+				}
+				
+				// add an item to backpack
+				else if (action=="add") {
+					std::cout << "------------------\n";
+					creatureAddItem(players[p]);
+					std::cout << "------------------\n";
+				}
+				
+				// remove an item from backpack
+				else if (action=="remove") {
+					std::cout << "------------------\n";
+					creatureRemoveItem(players[p]);
 					std::cout << "------------------\n";
 				}
 				
@@ -768,6 +807,82 @@ int Game::creatureMoveSoutheast(Creature *c) {
 	c->position.y+=1;
 	c->position.x-=1;
 	return GAME_MOVEMENT_OK;
+};
+
+// function to add an item to a player's backpack
+void Game::creatureAddItem(Creature *c) {
+	Player *p=dynamic_cast<Player*> (c);
+	if (p) {
+		if (gmap->getItem(p->position)) {
+			Item *item=gmap->getItem(p->position);
+			if (item->isUsable()) {
+				if (p->bp->canAddItem()) {
+					p->bp->addItem(item);
+					gmap->removeItem(p->position);
+					std::cout << "You added " << item->getName() << " to your backpack.\n";
+				}
+				
+				else if (!p->bp->canAddItem())
+					std::cout << "You can't add anymore items into your backpack.\n";
+				
+				return;
+			}
+			
+			std::cout << "You can't add this item to your backpack.\n";
+		}
+		
+		else
+			std::cout << "There are no items here that you can add to your backpack\n";
+		
+		return;
+	}
+};
+
+// function to remove an item from a player's backpack
+void Game::creatureRemoveItem(Creature *c) {
+	Player *p=dynamic_cast<Player*> (c);
+	if (p) {
+		int slot;
+		p->bp->displayContents();
+		
+		// if the backpack is empty, then return
+		if (p->bp->empty())
+			return;
+		
+		// lock the user until we get a valid slot or he aborts
+		while(1) {
+			std::cout << "Slot to remove (0 to abort): ";
+			std::cin >> slot;
+			
+			// check if we want to abort this function
+			if (slot==0)
+				return;
+			
+			// verify the slot
+			else if (slot < 1 || slot > p->bp->size()) {
+				std::cout << "Invalid slot.\n";
+				continue;
+			}
+			
+			else
+				break;
+		}
+		
+		// sync the slot with the backpack's contents
+		slot-=1;
+		
+		// remove the target item
+		Item *item=p->bp->getItemByPos(slot);
+		p->bp->removeItemByPos(slot);
+		
+		// change the items' position
+		item->position=p->position;
+		
+		// put it back on the map
+		gmap->placeItem(item);
+		
+		std::cout << "You removed " << item->getName() << std::endl;
+	}
 };
 
 // function to show a creature's inventory

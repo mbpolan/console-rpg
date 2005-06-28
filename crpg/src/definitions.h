@@ -58,6 +58,9 @@ const std::string version="0.3.0";
 #define SKILL_POWER	2
 #define SKILL_STRENGTH	3
 
+// maximum size for a player's backpack
+#define PLAYER_BACKPACK_SIZE	8
+
 // player equipment slots
 #define PLAYER_SLOT_HEAD	0
 #define PLAYER_SLOT_TORSO	1

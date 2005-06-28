@@ -142,9 +142,11 @@ class Game {
 		int creatureMoveNortheast(Creature*);
 		int creatureMoveSouthwest(Creature*);
 		int creatureMoveSoutheast(Creature*);
+		void creatureAddItem(Creature*);
 		void creatureDisplayInventory(Creature*);
 		void creatureDisplayStats(Creature*);
 		void creatureEquipItem(Creature*);
+		void creatureRemoveItem(Creature*);
 		void creatureUnequipItem(Creature*);
 		void creatureLook(Creature*);
 		void printMovementMessage(int move_code, const Direction dir);
