@@ -41,6 +41,7 @@ Map::Map(int width, int height, int loadMethod, std::string path): mapWidth(widt
 	// load error
 	catch (const CLoadErrorEx &e) {
 		std::cout << "Error loading item database: " << e.what() << std::endl;
+		std::cin.get();
 		if (e.isFatal())
 			exit(1);
 	}

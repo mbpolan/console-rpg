@@ -47,6 +47,7 @@ int main(int argc, char *argv[]) {
 	// catch exceptions
 	catch (const CLoadErrorEx &e) {
 		std::cout << "Exception caught: " << e.what() << std::endl;
+		std::cin.get();
 		exit(1);
 	}
 	
@@ -54,6 +55,7 @@ int main(int argc, char *argv[]) {
 	int loadMethod=mtoi(method);
 	if (loadMethod < 0 || loadMethod > 1) {
 		std::cout << "Invalid item database load method!\n";
+		std::cin.get();
 		exit(1);
 	}
 	
