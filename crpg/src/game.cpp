@@ -719,7 +719,7 @@ int Game::runMenu() {
 		// parse the option
 		op=atoi(buffer.c_str());
 		
-		//clearScreen(); // TODO: clear the screen
+		CRPG_CLEAR_SCREEN;
 		
 		// check if it is valid
 		if (op > 0 && op < 5)
