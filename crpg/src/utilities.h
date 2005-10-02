@@ -41,6 +41,9 @@ namespace Utilities {
 	
 	/// Convert a map load method to int
 	int mtoi(std::string method);
+	
+	/// Get a random number from a given range
+	int randomRange(int low, int hi);
 };
 
 #endif

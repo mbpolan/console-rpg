@@ -23,6 +23,9 @@
 
 // constructor
 Enemy::Enemy(std::string name, int hpNow, int hpMax, Position pos): Creature(name, pos, hpMax, hpNow) {
+	lowestHit=0;
+	highestHit=20;
+	expGiven=10;
 };
 
 // destructor

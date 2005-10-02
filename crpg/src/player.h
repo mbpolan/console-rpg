@@ -51,13 +51,17 @@ class PlayerTraits {
 		PlayerTraits(int _luck, int _strength, int _power, int _defense,
 			     int _luckBoost=0, int _strBoost=0, int _powBoost=0, int _defBoost=0):
 			     luck(_luck), strength(_strength), power(_power), defense(_defense),
-			     luckBoost(_luckBoost), strengthBoost(_strBoost), powerBoost(_powBoost), defenseBoost(_defBoost) {};
+			     luckBoost(_luckBoost), strengthBoost(_strBoost), powerBoost(_powBoost), defenseBoost(_defBoost),
+			     luckTry(0), strengthTry(0), powerTry(0), defenseTry(0) {};
 		
 		/// Skill levels
 		int luck, strength, power, defense;
 		
 		/// Skill boosts
 		int luckBoost, strengthBoost, powerBoost, defenseBoost;
+		
+		/// Skill tries
+		int luckTry, strengthTry, powerTry, defenseTry;
 		
 		/// Get the total skill level including boosts for that skill
 		int getTotal(int skill) {
@@ -157,6 +161,9 @@ class Player: public Creature {
 		  * \return A pointer to the requested item
 		*/
 		Item *itemAt(int slot) { return equipment[slot]; };
+		
+		/// Function called mostly when a player is killed; resets stats
+		void reset();
 		
 		/// Backpack
 		Container *bp;

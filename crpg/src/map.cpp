@@ -373,6 +373,12 @@ void Map::spawnMapItems(int amount) {
 		// sword and shield debug items
 		placeItem(Map::createItem(this, 100, Position(1, 1, 0)));
 		placeItem(Map::createItem(this, 110, Position(1, 2, 0)));
+		
+		// test food
+		Item *t=new Item(5000, "Cake", Position(15, 15, 0), true);
+		t->setPower(5);
+		t->setStrength(3);
+		placeItem(t);
 		//#endif
 	}
 };
@@ -390,4 +396,7 @@ void Map::spawnEnemies(int amount) {
 		placeEnemy(new Enemy("Enemy", 100, 100, Position(x, y, z)));
 		
 	}
+	
+	// test enemy
+	placeEnemy(new Enemy("Cat", 100, 100, Position(10, 10, 0)));
 };

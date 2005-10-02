@@ -37,6 +37,16 @@ const std::string version="0.3.0";
 #define CRPG_CLEAR_SCREEN system("cls")
 #endif
 
+// sleep macro for linux
+#ifdef __LINUX__
+#define CRPG_SLEEP(x) sleep(x)
+#endif
+
+// sleep macro for wind32
+#ifdef __WIN32__
+#define CRPG_SLEEP(x) Sleep(x)
+#endif
+
 // game class defines
 // define's for menu
 #define GAME_MENU_NEW_GAME	1

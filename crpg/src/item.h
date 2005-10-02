@@ -28,7 +28,8 @@
 
 /// Enumerated types of items
 enum ITEM_TYPE { ITEM_NON_INT,	// not interactive
-		 ITEM_EQ	// equipment
+		 ITEM_EQ,	// equipment
+		 ITEM_FOOD	// recovery item
 	       };
 
 /** Class that represents an item.

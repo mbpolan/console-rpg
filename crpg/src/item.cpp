@@ -28,9 +28,13 @@ Item::Item(): Object(0, 0, 0), itemID(0), luck(0), defense(0), power(0), strengt
 // constructor taking three parameters
 Item::Item(int id, std::string name, Position pos, bool use): 
 	Object(pos.x, pos.y, pos.z), itemID(id), luck(0), defense(0), power(0), strength(0), itemName(name), usable(use) {
+	if (id>=5000)
+		type=ITEM_FOOD;
 };
 
 // constructor taking eight parameters
 Item::Item(int id, std::string name, Position pos, bool use, int _luck, int def, int pow, int str):
 	Object(pos.x, pos.y, pos.z), itemName(name), itemID(id), luck(_luck), defense(def), power(pow), strength(str) {
+	if (id>=5000)
+		type=ITEM_FOOD;
 };

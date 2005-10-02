@@ -149,6 +149,10 @@ class Game {
 		void creatureRemoveItem(Creature*);
 		void creatureUnequipItem(Creature*);
 		void creatureLook(Creature*);
+		void creatureInitBattle(Creature*, Enemy*);
+		void checkMovement(Creature*);
+		void beginBattleSequence(Player*, Enemy*);
+		void endBattleSequence(Player*, Enemy*);
 		void printMovementMessage(int move_code, const Direction dir);
 		
 		/// Game data struct

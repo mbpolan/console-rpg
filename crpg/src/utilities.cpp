@@ -76,3 +76,14 @@ int Utilities::mtoi(std::string method) {
 	else
 		return -1;
 };
+
+// get a random number based on a range
+int Utilities::randomRange(int low, int hi) {
+	srand(static_cast<unsigned> (time(NULL)));
+	
+	if(low>hi)
+		std::swap(low, hi);
+	
+	int range=hi-low+1;
+	return (low+(int) (range*(rand()/(RAND_MAX+1.0))));
+};

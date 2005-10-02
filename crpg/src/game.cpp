@@ -739,6 +739,7 @@ int Game::creatureMoveNorth(Creature *c) {
 		return GAME_MOVEMENT_OUT_OF_BOUNDS;
 	
 	c->position.x+=1;
+	checkMovement(c);
 	return GAME_MOVEMENT_OK;
 };
 
@@ -748,6 +749,7 @@ int Game::creatureMoveSouth(Creature *c) {
 		return GAME_MOVEMENT_OUT_OF_BOUNDS;
 		
 	c->position.x-=1;
+	checkMovement(c);
 	return GAME_MOVEMENT_OK;
 };
 
@@ -757,6 +759,7 @@ int Game::creatureMoveEast(Creature *c) {
 		return GAME_MOVEMENT_OUT_OF_BOUNDS;
 		
 	c->position.y+=1;
+	checkMovement(c);
 	return GAME_MOVEMENT_OK;
 };
 
@@ -766,6 +769,7 @@ int Game::creatureMoveWest(Creature *c) {
 		return GAME_MOVEMENT_OUT_OF_BOUNDS;
 	
 	c->position.y-=1;
+	checkMovement(c);
 	return GAME_MOVEMENT_OK;
 };
 
@@ -776,6 +780,7 @@ int Game::creatureMoveNorthwest(Creature *c) {
 	
 	c->position.y-=1;
 	c->position.x+=1;
+	checkMovement(c);
 	return GAME_MOVEMENT_OK;
 };
 
@@ -786,6 +791,7 @@ int Game::creatureMoveNortheast(Creature *c) {
 	
 	c->position.y+=1;
 	c->position.x+=1;
+	checkMovement(c);
 	return GAME_MOVEMENT_OK;
 };
 
@@ -796,6 +802,7 @@ int Game::creatureMoveSouthwest(Creature *c) {
 	
 	c->position.y-=1;
 	c->position.x-=1;
+	checkMovement(c);
 	return GAME_MOVEMENT_OK;
 };
 
@@ -806,6 +813,7 @@ int Game::creatureMoveSoutheast(Creature *c) {
 	
 	c->position.y+=1;
 	c->position.x-=1;
+	checkMovement(c);
 	return GAME_MOVEMENT_OK;
 };
 
@@ -1127,6 +1135,370 @@ void Game::creatureLook(Creature *c) {
 	
 	// print the ground type
 	std::cout << "You see grass." << std::endl; // TODO: different ground tiles
+};
+
+// function to handle beginnnings of a battle
+void Game::creatureInitBattle(Creature *c, Enemy *e) {
+	srand(time(NULL));
+	
+	// battles are always between a player and enemy,
+	// so cast these pointers appropriately
+	Player *p=dynamic_cast<Player*> (c);
+	
+	// make sure we can proceed
+	if (p) {
+		// buffer
+		std::string str;
+		std::cin.ignore();
+		
+		// see if this enemy should try to bail out
+		if (e->getHP() < p->getHP()-10) {
+			std::cout << "The enemy is trying to escape! Attack it nonetheless? (y/n): ";
+			std::getline(std::cin, str);
+			
+			// check the answer
+			if (str[0]!='y' && str[0]!='Y') {
+				std::cout << "\nYou let the enemy run away.\n";
+				return;
+			}
+		}
+		
+		// see if we are way weaker than the enemy
+		else if (e->getHP()+10 > p->getHP()) {
+			std::cout << "The enemy is rather strong. Fight anyway? (y/n): ";
+			std::getline(std::cin, str);
+			
+			// check answer
+			if (str[0]!='y' && str[0]!='Y') {
+				std::cout << "\nYou escape from the enemy.\n";
+				return;
+			}
+		}
+		
+		// see if we are evenly matched (chance for 1-hit KO)
+		else if (e->getHP()==p->getHP()) {
+			std::cout << "The enemy and you are evenly matched. Attempt an opening KO? (y/n): ";
+			std::getline(std::cin, str);
+			
+			// check answer
+			if (str[0]=='y' && str[0]=='Y') {
+				// try a 1-hit KO. if we fail, then we take 10hp damage
+				int ko=rand()%20;
+				
+				// success range
+				if (ko>=0 && ko<=10) {
+					std::cout << "\nYou have KO'ed the enemy!\n";
+					endBattleSequence(p, e);
+					return;
+				}
+				
+				// failed, take 10hp
+				else {
+					std::cout << "\nYou failed to KO the enemy! As a result, you are dealt 10hp damage.\n";
+					
+					// check if we are dead
+					if (p->getHP()-10<=0) {
+						endBattleSequence(p, e);
+						return;
+					}
+					
+					else
+						p->setHP(p->getHP()-10);
+				}
+			}
+		}
+		
+		// everything seems in order, continue on to the battle loop
+		beginBattleSequence(p, e);
+	}
+};
+
+// function to check movement
+void Game::checkMovement(Creature *c) {
+	Player *p=dynamic_cast<Player*> (c);
+	if (p) {
+		// check if an enemy is here
+		for (MapEnemyIterator it=gmap->enemies.begin(); it!=gmap->enemies.end(); ++it) {
+			if ((*it)->position.x==p->position.x && (*it)->position.y==p->position.y && 
+			    (*it)->position.z==p->position.z) {
+			    	Enemy *e=(*it);
+				
+				// start battle
+				std::cout << "<!> -- You encounter " << e->getName() << "! -- <!>\n";
+				creatureInitBattle(c, e);
+				break;
+			}
+		}
+	}
+};
+
+// function that controls main battle loop
+void Game::beginBattleSequence(Player *p, Enemy *e) {
+	CRPG_CLEAR_SCREEN;
+	
+	// turn counter
+	int turn=1;
+	
+	// player actions
+	bool def=false;
+	bool act=true;
+	
+	// buffer
+	std::string str;
+	
+	// main loop
+	while(1) {
+		// player's turn
+		if (turn) {
+			// option
+			int op=0;
+			
+			// loop until a valid answer is recieved
+			while(1) {
+				std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n"
+					  << "Battle: " << p->getName() << " vs " << e->getName() << std::endl
+					  << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
+				std::cout << "HP: " << p->getHP() << " / Enemy: " << e->getHP();
+				std::cout << "\n-----------------------------------\n";
+				std::cout << "\nChoose option:\n1) Attack\t2) Defend\n3) Item\t\t4) Run";
+				std::cout << "\n-----------------------------------\n> ";
+				std::getline(std::cin, str);
+				
+				// parse the choice
+				op=atoi(str.c_str());
+				str.clear();
+				
+				// check the input
+				if (op<1 || op>4) {
+					std::cout << "\nInvalid action!\n";
+					continue;
+				}
+				
+				else
+					break;
+			}
+			
+			// do action
+			switch(op) {
+				// attack enemy
+				case 0x01: {
+					while(1) {
+						std::cout << "\n=========\nAttack\n=========\n";
+						std::cout << "Choose attack type: 1) Strong\t2) Accurate\n> ";
+						std::getline(std::cin, str);
+						
+						// parse input
+						op=atoi(str.c_str());
+						
+						// check input
+						if (op<1 || op>2) {
+							std::cout << "\nInvalid choice!\n";
+							continue;
+						}
+						
+						else
+							break;
+					}
+					
+					// calculate the attack and damage
+					int dmg=0;
+					switch(op) {
+						// strong
+						case 0x01: dmg=p->getTraits().getTotal(SKILL_STRENGTH); break;
+						
+						// accurate
+						case 0x02: dmg=p->getTraits().getTotal(SKILL_POWER); break;
+					}
+					
+					// deal damage to monster
+					e->setHP(e->getHP()-dmg);
+					
+					std::cout << "\nYou deal " << dmg << " damage!\n";
+					
+					// check if this enemy is dead
+					if (e->getHP()<=0) {
+						endBattleSequence(p, e);
+						return;
+					}
+					act=true;
+				};
+				break;
+				
+				// defend enemy's attacks
+				case 0x02: {
+					def=true;
+					act=true;
+					std::cout << "\nYou prepare for " << e->getName() << "'s next attack...\n";
+				};
+				break;
+				
+				// use item
+				case 0x03: {
+					if (p->bp->empty()) {
+						std::cout << "\nYou have no items in your backpack.\n";
+						std::cout << "Press any key to continue the battle...\n";
+						std::cin.get();
+						
+						act=false;
+					}
+					
+					else {
+						// first, display contents
+						std::cout << std::endl;
+						p->bp->displayContents();
+						int pos=-1;
+						bool use=true;
+						
+						while(1) {
+							std::cout << "Use item (0 to return) > ";
+							
+							// get input
+							std::getline(std::cin, str);
+							pos=atoi(str.c_str());
+							
+							// check the input
+							if (pos<0 || pos>p->bp->size()) {
+								std::cout << "\nThat item does not exist in your backpack.\n";
+								continue;
+							}
+							
+							else if (pos==0) {
+								use=false;
+								act=false;
+								CRPG_CLEAR_SCREEN;
+								break;
+							}
+							
+							else
+								break;
+						}
+						
+						// are we trying to use an item?
+						if (use) {
+							// try to get the item
+							Item *item=p->bp->getItemByPos(pos-1);
+							if (!item)
+								std::cout << "\n*CRPG-ERROR* - " << __FILE__ << ": Item ! container\n";
+							
+							else {
+								// check if this item will have any recovery effect
+								if (item->getType()==ITEM_FOOD) {
+									int rec=(item->getPower()+item->getStrength())*2;
+									int hp=p->getHP();
+									
+									// check amount needed to recover
+									if (hp+rec>p->getMaxHP())
+										rec=(p->getMaxHP()-hp);
+									
+									// recover
+									p->setHP(p->getHP()+rec);
+									
+									std::cout << "\nYou recovered " << rec << " hitpoints.\n";
+									
+									// remove from bp
+									p->bp->removeItemByPos(pos-1);
+									act=true;
+								}
+							
+								else {
+									std::cout << "\nThat item is not edible.\n";
+									act=false;
+								}
+							}
+						}
+					}
+				};
+				break;
+				
+				// attempt run
+				case 0x04: {
+					// chances of escape
+					int chance=rand()%50;
+					
+					// success
+					if (chance>=0 && chance<=25) {
+						std::cout << "\nYou safely escape from the enemy.\n";
+						std::cout << "Press any key to return to the game world...\n";
+						std::cin.get();
+						
+						CRPG_CLEAR_SCREEN;
+						return;
+					}
+					
+					// failure
+					else 
+						std::cout << "\nYou fail to run away!\n";
+					act=true;
+				};
+				break;
+			}
+			
+			// change turn
+			if (act) {
+				turn=0;
+				act=true;
+			}
+			continue;
+		}
+		
+		// monster's turn
+		else {
+			// get highest and lowest hit from monster
+			int low=e->getLowestHit();
+			int hi=e->getHighestHit();
+			
+			// draw a random number
+			int dmg=randomRange(low, hi);
+			
+			// reduce damage by def skill if necessary
+			if (def) {
+				dmg-=p->getTraits().getTotal(SKILL_DEFENSE);
+				def=false;
+			}
+			
+			// modify damage if it is negative
+			if (dmg<0)
+				dmg=0;
+			
+			// deal damage
+			p->setHP(p->getHP()-dmg);
+			std::cout << std::endl << e->getName() << " attacks...";
+			
+			CRPG_SLEEP(1);
+			
+			std::cout << std::endl << e->getName() << " deals " << dmg << " damage!\n";
+			
+			// check if player is dead
+			if (p->getHP()<=0) {
+				endBattleSequence(p, e);
+				return;
+			}
+			
+			else {
+				std::cout << "\nPress any key to continue battle...\n";
+				std::cin.get();
+				
+				CRPG_CLEAR_SCREEN;
+				turn=1;
+			}
+		}
+	}
+};
+
+// function to handle the end of battle
+void Game::endBattleSequence(Player *p, Enemy *e) {
+	CRPG_CLEAR_SCREEN;
+	
+	// check who is dead
+	if (p->getHP()<=0) {
+		std::cout << "You are dead!\n";
+		p->reset();
+	}
+	
+	else {
+		std::cout << "You have defeated " << e->getName() << "!\n";
+		// TODO: distribute exp and skill bonuses
+	}
 };
 
 // function that displays an error message if needed about a move

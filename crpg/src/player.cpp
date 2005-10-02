@@ -96,3 +96,15 @@ bool Player::isEquipped(int slot) {
 	else
 		return true;
 };
+
+// function called when a player is killed
+void Player::reset() {
+	// reset hp and mp
+	magicPts=maxMagicPts;
+	setHP(getMaxHP());
+	
+	// reset position on map to 0,0,0
+	position.x=0;
+	position.y=0;
+	position.z=0;
+};
